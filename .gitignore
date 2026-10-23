@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+data/*.db
+data/*.db-*
+data/dtl_metadata_v0.9.csv
+.DS_Store
+*.log
+.qa/
