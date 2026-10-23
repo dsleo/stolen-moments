@@ -9,11 +9,11 @@ import sqlite3
 import threading
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from collections import Counter
 from pathlib import Path
-from urllib.parse import parse_qs, urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.parse import parse_qs, urlparse
 
-from . import VERSION
+from . import VERSION, covers
 from .corpus import ROOT, STORE, Solo, combined_source_checksum, load_combined_corpus, load_corpus, source_checksum
 from .mining import connect_store
 
@@ -35,13 +35,19 @@ class App:
         self.by_id = {r["id"]: r for r in self.rows}
         self.db_lock = threading.RLock()
         self.discovery_lock = threading.Lock()
-        self.cover_cache: dict[tuple[str, str, str], str | None] = {}
-        self.cover_image_cache: dict[tuple[str, str, str], tuple[bytes, str] | None] = {}
         self.meta = {r["key"]: r["value"] for r in self.db.execute("SELECT key,value FROM meta")}
         self.solos = (load_combined_corpus() if self.meta.get("source_sha256") == combined_source_checksum()
                       else load_corpus())
         if self.meta.get("source_sha256") not in {source_checksum(), combined_source_checksum()}:
             raise ValueError("The source database changed after indexing. Run `python3 -m jazzmine build`.")
+        # Per-pair facet values (either soloist counts), computed once.
+        self.performer_names = {s.performer.casefold(): s.performer for s in self.solos.values()}
+        def facet_values(r):
+            a, b = self.solos[r["a_melid"]], self.solos[r["b_melid"]]
+            return ({s.year // 10 * 10 for s in (a, b) if s.year},
+                    {s.instrument.casefold() for s in (a, b) if s.instrument},
+                    {s.performer.casefold() for s in (a, b)})
+        self.row_facets = {r["id"]: facet_values(r) for r in self.rows}
 
     def solo_summary(self, solo: Solo) -> dict:
         return {"melid": solo.melid, "trackid": solo.trackid, "performer": solo.performer,
@@ -49,63 +55,6 @@ class App:
                 "instrument": solo.instrument, "recording_date": solo.recording_date,
                 "year": solo.year, "musicbrainz_id": solo.musicbrainz_id,
                 "source": solo.source, "source_id": solo.source_id, "source_url": solo.source_url}
-
-    def album_cover(self, performer: str, album: str, title: str = "") -> str | None:
-        """Resolve a cover server-side so the local-file UI never depends on browser CORS."""
-        key = (performer.strip().lower(), album.strip().lower(), title.strip().lower())
-        if key in self.cover_cache:
-            return self.cover_cache[key]
-        if not performer.strip() or not album.strip():
-            self.cover_cache[key] = None
-            return None
-        try:
-            query = urlencode({"term": f"{performer} {album}", "entity": "album", "limit": "20"})
-            request = Request(f"https://itunes.apple.com/search?{query}", headers={"User-Agent": "MotifAtlas/0.1"})
-            with urlopen(request, timeout=8) as response:
-                results = json.load(response).get("results", [])
-            compact = lambda value: re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
-            wanted_album, surname = compact(album), compact(performer.split()[-1])
-            cover = next((item for item in results
-                          if surname in compact(item.get("artistName")) and wanted_album in compact(item.get("collectionName"))), None)
-            cover = cover or next((item for item in results if surname in compact(item.get("artistName"))), None)
-            if not cover and title:
-                recording_query = urlencode({"term": f"{performer} {title}", "entity": "song", "limit": "20"})
-                request = Request(f"https://itunes.apple.com/search?{recording_query}", headers={"User-Agent": "MotifAtlas/0.1"})
-                with urlopen(request, timeout=8) as response:
-                    recordings = json.load(response).get("results", [])
-                compact_title = compact(title)
-                cover = next((item for item in recordings
-                              if surname in compact(item.get("artistName")) and compact_title in compact(item.get("trackName"))), None)
-            image = cover.get("artworkUrl100") if cover else None
-            if image:
-                image = re.sub(r"/100x100(?:bb)?\.", "/600x600bb.", image)
-            self.cover_cache[key] = image
-            return image
-        except Exception:
-            self.cover_cache[key] = None
-            return None
-
-    def album_cover_image(self, performer: str, album: str, title: str = "") -> tuple[bytes, str] | None:
-        key = (performer.strip().lower(), album.strip().lower(), title.strip().lower())
-        if key in self.cover_image_cache:
-            return self.cover_image_cache[key]
-        url = self.album_cover(performer, album, title)
-        if not url:
-            self.cover_image_cache[key] = None
-            return None
-        try:
-            request = Request(url, headers={"User-Agent": "MotifAtlas/0.1"})
-            with urlopen(request, timeout=12) as response:
-                content = response.read()
-                mime = response.headers.get_content_type() or "image/jpeg"
-            if not content or not mime.startswith("image/"):
-                raise ValueError("Cover source did not return an image")
-            result = (content, mime)
-            self.cover_image_cache[key] = result
-            return result
-        except Exception:
-            self.cover_image_cache[key] = None
-            return None
 
     def parameters(self, query: dict[str, list[str]]) -> dict:
         def num(name, default, low, high, integral=False):
@@ -125,45 +74,68 @@ class App:
             "scope": query.get("scope", ["all"])[0],
             "composition": query.get("composition", ["distinct"])[0],
             "performer": query.get("performer", [""])[0].strip(),
+            "decade": num("decade", 0, 0, 3000, True),
+            "instrument": query.get("instrument", [""])[0].strip(),
             "sort": query.get("sort", ["score"])[0],
             "collection": query.get("collection", ["all"])[0],
             "limit": num("limit", 50, 1, 200, True),
             "offset": num("offset", 0, 0, 1000000, True),
         }
 
-    def filtered(self, p: dict) -> list[dict]:
-        out = []
+    def _base_ok(self, r: dict, p: dict) -> bool:
+        source_a = self.solos[r["a_melid"]].source
+        source_b = self.solos[r["b_melid"]].source
+        if p["collection"] == "wjazzd" and (source_a != "WJazzD" or source_b != "WJazzD"):
+            return False
+        if p["collection"] == "dtl" and (source_a != "DTL1000" or source_b != "DTL1000"):
+            return False
+        if p["collection"] == "cross" and source_a == source_b:
+            return False
+        if r["notes"] < p["min_notes"] or r["edits"] > p["max_edits"]:
+            return False
+        if r["pitch_similarity"] < p["min_pitch"] or r["rhythm_similarity"] < p["min_rhythm"]:
+            return False
+        if r["distinctiveness"] < p["min_distinct"] or r["heuristic_score"] < p["min_score"]:
+            return False
+        if p["scope"] == "same" and not r["same_performer"]:
+            return False
+        if p["scope"] == "cross" and r["same_performer"]:
+            return False
+        if p["composition"] == "distinct" and r["same_composition"]:
+            return False
+        if p["composition"] == "same" and not r["same_composition"]:
+            return False
+        if p["composition"] != "all" and r["same_track"]:
+            return False
+        return True
+
+    def _facet_flags(self, r: dict, p: dict) -> tuple[bool, bool, bool]:
+        decades, instruments, performers = self.row_facets[r["id"]]
+        return (not p["decade"] or p["decade"] in decades,
+                not p["instrument"] or p["instrument"].casefold() in instruments,
+                not p["performer"] or p["performer"].casefold() in performers)
+
+    def facets(self, query: dict[str, list[str]]) -> dict:
+        """Counts per facet value; each facet is counted under the other facets' selections."""
+        p = self.parameters(query)
+        counts = {"decade": Counter(), "instrument": Counter(), "performer": Counter()}
         for r in self.rows:
-            source_a = self.solos[r["a_melid"]].source
-            source_b = self.solos[r["b_melid"]].source
-            if p["collection"] == "wjazzd" and (source_a != "WJazzD" or source_b != "WJazzD"):
+            if not self._base_ok(r, p):
                 continue
-            if p["collection"] == "dtl" and (source_a != "DTL1000" or source_b != "DTL1000"):
-                continue
-            if p["collection"] == "cross" and source_a == source_b:
-                continue
-            if r["notes"] < p["min_notes"] or r["edits"] > p["max_edits"]:
-                continue
-            if r["pitch_similarity"] < p["min_pitch"] or r["rhythm_similarity"] < p["min_rhythm"]:
-                continue
-            if r["distinctiveness"] < p["min_distinct"] or r["heuristic_score"] < p["min_score"]:
-                continue
-            if p["scope"] == "same" and not r["same_performer"]:
-                continue
-            if p["scope"] == "cross" and r["same_performer"]:
-                continue
-            if p["composition"] == "distinct" and r["same_composition"]:
-                continue
-            if p["composition"] == "same" and not r["same_composition"]:
-                continue
-            if p["composition"] != "all" and r["same_track"]:
-                continue
-            if p["performer"]:
-                name = p["performer"].casefold()
-                if name not in (self.solos[r["a_melid"]].performer.casefold(),
-                                self.solos[r["b_melid"]].performer.casefold()):
-                    continue
-            out.append(r)
+            fd, fi, fp = self._facet_flags(r, p)
+            decades, instruments, performers = self.row_facets[r["id"]]
+            if fi and fp:
+                counts["decade"].update(decades)
+            if fd and fp:
+                counts["instrument"].update(instruments)
+            if fd and fi:
+                counts["performer"].update(performers)
+        return {"decade": sorted(counts["decade"].items()),
+                "instrument": counts["instrument"].most_common(),
+                "performer": [[self.performer_names[k], n] for k, n in counts["performer"].most_common(40)]}
+
+    def filtered(self, p: dict) -> list[dict]:
+        out = [r for r in self.rows if self._base_ok(r, p) and all(self._facet_flags(r, p))]
         sorts = {"score": ("heuristic_score", "notes"), "length": ("notes", "heuristic_score"),
                  "rhythm": ("rhythm_similarity", "heuristic_score"),
                  "rare": ("distinctiveness", "heuristic_score")}
@@ -392,19 +364,14 @@ def serve(host: str = "127.0.0.1", port: int = 8766):
                                 "candidates": len(app.rows), "performers": sorted({s.performer for s in app.solos.values()}),
                                 "pipeline": app.meta.get("pipeline")})
                 elif url.path == "/api/cover-image":
-                    performer = q.get("performer", [""])[0]
-                    album = q.get("album", [""])[0]
-                    title = q.get("title", [""])[0]
-                    image = app.album_cover_image(performer, album, title)
+                    image = covers.get(q.get("performer", [""])[0], q.get("album", [""])[0], q.get("title", [""])[0])
+                    week = "public, max-age=604800"
                     if image:
-                        self._reply(image[0], mime=image[1])
+                        self._reply(image[0], mime=image[1], cache=week)
                     else:
-                        self._json({"error": "Album cover not found"}, 404)
-                elif url.path == "/api/cover":
-                    performer = q.get("performer", [""])[0]
-                    album = q.get("album", [""])[0]
-                    title = q.get("title", [""])[0]
-                    self._json({"url": app.album_cover(performer, album, title)})
+                        self._reply(b'{"error": "Album cover not found"}', 404, cache="public, max-age=3600")
+                elif url.path == "/api/facets":
+                    self._json(app.facets(q))
                 elif url.path == "/api/matches":
                     self._json(app.list_matches(q))
                 elif re.fullmatch(r"/api/matches/\d+", url.path):

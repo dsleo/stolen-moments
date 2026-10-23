@@ -21,6 +21,8 @@ def main():
     videos.add_argument("--limit", type=int, default=50)
     jazz = sub.add_parser("sync-jazztube", help="Import JazzTube's published solo/video alignments")
     jazz.add_argument("--csv", type=str, help="Use a previously downloaded JazzTube CSV")
+    warm = sub.add_parser("warm-covers", help="Fetch and cache covers for the top-ranked pairs")
+    warm.add_argument("--pairs", type=int, default=500, help="How many top-ranked pairs to cover")
     web = sub.add_parser("serve", help="Start the local web app")
     web.add_argument("--host", default="127.0.0.1")
     web.add_argument("--port", type=int, default=8766)
@@ -50,6 +52,17 @@ def main():
         from .corpus import STORE
         from .jazztube import sync
         print(json.dumps(sync(STORE, set(load_corpus()), Path(args.csv) if args.csv else None), indent=2))
+    elif args.command == "warm-covers":
+        from concurrent.futures import ThreadPoolExecutor
+        from . import covers
+        from .server import App
+        app = App()
+        top = sorted(app.rows, key=lambda r: -r["heuristic_score"])[:args.pairs]
+        wanted = {(s.performer, s.album or s.title, s.title) for r in top
+                  for s in (app.solos[r["a_melid"]], app.solos[r["b_melid"]])}
+        with ThreadPoolExecutor(4) as pool:
+            found = sum(1 for hit in pool.map(lambda w: covers.get(*w), sorted(wanted)) if hit)
+        print(json.dumps({"covers_wanted": len(wanted), "covers_found": found}))
     elif args.command == "serve":
         serve(args.host, args.port)
 

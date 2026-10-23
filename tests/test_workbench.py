@@ -139,6 +139,24 @@ class WorkbenchTests(unittest.TestCase):
                                        (10, 1, "BBBBBBBBBBB", 12, 32, None, None)])
         self.assertEqual(chosen[0][1:3], (1, "BBBBBBBBBBB"))
 
+    def test_cover_cache_remembers_hits_and_misses(self):
+        from jazzmine import covers
+        with tempfile.TemporaryDirectory() as tmp, patch.object(covers, "CACHE", Path(tmp)):
+            with patch.object(covers, "_find_artwork", return_value=None) as lookup:
+                self.assertIsNone(covers.get("A Player", "An Album"))
+                self.assertIsNone(covers.get("A Player", "An Album"))
+                self.assertEqual(lookup.call_count, 1)  # the miss is cached on disk
+            (Path(tmp) / f"{covers._key('B Player', 'Other', '')}.jpg").write_bytes(b"img")
+            self.assertEqual(covers.get("B Player", "Other"), (b"img", "image/jpeg"))
+
+    def test_facets_count_pairs_per_decade_and_filter(self):
+        app = App()
+        facets = app.facets({})
+        self.assertEqual(sum(n for _, n in facets["decade"]) >= app.list_matches({})["total"], True)
+        fifties = app.list_matches({"decade": ["1950"], "instrument": ["ts"]})
+        self.assertGreater(fifties["total"], 0)
+        self.assertLess(fifties["total"], app.list_matches({})["total"])
+
 
 if __name__ == "__main__":
     unittest.main()

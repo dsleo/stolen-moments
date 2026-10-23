@@ -1,56 +1,11 @@
 const API_ORIGIN = location.protocol === 'file:' ? 'http://127.0.0.1:8766' : '';
 const apiURL = path => `${API_ORIGIN}${path}`;
-const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],artistImages:new Map(),albumImages:new Map()};
+const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
 const sec = n => {const t=Math.max(0,Math.round(n));return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
 const initials = name => String(name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase();
-const artistCatalog = {
-  'Charlie Parker': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/Portrait%20of%20Charlie%20Parker%20in%201947.jpg?width=640',source:'Wikimedia Commons',license:'Public domain',credit:'William P. Gottlieb / Library of Congress',page:'https://commons.wikimedia.org/wiki/File:Portrait_of_Charlie_Parker_in_1947.jpg'},
-  'Miles Davis': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/Miles%20Davis%20by%20Palumbo%20portrait%20head.jpg?width=640',source:'Wikimedia Commons',license:'CC BY-SA 2.0',credit:'Tom Palumbo',page:'https://commons.wikimedia.org/wiki/File:Miles_Davis_by_Palumbo_portrait_head.jpg'},
-  'John Coltrane': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/John%20Coltrane%201963a.jpg?width=640',source:'Wikimedia Commons',license:'CC BY-SA 3.0',credit:'Hugo van Gelderen',page:'https://commons.wikimedia.org/wiki/File:John_Coltrane_1963a.jpg'},
-  'Chet Baker': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/Chet%20Baker%201953.jpg?width=640',source:'Wikimedia Commons',license:'Public domain / Commons',credit:'Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/Category:Chet_Baker'},
-  'Dizzy Gillespie': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/Dizzy%20Gillespie%201956.jpg?width=640',source:'Wikimedia Commons',license:'Public domain / Commons',credit:'Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/Category:Dizzy_Gillespie'},
-  'Lester Young': {url:'https://commons.wikimedia.org/wiki/Special:FilePath/Lester%20Young%201943.jpg?width=640',source:'Wikimedia Commons',license:'Public domain / Commons',credit:'Wikimedia Commons',page:'https://commons.wikimedia.org/wiki/Category:Lester_Young'}
-};
-const catalogImage = name => artistCatalog[name] || null;
-const commonsSearch = async name => {
-  const key=String(name||'');
-  if(state.artistImages.has(key))return state.artistImages.get(key);
-  const fallback=catalogImage(key);
-  if(fallback){state.artistImages.set(key,fallback);return fallback}
-  try{
-    const endpoint='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrlimit=8&gsrsearch='+encodeURIComponent(`${key} jazz musician`)+'&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=640&format=json&origin=*';
-    const res=await fetch(endpoint); if(!res.ok)throw new Error('Commons unavailable');
-    const data=await res.json();
-    const surname=key.split(/\s+/).filter(Boolean).at(-1)?.toLowerCase()||key.toLowerCase();
-    const page=Object.values(data.query?.pages||{}).find(item=>{
-      const info=item.imageinfo?.[0], meta=info?.extmetadata||{};
-      const license=String(meta.LicenseShortName?.value||'').toLowerCase();
-      const title=String(item.title||'').toLowerCase();
-      return info && title.includes(surname) && /public domain|cc0|cc by|cc-by|cc-by-sa|gfdl/.test(license) && !/poster|album|cover|logo|flyer|venue|building|ticket/.test(title);
-    });
-    if(page){
-      const info=page.imageinfo[0],meta=info.extmetadata||{};
-      const result={url:info.thumburl||info.url,source:'Wikimedia Commons',license:String(meta.LicenseShortName?.value||'Open license'),credit:String(meta.Artist?.value||'Wikimedia Commons').replace(/<[^>]*>/g,''),page:`https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title.replaceAll(' ','_'))}`};
-      state.artistImages.set(key,result);return result;
-    }
-  }catch{}
-  state.artistImages.set(key,null);return null;
-};
-const albumKey = solo => `${solo.musicbrainz_id||''}|${solo.album||''}|${solo.title||''}`;
-const albumArt = async solo => {
-  const key=albumKey(solo);
-  if(state.albumImages.has(key))return state.albumImages.get(key);
-  try{
-    const query=new URLSearchParams({performer:solo.performer||'',album:solo.album||solo.title||'',title:solo.title||''});
-    const res=await fetch(apiURL(`/api/cover?${query}`));
-    const data=res.ok?await res.json():null;
-    if(data?.url){const result={url:apiURL(`/api/cover-image?${query}`),source:'Album archive'};state.albumImages.set(key,result);return result;}
-  }catch{}
-  state.albumImages.set(key,null);return null;
-};
 const recordingLink = (item,side) => {
   const s=item[side],recording=item[`recording_${side}`],time=item[`${side}_track_time`];
   const label=side.toUpperCase();
@@ -61,7 +16,7 @@ const recordingLink = (item,side) => {
 const params = () => ({scope:state.scope,composition:state.composition,collection:state.collection,max_edits:state.max_edits,
   min_notes:$('#min_notes').value,min_pitch:Number($('#min_pitch').value)/100,
   min_rhythm:Number($('#min_rhythm').value)/100,min_distinct:Number($('#min_distinct').value)/100,
-  performer:$('#performer').value,sort:$('#sort').value,limit:50,offset:state.offset});
+  performer:$('#performer').value,decade:state.decade,instrument:state.instrument,sort:$('#sort').value,limit:50,offset:state.offset});
 const query = p => new URLSearchParams(p).toString();
 let toastTimer;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3600)}
@@ -102,6 +57,7 @@ function row(item,index){
 async function load(append=false){
   const serial=++state.request;
   state.loading=true;
+  if(!append)refreshFacets(serial);
   if(!append)$('#results').innerHTML='<div class="empty">Reading the archive…</div>';
   try{
     const response=await fetch(apiURL('/api/matches?'+query(params())));
@@ -148,6 +104,26 @@ function setView(view){
 }
 document.addEventListener('error',e=>{if(e.target.matches?.('.sleeve img'))e.target.hidden=true},true);
 
+const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sax',tp:'Trumpet',tb:'Trombone',cl:'Clarinet',p:'Piano',g:'Guitar',vib:'Vibraphone',b:'Bass',fl:'Flute',cor:'Cornet',bcl:'Bass clarinet',voc:'Voice'};
+const FACETS={decade:{label:'Decade',name:v=>`${v}s`},instrument:{label:'Instrument',name:v=>INSTRUMENTS[v]||v.toUpperCase()},performer:{label:'Musician',name:v=>v}};
+const facetValue = kind => kind==='performer'?$('#performer').value:state[kind];
+async function refreshFacets(serial){
+  try{const res=await fetch(apiURL('/api/facets?'+query(params())));if(!res.ok)return;const data=await res.json();if(serial===state.request){state.facetData=data;renderShelf()}}catch{}
+}
+function renderShelf(){
+  const data=state.facetData;if(!data)return;
+  document.querySelectorAll('[data-facet-kind]').forEach(b=>{const k=b.dataset.facetKind;b.setAttribute('aria-pressed',String(k===state.facetKind));b.classList.toggle('has-pick',!!facetValue(k))});
+  const kind=state.facetKind,current=String(facetValue(kind)),{name}=FACETS[kind];
+  const chip=(value,label,count)=>`<button type="button" class="shelf-chip" data-facet-value="${esc(value)}" aria-pressed="${String(value)===current}">${esc(label)}${count==null?'':` <small>${count.toLocaleString()}</small>`}</button>`;
+  $('#shelf-chips').innerHTML=chip('','All',null)+data[kind].map(([v,n])=>chip(v,name(v),n)).join('');
+  const picks=Object.keys(FACETS).filter(k=>facetValue(k)).map(k=>FACETS[k].name(facetValue(k)));
+  $('#crate-label').textContent='The crate · '+(picks.length?picks.join(' · '):'flick sideways, pull a record');
+}
+function pickFacet(value){
+  const kind=state.facetKind;
+  if(kind==='performer')$('#performer').value=value;else state[kind]=value;
+  resetSearch();
+}
 function resetSearch(){state.offset=0;state.openId=null;load()}
 function scorePanel(notes,side,id,solo){
   if(!notes.length)return '';
@@ -209,7 +185,7 @@ function mediaSection(d,side){
 
 function albumVisual(s,side){
   const query=new URLSearchParams({performer:s.performer||'',album:s.album||s.title||'',title:s.title||''});
-  return `<div class="album-visual" data-side="${side}" data-album-key="${esc(albumKey(s))}"><div class="album-placeholder" aria-hidden="true"></div><img class="album-art" src="${esc(apiURL(`/api/cover-image?${query}`))}" alt="Album cover for ${esc(s.album||s.title)}" onerror="this.hidden=true"><div class="album-credit" aria-hidden="true"></div></div>`;
+  return `<div class="album-visual" data-side="${side}"><div class="album-placeholder" aria-hidden="true"></div><img class="album-art" src="${esc(apiURL(`/api/cover-image?${query}`))}" alt="Album cover for ${esc(s.album||s.title)}" onerror="this.hidden=true"><div class="album-credit" aria-hidden="true"></div></div>`;
 }
 
 function artistPanel(d,side){
@@ -235,20 +211,12 @@ function detailHTML(d){
   </div>`;
 }
 
-async function hydrateVisuals(d){
-  const dialog=$('#pair-dialog');
-  for(const side of ['a','b']){
-    const s=d[side],album=await albumArt(s),albumNode=dialog.querySelector(`.album-visual[data-side="${side}"][data-album-key="${CSS.escape(albumKey(s))}"]`);
-    if(album && albumNode && state.openId===d.id){const img=albumNode.querySelector('.album-art');img.src=album.url;img.hidden=false;albumNode.querySelector('.album-placeholder').hidden=true;}
-  }
-}
-
 async function toggleDetail(button){
   const id=Number(button.dataset.match),dialog=$('#pair-dialog');
   state.lastTrigger=button;
   state.openId=id;dialog.innerHTML='<div class="pair-loading">Reading both passages…</div>';
   if(!dialog.open)dialog.showModal();
-  try{const res=await fetch(apiURL(`/api/matches/${id}`));if(!res.ok)throw new Error('Could not load passage');const detail=await res.json();state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail);hydrateVisuals(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
+  try{const res=await fetch(apiURL(`/api/matches/${id}`));if(!res.ok)throw new Error('Could not load passage');const detail=await res.json();state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
 }
 
 async function playTranscript(notes){
@@ -275,6 +243,8 @@ async function submitJSON(url,data){const res=await fetch(apiURL(url),{method:'P
 document.addEventListener('click',event=>{
   const seg=event.target.closest('.segmented button');
   if(seg){const group=seg.closest('.segmented');group.querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===seg));state[group.dataset.name]=group.dataset.name==='max_edits'?Number(seg.dataset.value):seg.dataset.value;resetSearch()}
+  const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
+  const facetChip=event.target.closest('[data-facet-value]');if(facetChip)pickFacet(facetChip.dataset.facetValue);
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
@@ -289,7 +259,7 @@ $('#performer').addEventListener('change',resetSearch);$('#sort').addEventListen
 $('#collection').addEventListener('change',()=>{state.collection=$('#collection').value;resetSearch()});
 $('#reset').addEventListener('click',()=>{
   for(const [id,value] of Object.entries({min_notes:9,min_pitch:80,min_rhythm:45,min_distinct:40}))$('#'+id).value=value;
-  $('#performer').value='';$('#sort').value='score';$('#collection').value='all';state.scope='all';state.composition='distinct';state.collection='all';state.max_edits=1;
+  $('#performer').value='';$('#sort').value='score';$('#collection').value='all';state.scope='all';state.composition='distinct';state.collection='all';state.max_edits=1;state.decade='';state.instrument='';
   document.querySelectorAll('.segmented').forEach(group=>group.querySelectorAll('button').forEach(button=>button.classList.toggle('selected',String(state[group.dataset.name])===button.dataset.value)));
   updateOutputs();resetSearch();
 });

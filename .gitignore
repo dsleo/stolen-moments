@@ -6,3 +6,4 @@ data/dtl_metadata_v0.9.csv
 .DS_Store
 *.log
 .qa/
+data/covers/

@@ -27,9 +27,9 @@
 .crate-label { margin: 0 16px 8px; color: #d9c29a; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 .crate-strip { display: flex; gap: 10px; overflow-x: auto; padding: 26px 16px 18px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 .crate-card { flex: 0 0 clamp(150px,44vw,190px); scroll-snap-align: start; display: grid; gap: 6px; padding: 0 0 8px; border: 0; background: transparent; color: #f3e9d2; text-align: left; transition: transform .3s cubic-bezier(.25,1,.5,1); }
-.crate-card .sleeves { position: relative; display: block; padding: 0 22px 22px 0; }
-.crate-card .sleeve.b { position: absolute; right: 0; bottom: 0; width: 82%; transform: rotate(3deg); }
-.crate-card .sleeve.a { width: 82%; }
+.crate-card .sleeves { position: relative; display: block; aspect-ratio: 1; }
+.crate-card .sleeve.b { position: absolute; right: 0; bottom: 0; width: 80%; transform: rotate(3deg); }
+.crate-card .sleeve.a { width: 80%; }
 .crate-card:hover, .crate-card:focus-visible { transform: translateY(-8px); }
 .crate-card[aria-pressed="true"] { transform: translateY(-14px); }
 .crate-card[aria-pressed="true"] .sleeve { box-shadow: 0 0 0 2px #e8b67d, 0 8px 18px #0008; }
@@ -39,3 +39,15 @@
 .crate-strip { padding-bottom: 34px; }
 @media (min-width: 900px) { .crate { margin: 0; } .crate-card { flex-basis: 200px; } }
 @media (prefers-reduced-motion: reduce) { .stage.has-pair { animation: none; } .sleeve, .crate-card { transition: none; } }
+
+/* Facet shelf: dividers that re-file the crate by decade, instrument or musician. */
+.shelf { margin: 0 0 4px; }
+.shelf-kinds { display: flex; gap: 6px; padding: 0 16px 8px; }
+.shelf-kinds button { min-height: 36px; padding: 0 12px; border: 1px solid #7a5c3c; border-radius: 999px; background: transparent; color: #d9c29a; font-size: 12px; }
+.shelf-kinds button[aria-pressed="true"] { background: #d9c29a; color: #3a2c1f; }
+.shelf-kinds button.has-pick:not([aria-pressed="true"]) { border-color: #e8b67d; color: #f3e9d2; }
+.shelf-chips { display: flex; gap: 6px; overflow-x: auto; padding: 0 16px 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.shelf-chips::-webkit-scrollbar { display: none; }
+.shelf-chip { flex: none; min-height: 44px; padding: 0 14px; border: 0; border-radius: 4px 4px 0 0; background: #5a4430; color: #f3e9d2; font-size: 13px; white-space: nowrap; }
+.shelf-chip small { opacity: .65; font-size: 11px; }
+.shelf-chip[aria-pressed="true"] { background: #e8b67d; color: #2b2015; }
