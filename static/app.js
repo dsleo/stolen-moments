@@ -35,30 +35,10 @@ function histogram(counts){
   $('#histogram').innerHTML=counts.map((n,i)=>`<div class="histogram-bar" style="height:${Math.max(3,n/max*100)}%" title="Scores ${i*10}–${i*10+9}: ${n.toLocaleString()} passages"></div>`).join('');
 }
 
-function row(item,index){
-  const badges=[];
-  if(item.a.source!=='WJazzD'||item.b.source!=='WJazzD')badges.push(`<span class="badge">${esc(item.a.source)} ↔ ${esc(item.b.source)}</span>`);
-  if(item.same_performer)badges.push('<span class="badge">Same musician</span>');
-  if(item.same_composition)badges.push('<span class="badge">Same tune</span>');
-  if(item.periodicity>.62)badges.push('<span class="badge rust">Looping cell</span>');
-  if(item.edits)badges.push(`<span class="badge rust">${item.edits} pitch edit${item.edits===1?'':'s'}</span>`);
-  else badges.push('<span class="badge">Exact intervals</span>');
-  return `<article class="match-row" id="match-${item.id}">
-    <button class="match-trigger" type="button" data-match="${item.id}" aria-haspopup="dialog">
-      <span class="row-index">${String(index+1).padStart(2,'0')}</span>
-      <span><span class="match-title">${esc(item.a.performer)} <span>↔</span> ${esc(item.b.performer)}</span>
-        <span class="match-sub"><strong>${esc(item.a.title)}</strong> · ${sec(item.a_track_time)} &nbsp; / &nbsp; <strong>${esc(item.b.title)}</strong> · ${sec(item.b_track_time)}</span>
-        <span class="badges">${badges.join('')}</span></span>
-      <span class="match-evidence"><span><span class="score">${item.heuristic_score.toFixed(1)}</span><span class="score-label">ranking score</span></span><span class="evidence-line">${item.notes} notes · ${pct(item.rhythm_similarity)} rhythm <span class="arrow">↗</span></span></span>
-    </button>
-  </article>`;
-}
-
 async function load(append=false){
   const serial=++state.request;
   state.loading=true;
   if(!append)refreshFacets(serial);
-  if(!append)$('#results').innerHTML='<div class="empty">Reading the archive…</div>';
   try{
     const response=await fetch(apiURL('/api/matches?'+query(params())));
     if(!response.ok)throw new Error((await response.json()).error||'Search failed');
@@ -68,12 +48,10 @@ async function load(append=false){
     $('#result-context').textContent=`${data.total.toLocaleString()} of ${data.unfiltered_total.toLocaleString()} indexed passage pairs meet these controls`;
     histogram(data.histogram);
     if(!append)state.items=[];state.items.push(...data.items);renderCrate(data.items,append);
-    const html=data.items.map((x,i)=>row(x,state.offset+i)).join('');
-    if(append)$('#results').insertAdjacentHTML('beforeend',html);
-    else $('#results').innerHTML=html||'<div class="empty"><strong>No passages at this setting.</strong>Lower a threshold or include the same tune to broaden the search.</div>';
+    if(!append&&!data.items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower a threshold or include the same tune to broaden the search.</div>';
     $('#list-footer').innerHTML=data.next_offset!==null?'<button id="load-more" type="button" class="load-more">Show more passages ↓</button>':'';
     if(data.next_offset!==null)$('#load-more').addEventListener('click',()=>{state.offset=data.next_offset;load(true)});
-  }catch(err){if(serial===state.request){$('#results').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
+  }catch(err){if(serial===state.request){$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
   finally{if(serial===state.request)state.loading=false}
 }
 
@@ -97,10 +75,58 @@ function pullPair(id){
     <p>${item.notes} notes · ${pct(item.pitch_similarity)} pitch · ${pct(item.rhythm_similarity)} rhythm</p>
     <button type="button" class="drawer-done" data-match="${id}" aria-haspopup="dialog">Hear this pair ↗</button>`;
 }
+const SPACING=64,NODE_H=84,TOP_N=70;
+function layoutEcho(d){
+  const order=d.musicians.map((m,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
+  const x=[];order.forEach((mi,pos)=>{x[mi]=SPACING/2+pos*SPACING});
+  return {x,width:order.length*SPACING};
+}
+function renderEchoes(){
+  const d=state.echoes;if(!d)return;
+  const ARC_H=Math.max(110,Math.floor(($('#echoes-scroll').clientHeight-NODE_H-12)/2));
+  const {x,width}=layoutEcho(d),sel=state.echoSel,m=d.musicians;
+  const links=d.links.filter(l=>sel==null?false:l.from===sel||l.to===sel);
+  const shown=sel==null?[...d.links].sort((a,b)=>b.strength-a.strength).slice(0,TOP_N):links;
+  const max=Math.max(...shown.map(l=>l.strength),1e-9),y0=ARC_H+4;
+  const linked=new Set(shown.flatMap(l=>[l.from,l.to]));
+  const arcs=shown.map(l=>{
+    const x1=Math.min(x[l.from],x[l.to]),x2=Math.max(x[l.from],x[l.to]),rx=(x2-x1)/2,ry=Math.max(14,(ARC_H-6)*Math.pow(rx/(width/2),.6));
+    const down=sel!=null&&l.from===sel,ty=down?y0+NODE_H:y0-4;
+    return `<path class="echo-arc ${down?'down':'up'}${sel!=null?' sel':''}" d="M${x1},${ty} A${rx},${ry} 0 0 ${down?0:1} ${x2},${ty}" stroke-width="${(1.5+4.5*l.strength/max).toFixed(1)}" data-match="${l.top_id}" tabindex="0" role="button" aria-label="${esc(m[l.from].name)} to ${esc(m[l.to].name)}, ${l.pairs} solo pairs"><title>${esc(m[l.from].name)} → ${esc(m[l.to].name)} · ${l.pairs} solo pair${l.pairs===1?'':'s'}</title></path>`;
+  }).join('');
+  let lastDecade='';
+  const years=state.echoOrder.map(mi=>{const dec=m[mi].year?Math.floor(m[mi].year/10)*10:'';const t=dec&&dec!==lastDecade?`<text class="echo-year" x="${x[mi]-24}" y="14">${dec}s</text>`:'';if(dec)lastDecade=dec;return t}).join('');
+  const nodes=m.map((p,i)=>`<button type="button" class="echo-node${sel!=null&&sel!==i&&!linked.has(i)?' dim':''}" style="left:${x[i]}px;top:${y0}px" data-echo="${i}" aria-pressed="${sel===i}">${sleeve({performer:p.name,album:p.album,title:p.title},'a')}<span>${esc(p.name)}</span></button>`).join('');
+  const H=y0+NODE_H+ARC_H+8,box=$('#echoes-scroll'),left=box.scrollLeft;
+  box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${H}px"><svg width="${width}" height="${H}" aria-label="Arcs from earlier to later musicians">${years}${arcs}</svg>${nodes}</div>`;
+  box.scrollLeft=sel==null?left:Math.max(0,x[sel]-box.clientWidth/2);
+  $('#echoes-note').textContent=sel==null?`Strongest ${shown.length} echoes, earlier player to later one. Pick a musician to see theirs. ${d.undirected} same-year pairs are left out.`:'';
+  renderEchoPanel(sel);
+}
+function renderEchoPanel(sel){
+  const d=state.echoes,m=d.musicians,panel=$('#echoes-panel');
+  if(sel==null){panel.innerHTML='';return}
+  const list=(ls,other)=>ls.length?`<ol>${[...ls].sort((a,b)=>b.strength-a.strength).slice(0,10).map(l=>`<li><button type="button" data-match="${l.top_id}"><span>${esc(m[l[other]].name)}</span><small>${l.pairs} pair${l.pairs===1?'':'s'}</small></button></li>`).join('')}</ol>`:'<p>None at these settings.</p>';
+  panel.innerHTML=`<h3>${esc(m[sel].name)}</h3><p>${m[sel].solos} solos · c. ${m[sel].year??'?'}</p><h4>Echoes (earlier players)</h4>${list(d.links.filter(l=>l.to===sel),'from')}<h4>Echoed by (later players)</h4>${list(d.links.filter(l=>l.from===sel),'to')}`;
+}
+let echoHeight=0;
+new ResizeObserver(()=>{const h=$('#echoes-scroll').clientHeight;if(h&&h!==echoHeight){echoHeight=h;renderEchoes()}}).observe($('#echoes-scroll'));
+async function loadEchoes(){
+  const serial=state.echoSerial=(state.echoSerial||0)+1;
+  try{
+    const res=await fetch(apiURL('/api/influence?'+query(params())));if(!res.ok)throw new Error('Echoes unavailable');
+    const d=await res.json();if(serial!==state.echoSerial)return;
+    state.echoes=d;
+    state.echoOrder=d.musicians.map((_,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
+    if(state.echoSel!=null&&state.echoSel>=d.musicians.length)state.echoSel=null;
+    renderEchoes();
+  }catch(err){$('#echoes-scroll').innerHTML=`<div class="empty"><strong>Echoes unavailable.</strong>${esc(err.message)}</div>`}
+}
 function setView(view){
   document.querySelector('.results-area').dataset.view=view;
   document.querySelectorAll('[data-view-btn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.viewBtn===view)));
   try{localStorage.setItem('atlas-view',view)}catch{}
+  if(view==='echoes'){loadEchoes();$('.results-area').scrollIntoView()}
 }
 document.addEventListener('error',e=>{if(e.target.matches?.('.sleeve img'))e.target.hidden=true},true);
 
@@ -124,7 +150,7 @@ function pickFacet(value){
   if(kind==='performer')$('#performer').value=value;else state[kind]=value;
   resetSearch();
 }
-function resetSearch(){state.offset=0;state.openId=null;load()}
+function resetSearch(){state.offset=0;state.openId=null;load();if($('.results-area').dataset.view==='echoes')loadEchoes()}
 function scorePanel(notes,side,id,solo){
   if(!notes.length)return '';
   return `<section class="score-panel ${side}" aria-label="Score excerpt ${side.toUpperCase()}">
@@ -246,6 +272,7 @@ document.addEventListener('click',event=>{
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
   const facetChip=event.target.closest('[data-facet-value]');if(facetChip)pickFacet(facetChip.dataset.facetValue);
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
+  const echo=event.target.closest('[data-echo]');if(echo){const i=Number(echo.dataset.echo);state.echoSel=state.echoSel===i?null:i;renderEchoes()}
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
   const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
@@ -263,7 +290,6 @@ $('#reset').addEventListener('click',()=>{
   document.querySelectorAll('.segmented').forEach(group=>group.querySelectorAll('button').forEach(button=>button.classList.toggle('selected',String(state[group.dataset.name])===button.dataset.value)));
   updateOutputs();resetSearch();
 });
-$('#export').addEventListener('click',()=>{const p=params();delete p.limit;delete p.offset;location.href=apiURL('/api/export.csv?'+query(p))});
 // One photograph and one hinged cover persist through both views. The lid's
 // projected corners rotate around the rear hinges; the record never changes.
 const desk = $('#landing');
@@ -368,7 +394,7 @@ $('#pair-dialog').addEventListener('close',()=>{state.openId=null;if(state.lastT
 
 async function init(){
   updateOutputs();
-  try{setView(localStorage.getItem('atlas-view')==='list'?'list':'crate')}catch{}
+  try{setView(localStorage.getItem('atlas-view')==='echoes'?'echoes':'crate')}catch{}
   try{const res=await fetch(apiURL('/api/bootstrap'));if(!res.ok)throw new Error('Index unavailable');const data=await res.json();
     const collections=data.corpus.collections||{WJazzD:data.corpus.solos};
     if(collections.DTL1000){
@@ -378,6 +404,6 @@ async function init(){
     }
     $('#performer').insertAdjacentHTML('beforeend',data.performers.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join(''));
     await load();
-  }catch(err){const message=location.protocol==='file:'?'Start the local server with `python3 -m jazzmine serve --port 8766`, then reload this file.':err.message;$('#results').innerHTML=`<div class="empty"><strong>Could not open the atlas.</strong>${esc(message)}</div>`}
+  }catch(err){const message=location.protocol==='file:'?'Start the local server with `python3 -m jazzmine serve --port 8766`, then reload this file.':err.message;$('#crate-strip').innerHTML=`<div class="empty"><strong>Could not open the atlas.</strong>${esc(message)}</div>`}
 }
 init();

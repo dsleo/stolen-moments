@@ -1,4 +1,4 @@
-# Motif Atlas
+# Stolen Moments
 
 A local web app for exploring melodic reuse in the 456 solo transcriptions of the Weimar Jazz Database (WJazzD) v2.1. It finds transposed interval matches and bounded variants, then lets a musician adjust thresholds, compare score excerpts, hear a synthesized rendering, and find a source-recording link.
 

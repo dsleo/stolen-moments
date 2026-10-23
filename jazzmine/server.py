@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import csv
 import gzip
-import io
 import json
 import re
 import sqlite3
@@ -142,6 +140,46 @@ class App:
         first, second = sorts.get(p["sort"], sorts["score"])
         out.sort(key=lambda r: (r[first], r[second], -r["id"]), reverse=True)
         return out
+
+    def influence(self, query: dict[str, list[str]]) -> dict:
+        """Who echoes whom: cross-performer pairs directed from the earlier recording to the later one."""
+        p = self.parameters(query) | {"scope": "cross"}
+        by_performer: dict[str, list[Solo]] = {}
+        for s in self.solos.values():
+            by_performer.setdefault(s.performer, []).append(s)
+        links: dict[tuple[str, str], dict] = {}
+        undirected = 0
+        for r in self.rows:
+            if not self._base_ok(r, p):
+                continue
+            a, b = self.solos[r["a_melid"]], self.solos[r["b_melid"]]
+            if a.performer == b.performer:
+                continue
+            if not (a.year and b.year and a.year != b.year):
+                undirected += 1
+                continue
+            old, new = (a, b) if a.year < b.year else (b, a)
+            link = links.setdefault((old.performer, new.performer), {"solo_pairs": set(), "best": r})
+            link["solo_pairs"].add((old.melid, new.melid))
+            if r["heuristic_score"] > link["best"]["heuristic_score"]:
+                link["best"] = r
+        names = sorted({n for pair in links for n in pair})
+        index = {n: i for i, n in enumerate(names)}
+        def median_year(n):
+            years = sorted(s.year for s in by_performer[n] if s.year)
+            return years[len(years) // 2] if years else None
+        musicians = []
+        for n in names:
+            first = by_performer[n][0]
+            musicians.append({"name": n, "year": median_year(n), "solos": len(by_performer[n]),
+                              "album": first.album or first.title, "title": first.title})
+        out = []
+        for (old, new), link in links.items():
+            pairs = len(link["solo_pairs"])
+            out.append({"from": index[old], "to": index[new], "pairs": pairs,
+                        "strength": pairs / (len(by_performer[old]) * len(by_performer[new])) ** 0.5,
+                        "top_id": link["best"]["id"], "best_score": link["best"]["heuristic_score"]})
+        return {"musicians": musicians, "links": out, "undirected": undirected}
 
     def _media(self, trackid: int, track_time: float) -> dict | None:
         with self.db_lock:
@@ -372,6 +410,8 @@ def serve(host: str = "127.0.0.1", port: int = 8766):
                         self._reply(b'{"error": "Album cover not found"}', 404, cache="public, max-age=3600")
                 elif url.path == "/api/facets":
                     self._json(app.facets(q))
+                elif url.path == "/api/influence":
+                    self._json(app.influence(q))
                 elif url.path == "/api/matches":
                     self._json(app.list_matches(q))
                 elif re.fullmatch(r"/api/matches/\d+", url.path):
@@ -379,20 +419,6 @@ def serve(host: str = "127.0.0.1", port: int = 8766):
                     self._json(data if data else {"error": "Match not found"}, 200 if data else 404)
                 elif re.fullmatch(r"/api/media/\d+", url.path):
                     self._json({"media": app.get_media(int(url.path.rsplit("/", 1)[1]))})
-                elif url.path == "/api/export.csv":
-                    p = app.parameters(q)
-                    rows = app.filtered(p)
-                    out = io.StringIO()
-                    writer = csv.writer(out)
-                    writer.writerow(["match_id", "score", "notes", "edits", "pitch_similarity", "rhythm_similarity",
-                                     "distinctiveness", "performer_a", "title_a", "track_time_a", "performer_b",
-                                     "title_b", "track_time_b", "transposition", "same_composition"])
-                    for r in rows:
-                        a,b = app.solos[r["a_melid"]],app.solos[r["b_melid"]]
-                        writer.writerow([r["id"],r["heuristic_score"],r["notes"],r["edits"],r["pitch_similarity"],
-                                         r["rhythm_similarity"],r["distinctiveness"],a.performer,a.title,r["a_track_time"],
-                                         b.performer,b.title,r["b_track_time"],r["transposition"],r["same_composition"]])
-                    self._reply(out.getvalue().encode(), mime="text/csv; charset=utf-8")
                 else:
                     rel = "index.html" if url.path == "/" else url.path.lstrip("/")
                     path = (STATIC / rel).resolve()
@@ -423,5 +449,5 @@ def serve(host: str = "127.0.0.1", port: int = 8766):
             except (ValueError, TypeError, sqlite3.Error) as exc:
                 self._json({"error": str(exc)}, 400)
 
-    print(f"Jazz Motif Atlas: http://{host}:{port}", flush=True)
+    print(f"Stolen Moments: http://{host}:{port}", flush=True)
     ThreadingHTTPServer((host, port), Handler).serve_forever()

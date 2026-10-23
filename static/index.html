@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#252921">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <title>Motif Atlas · Jazz phrase discovery</title>
+  <title>Stolen Moments · Jazz phrase discovery</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Non-blocking: text paints in the fallback fonts, then swaps. -->
@@ -15,12 +15,13 @@
   <link rel="stylesheet" href="styles.css?v=perf-2">
   <link rel="stylesheet" href="desk.css">
   <link rel="stylesheet" href="crate.css">
-  <script src="app.js?v=perf-2" defer></script>
+  <link rel="stylesheet" href="echoes.css">
+  <script src="app.js?v=perf-5" defer></script>
 </head>
 <body>
   <div class="app-shell">
     <main id="top">
-      <section id="landing" class="listening-desk" aria-label="Motif Atlas listening desk" data-phase="closed">
+      <section id="landing" class="listening-desk" aria-label="Stolen Moments listening desk" data-phase="closed">
         <div class="desk-camera">
           <div class="desk-art">
             <img class="desk-photograph" src="assets/jazz-desk-base.webp" width="1672" height="941" alt="A vintage turntable on a sunlit desk surrounded by jazz scores" fetchpriority="high">
@@ -56,7 +57,7 @@
         </div>
         <div class="desk-shade" aria-hidden="true"></div>
         <div class="landing-intro">
-          <div class="landing-meta"><span>Motif Atlas</span><span>Jazz phrase archive</span></div>
+          <div class="landing-meta"><span>Stolen Moments</span><span>Jazz phrase archive</span></div>
           <div class="landing-copy"><p>Vol. 02 · WJazzD</p><h1 id="landing-title">A desk for<br>close listening.</h1><button type="button" id="landing-prompt" class="landing-prompt" data-lift-lid>Lift the lid <span aria-hidden="true">↗</span></button></div>
         </div>
         <div class="desk-actions" inert>
@@ -70,22 +71,21 @@
         <div class="results-area" data-view="crate">
           <div class="results-top">
             <div><p class="small-caps">Found in the archive</p><h2><span id="result-count">—</span> <em>passages</em></h2><p id="result-context">Scanning the solos…</p></div>
-            <div class="result-tools"><div class="view-toggle" role="group" aria-label="Result view"><button type="button" data-view-btn="crate" aria-pressed="true">Crate</button><button type="button" data-view-btn="list" aria-pressed="false">Catalog</button></div><button id="export" type="button" class="export-button" title="Download current filtered results as CSV">Export CSV ↗</button></div>
+            <div class="result-tools"><div class="view-toggle" role="group" aria-label="Result view"><button type="button" data-view-btn="crate" aria-pressed="true">Crate</button><button type="button" data-view-btn="echoes" aria-pressed="false">Echoes</button></div></div>
           </div>
           <div class="distribution" aria-label="Distribution of candidate ranking scores"><div class="distribution-title"><span>Score distribution</span><span id="distribution-caption">Within current search</span></div><div id="histogram" class="histogram"></div><div class="distribution-scale"><span>Lower ranking</span><span>Higher ranking</span></div></div>
           <div class="crate"><p class="crate-label" id="crate-label">The crate · flick sideways, pull a record</p><div class="shelf"><div class="shelf-kinds" role="group" aria-label="Sort the crate by"><button type="button" data-facet-kind="decade">Decade</button><button type="button" data-facet-kind="instrument">Instrument</button><button type="button" data-facet-kind="performer">Musician</button></div><div id="shelf-chips" class="shelf-chips"></div></div>
           <div id="crate-strip" class="crate-strip" role="list"></div></div>
           <div id="stage" class="stage" aria-live="polite"><p>Pull a pair from the crate to see both sleeves.</p></div>
-          <div class="list-heading"><span>Passage pair</span><span>Evidence</span></div>
-          <div id="results" class="results-list" aria-live="polite"></div>
           <div id="list-footer" class="list-footer"></div>
+          <div id="echoes" class="echoes"><p id="echoes-note" class="echoes-note"></p><div class="echoes-body"><div id="echoes-scroll" class="echoes-scroll"></div><aside id="echoes-panel" class="echoes-panel" aria-live="polite"></aside></div></div>
         </div>
       </section>
       <section class="method" id="method">
         <div><p class="small-caps">Reading the atlas</p><h2>Hear the pattern.<br><em>See the phrase.</em></h2></div>
         <div class="method-copy"><p>Each result is a candidate built from transposition-invariant pitch intervals. The ranking score helps order listening; it is not a probability of quotation or influence.</p><p id="method-rhythm">“Matched notes” counts the aligned phrase. Pitch agreement measures interval matches after limited edits. Rhythm agreement compares note spacing in beats. Distinctiveness reflects how widely the seed appears in this corpus. The score excerpts show stored pitches with approximate note values.</p><p id="dtl-method" hidden>DTL1000 notes were automatically extracted and can contain transcription errors. When DTL1000 is involved, rhythm agreement compares note-onset timing after adjusting for tempo.</p><p>Direct video links use source-track times and may need timing correction for a particular upload. A quotation outside the indexed collections may be absent.</p><a href="https://jazzomat.hfm-weimar.de/dbformat/dbformat.html" target="_blank" rel="noopener">WJazzD schema ↗</a><span id="dtl-method-link" hidden> · <a href="https://dig-that-lick.hfm-weimar.de/similarity_search/documentation" target="_blank" rel="noopener">DTL1000 documentation ↗</a></span></div>
       </section>
-      <footer><span>Motif Atlas · a local research instrument</span><span id="footer-source">Source: WJazzD v2.1 · ODbL</span></footer>
+      <footer><span>Stolen Moments · a local research instrument</span><span id="footer-source">Source: WJazzD v2.1 · ODbL</span></footer>
       </div>
     </main>
   </div>
