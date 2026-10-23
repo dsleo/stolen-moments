@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="desk.css">
   <link rel="stylesheet" href="crate.css">
   <link rel="stylesheet" href="echoes.css">
-  <script src="app.js?v=perf-5" defer></script>
+  <script src="app.js?v=ui-8" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -71,13 +71,14 @@
         <div class="results-area" data-view="crate">
           <div class="results-top">
             <div><p class="small-caps">Found in the archive</p><h2><span id="result-count">—</span> <em>passages</em></h2><p id="result-context">Scanning the solos…</p></div>
-            <div class="result-tools"><div class="view-toggle" role="group" aria-label="Result view"><button type="button" data-view-btn="crate" aria-pressed="true">Crate</button><button type="button" data-view-btn="echoes" aria-pressed="false">Echoes</button></div></div>
+            <div class="result-tools"><div class="view-toggle" role="group" aria-label="Result view">
+              <button type="button" data-view-btn="crate" aria-pressed="true" aria-label="Crate: browse passage pairs" title="Crate · passage pairs"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 4h21v21M4 7h21v21H4z"/><circle cx="14.5" cy="17.5" r="6"/><circle cx="14.5" cy="17.5" r="1.2"/></svg></button>
+              <button type="button" data-view-btn="echoes" aria-pressed="false" aria-label="Echoes: explore musicians and connections" title="Echoes · musician connections"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="6" cy="16" r="2.5"/><circle cx="26" cy="8" r="2.5"/><circle cx="26" cy="24" r="2.5"/><path d="M9 15C15 15 17 9 23 8M9 17c6 0 8 6 14 7M13 13c3 3 3 5 0 7"/></svg></button>
+            </div></div>
           </div>
-          <div class="distribution" aria-label="Distribution of candidate ranking scores"><div class="distribution-title"><span>Score distribution</span><span id="distribution-caption">Within current search</span></div><div id="histogram" class="histogram"></div><div class="distribution-scale"><span>Lower ranking</span><span>Higher ranking</span></div></div>
-          <div class="crate"><p class="crate-label" id="crate-label">The crate · flick sideways, pull a record</p><div class="shelf"><div class="shelf-kinds" role="group" aria-label="Sort the crate by"><button type="button" data-facet-kind="decade">Decade</button><button type="button" data-facet-kind="instrument">Instrument</button><button type="button" data-facet-kind="performer">Musician</button></div><div id="shelf-chips" class="shelf-chips"></div></div>
+          <div class="crate"><div class="shelf"><button type="button" id="open-shelf" class="shelf-toggle" aria-label="Browse by decade, instrument, or musician" title="Browse by decade, instrument, or musician" aria-expanded="false" aria-controls="shelf-options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M9 19h6"/><circle cx="8" cy="5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg><span class="sr-only">Browse filters</span></button><div id="shelf-options" class="shelf-options" hidden><div class="shelf-kinds" role="group" aria-label="Browse the crate by"><button type="button" data-facet-kind="decade">Decade</button><button type="button" data-facet-kind="instrument">Instrument</button><button type="button" data-facet-kind="performer">Musician</button></div><div id="shelf-chips" class="shelf-chips"></div></div></div>
           <div id="crate-strip" class="crate-strip" role="list"></div></div>
-          <div id="stage" class="stage" aria-live="polite"><p>Pull a pair from the crate to see both sleeves.</p></div>
-          <div id="list-footer" class="list-footer"></div>
+          <div id="stage" class="stage" aria-live="polite"></div>
           <div id="echoes" class="echoes"><p id="echoes-note" class="echoes-note"></p><div class="echoes-body"><div id="echoes-scroll" class="echoes-scroll"></div><aside id="echoes-panel" class="echoes-panel" aria-live="polite"></aside></div></div>
         </div>
       </section>

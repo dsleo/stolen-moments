@@ -41,18 +41,6 @@ main{min-width:0}
 .result-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .result-tools label{font-size:11px;color:var(--muted)}
 .result-tools select{width:auto;min-width:142px;padding:8px 9px;font-size:12px}
-.distribution{margin:32px 0 33px;padding:17px 20px 14px;background:#e8eadc;border:1px solid #d4d8c8}
-.distribution-title,.distribution-scale{display:flex;justify-content:space-between;gap:15px}
-.distribution-title{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:#565f4b}
-.distribution-title span:last-child{color:#818b77}
-.histogram{height:52px;display:flex;gap:6px;align-items:flex-end;margin:13px 0 6px}
-.histogram-bar{min-height:2px;flex:1;background:#9aa586;position:relative;transition:height .3s cubic-bezier(.19,1,.22,1)}
-.histogram-bar:nth-last-child(-n+3){background:#b46d4f}
-.histogram-bar:hover{background:var(--ink)}
-.distribution-scale{color:#7f8878;font-size:10px}
-.list-footer{padding-top:24px;text-align:center}
-.load-more{border:1px solid #959e8d;background:transparent;padding:11px 24px;color:#4e5749;font-size:12px;font-weight:700}
-.load-more:hover{background:#e7e9db}
 .empty{padding:75px 20px;text-align:center;color:#73796f}
 .empty strong{display:block;font:400 26px var(--display);color:var(--ink);margin-bottom:7px}
 .detail{border-top:1px solid var(--line);padding:25px 0 32px;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,290px);gap:30px}
@@ -88,7 +76,6 @@ footer{padding:20px}}
 .controls fieldset,.control-field,.range-field{margin-bottom:20px!important}
 .results-top{display:block}
 .result-tools{margin-top:18px}
-.distribution{margin-top:23px}
 footer{display:block}
 footer span{display:block;margin-bottom:5px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
@@ -217,7 +204,6 @@ footer span{display:block;margin-bottom:5px}}
 .workspace{background:#f5f1e8;border-top:1px solid #a7aa995c}
 .results-area{padding-top:clamp(54px,7vw,96px)}
 .results-top h2{letter-spacing:-.062em}
-.distribution{background:#e1e5d2;border-color:#cdd2bd}
 @media(max-width:900px){.turntable{width:min(82vw,650px);height:min(68vw,520px)}}
 @media(max-width:600px){.turntable{width:100%;height:320px;min-width:0;min-height:0}
 .record{width:280px;height:280px;min-width:0;min-height:0;left:1%;top:8%}}

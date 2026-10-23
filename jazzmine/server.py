@@ -19,7 +19,7 @@ from .mining import connect_store
 STATIC = ROOT / "static"
 LABELS = {"exact", "variant", "shared vocabulary", "possible quotation", "uncertain", "rejected"}
 MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
-        ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml",
+        ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml",
         ".png": "image/png", ".webp": "image/webp", ".avif": "image/avif", ".woff2": "font/woff2"}
 COMPRESSIBLE = ("text/", "application/json", "image/svg+xml")
 

@@ -1,7 +1,7 @@
 /* Echoes view: musicians along a timeline, arcs from earlier to later players; fills the screen. */
 .echoes { display: none; }
 .results-area[data-view="echoes"] { display: flex; flex-direction: column; height: 100svh; padding: 16px 0 0; }
-.results-area[data-view="echoes"] :is(.results-top > div:first-child, .crate, .stage, #list-footer, .distribution) { display: none; }
+.results-area[data-view="echoes"] :is(.results-top > div:first-child, .crate, .stage) { display: none; }
 .results-area[data-view="echoes"] .results-top { margin: 0 clamp(16px,3vw,40px) 8px; justify-content: flex-end; }
 .results-area[data-view="echoes"] .echoes { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .echoes-note { margin: 0 clamp(16px,3vw,40px) 8px; color: var(--muted); font-size: 13px; min-height: 1.2em; }
@@ -15,8 +15,10 @@
 .echo-arc.sel { opacity: .75; }
 .echo-year { fill: var(--muted); font-size: 11px; }
 .echo-node { position: absolute; width: 56px; margin-left: -28px; display: grid; gap: 4px; justify-items: center; padding: 0; border: 0; background: transparent; color: var(--ink); font-size: 11px; line-height: 1.2; text-align: center; }
-.echo-node .sleeve { width: 44px; border-radius: 50%; box-shadow: none; }
-.echo-node[aria-pressed="true"] .sleeve { box-shadow: 0 0 0 3px var(--rust); }
+.echo-portrait { position: relative; display: grid; place-items: center; width: 46px; height: 46px; overflow: hidden; border-radius: 50%; background: hsl(var(--h) 25% 34%); color: #f8f2e7; }
+.echo-portrait-fallback { font: 600 16px/1 var(--display); }
+.echo-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.echo-node[aria-pressed="true"] .echo-portrait { box-shadow: 0 0 0 3px var(--rust); }
 .echo-node.dim { opacity: .35; }
 .echoes-panel { width: 280px; flex: none; overflow-y: auto; padding: 16px; border-left: 1px solid var(--line); font-size: 14px; }
 .echoes-panel:empty { display: none; }
@@ -26,3 +28,5 @@
 .echoes-panel ol { list-style: none; margin: 0; padding: 0; }
 .echoes-panel li button { display: flex; justify-content: space-between; gap: 8px; width: 100%; min-height: 36px; padding: 4px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; }
 .echoes-panel li small { color: var(--muted); white-space: nowrap; }
+.portrait-source { display: inline-block; color: var(--rust); font-size: 11px; font-weight: 700; text-decoration: none; }
+.portrait-source:hover { text-decoration: underline; }

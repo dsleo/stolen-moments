@@ -1,6 +1,6 @@
 const API_ORIGIN = location.protocol === 'file:' ? 'http://127.0.0.1:8766' : '';
 const apiURL = path => `${API_ORIGIN}${path}`;
-const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null};
+const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
@@ -30,14 +30,10 @@ function updateOutputs(){
   }
 }
 
-function histogram(counts){
-  const max=Math.max(...counts,1);
-  $('#histogram').innerHTML=counts.map((n,i)=>`<div class="histogram-bar" style="height:${Math.max(3,n/max*100)}%" title="Scores ${i*10}–${i*10+9}: ${n.toLocaleString()} passages"></div>`).join('');
-}
-
 async function load(append=false){
   const serial=++state.request;
   state.loading=true;
+  if(!append)state.nextOffset=null;
   if(!append)refreshFacets(serial);
   try{
     const response=await fetch(apiURL('/api/matches?'+query(params())));
@@ -46,12 +42,10 @@ async function load(append=false){
     if(serial!==state.request)return;
     $('#result-count').textContent=data.total.toLocaleString();
     $('#result-context').textContent=`${data.total.toLocaleString()} of ${data.unfiltered_total.toLocaleString()} indexed passage pairs meet these controls`;
-    histogram(data.histogram);
     if(!append)state.items=[];state.items.push(...data.items);renderCrate(data.items,append);
     if(!append&&!data.items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower a threshold or include the same tune to broaden the search.</div>';
-    $('#list-footer').innerHTML=data.next_offset!==null?'<button id="load-more" type="button" class="load-more">Show more passages ↓</button>':'';
-    if(data.next_offset!==null)$('#load-more').addEventListener('click',()=>{state.offset=data.next_offset;load(true)});
-  }catch(err){if(serial===state.request){$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
+    state.nextOffset=data.next_offset;
+  }catch(err){if(serial===state.request){if(!append)$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
   finally{if(serial===state.request)state.loading=false}
 }
 
@@ -62,9 +56,15 @@ const sleeve = (s,side) => `<span class="sleeve ${side}" style="--h:${hue(s.perf
 const crateCard = item => `<button type="button" class="crate-card" role="listitem" data-pull="${item.id}" aria-pressed="false" aria-label="Pull ${esc(item.a.performer)} and ${esc(item.b.performer)}"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${item.heuristic_score.toFixed(1)} · ${item.notes} notes</span></button>`;
 function renderCrate(items,append){
   const strip=$('#crate-strip');
-  if(!append){strip.innerHTML='';strip.scrollLeft=0;$('#stage').className='stage';$('#stage').innerHTML='<p>Pull a pair from the crate to see both sleeves.</p>'}
+  if(!append){strip.innerHTML='';strip.scrollLeft=0;$('#stage').className='stage';$('#stage').innerHTML=''}
   strip.insertAdjacentHTML('beforeend',items.map(crateCard).join(''));
 }
+$('#crate-strip').addEventListener('scroll',()=>{
+  const strip=$('#crate-strip');
+  if(state.loading||state.nextOffset===null||strip.scrollLeft+strip.clientWidth<strip.scrollWidth-400)return;
+  state.offset=state.nextOffset;
+  load(true);
+});
 function pullPair(id){
   const item=state.items.find(x=>x.id===id);if(!item)return;
   document.querySelectorAll('.crate-card').forEach(c=>c.setAttribute('aria-pressed',String(Number(c.dataset.pull)===id)));
@@ -96,18 +96,19 @@ function renderEchoes(){
   }).join('');
   let lastDecade='';
   const years=state.echoOrder.map(mi=>{const dec=m[mi].year?Math.floor(m[mi].year/10)*10:'';const t=dec&&dec!==lastDecade?`<text class="echo-year" x="${x[mi]-24}" y="14">${dec}s</text>`:'';if(dec)lastDecade=dec;return t}).join('');
-  const nodes=m.map((p,i)=>`<button type="button" class="echo-node${sel!=null&&sel!==i&&!linked.has(i)?' dim':''}" style="left:${x[i]}px;top:${y0}px" data-echo="${i}" aria-pressed="${sel===i}">${sleeve({performer:p.name,album:p.album,title:p.title},'a')}<span>${esc(p.name)}</span></button>`).join('');
+  const nodes=m.map((p,i)=>`<button type="button" class="echo-node${sel!=null&&sel!==i&&!linked.has(i)?' dim':''}" style="left:${x[i]}px;top:${y0}px" data-echo="${i}" aria-pressed="${sel===i}" aria-label="${esc(p.name)}. Select, then double click for details" title="${esc(p.name)} · double click for details">${portrait(p.name)}<span>${esc(p.name)}</span></button>`).join('');
   const H=y0+NODE_H+ARC_H+8,box=$('#echoes-scroll'),left=box.scrollLeft;
   box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${H}px"><svg width="${width}" height="${H}" aria-label="Arcs from earlier to later musicians">${years}${arcs}</svg>${nodes}</div>`;
-  box.scrollLeft=sel==null?left:Math.max(0,x[sel]-box.clientWidth/2);
-  $('#echoes-note').textContent=sel==null?`Strongest ${shown.length} echoes, earlier player to later one. Pick a musician to see theirs. ${d.undirected} same-year pairs are left out.`:'';
-  renderEchoPanel(sel);
+  box.scrollLeft=left;
+  $('#echoes-note').textContent=sel==null?`Strongest ${shown.length} connections. Select a musician to trace their echoes; double click to open details.`:`${m[sel].name} · double click for details`;
+  renderEchoPanel(state.echoPanel);
 }
 function renderEchoPanel(sel){
   const d=state.echoes,m=d.musicians,panel=$('#echoes-panel');
   if(sel==null){panel.innerHTML='';return}
   const list=(ls,other)=>ls.length?`<ol>${[...ls].sort((a,b)=>b.strength-a.strength).slice(0,10).map(l=>`<li><button type="button" data-match="${l.top_id}"><span>${esc(m[l[other]].name)}</span><small>${l.pairs} pair${l.pairs===1?'':'s'}</small></button></li>`).join('')}</ol>`:'<p>None at these settings.</p>';
-  panel.innerHTML=`<h3>${esc(m[sel].name)}</h3><p>${m[sel].solos} solos · c. ${m[sel].year??'?'}</p><h4>Echoes (earlier players)</h4>${list(d.links.filter(l=>l.to===sel),'from')}<h4>Echoed by (later players)</h4>${list(d.links.filter(l=>l.from===sel),'to')}`;
+  const source=state.portraits[m[sel].name]?.page;
+  panel.innerHTML=`<h3>${esc(m[sel].name)}</h3><p>${m[sel].solos} solos · c. ${m[sel].year??'?'}</p>${source?`<a class="portrait-source" href="${esc(source)}" target="_blank" rel="noopener noreferrer">Portrait source ↗</a>`:''}<h4>Echoes</h4>${list(d.links.filter(l=>l.to===sel),'from')}<h4>Echoed by</h4>${list(d.links.filter(l=>l.from===sel),'to')}`;
 }
 let echoHeight=0;
 new ResizeObserver(()=>{const h=$('#echoes-scroll').clientHeight;if(h&&h!==echoHeight){echoHeight=h;renderEchoes()}}).observe($('#echoes-scroll'));
@@ -119,6 +120,7 @@ async function loadEchoes(){
     state.echoes=d;
     state.echoOrder=d.musicians.map((_,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
     if(state.echoSel!=null&&state.echoSel>=d.musicians.length)state.echoSel=null;
+    if(state.echoPanel!=null&&state.echoPanel>=d.musicians.length)state.echoPanel=null;
     renderEchoes();
   }catch(err){$('#echoes-scroll').innerHTML=`<div class="empty"><strong>Echoes unavailable.</strong>${esc(err.message)}</div>`}
 }
@@ -129,6 +131,8 @@ function setView(view){
   if(view==='echoes'){loadEchoes();$('.results-area').scrollIntoView()}
 }
 document.addEventListener('error',e=>{if(e.target.matches?.('.sleeve img'))e.target.hidden=true},true);
+const portrait=name=>{const photo=state.portraits[name];return `<span class="echo-portrait" style="--h:${hue(name)}"><span class="echo-portrait-fallback">${esc(initials(name))}</span>${photo?`<img loading="lazy" decoding="async" src="${esc(photo.image)}" alt="">`:''}</span>`};
+document.addEventListener('error',e=>{if(e.target.matches?.('.echo-portrait img'))e.target.hidden=true},true);
 
 const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sax',tp:'Trumpet',tb:'Trombone',cl:'Clarinet',p:'Piano',g:'Guitar',vib:'Vibraphone',b:'Bass',fl:'Flute',cor:'Cornet',bcl:'Bass clarinet',voc:'Voice'};
 const FACETS={decade:{label:'Decade',name:v=>`${v}s`},instrument:{label:'Instrument',name:v=>INSTRUMENTS[v]||v.toUpperCase()},performer:{label:'Musician',name:v=>v}};
@@ -142,8 +146,7 @@ function renderShelf(){
   const kind=state.facetKind,current=String(facetValue(kind)),{name}=FACETS[kind];
   const chip=(value,label,count)=>`<button type="button" class="shelf-chip" data-facet-value="${esc(value)}" aria-pressed="${String(value)===current}">${esc(label)}${count==null?'':` <small>${count.toLocaleString()}</small>`}</button>`;
   $('#shelf-chips').innerHTML=chip('','All',null)+data[kind].map(([v,n])=>chip(v,name(v),n)).join('');
-  const picks=Object.keys(FACETS).filter(k=>facetValue(k)).map(k=>FACETS[k].name(facetValue(k)));
-  $('#crate-label').textContent='The crate · '+(picks.length?picks.join(' · '):'flick sideways, pull a record');
+  $('#open-shelf').classList.toggle('has-pick',Object.keys(FACETS).some(k=>!!facetValue(k)));
 }
 function pickFacet(value){
   const kind=state.facetKind;
@@ -271,8 +274,9 @@ document.addEventListener('click',event=>{
   if(seg){const group=seg.closest('.segmented');group.querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===seg));state[group.dataset.name]=group.dataset.name==='max_edits'?Number(seg.dataset.value):seg.dataset.value;resetSearch()}
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
   const facetChip=event.target.closest('[data-facet-value]');if(facetChip)pickFacet(facetChip.dataset.facetValue);
+  if(event.target.closest('#open-shelf')){const options=$('#shelf-options'),open=options.hidden;options.hidden=!open;$('#open-shelf').setAttribute('aria-expanded',String(open))}
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
-  const echo=event.target.closest('[data-echo]');if(echo){const i=Number(echo.dataset.echo);state.echoSel=state.echoSel===i?null:i;renderEchoes()}
+  const echo=event.target.closest('[data-echo]');if(echo){const i=Number(echo.dataset.echo),now=performance.now();const secondClick=state.lastEchoClick?.index===i&&now-state.lastEchoClick.time<450;state.echoSel=i;state.echoPanel=secondClick?i:null;state.lastEchoClick={index:i,time:now};renderEchoes()}
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
   const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
@@ -280,6 +284,8 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-close-settings]'))$('#settings-dialog').close();
   if(event.target.closest('[data-close-pair]'))$('#pair-dialog').close();
 });
+document.addEventListener('dblclick',event=>{const echo=event.target.closest('[data-echo]');if(echo){state.echoSel=Number(echo.dataset.echo);state.echoPanel=state.echoSel;renderEchoes()}});
+document.addEventListener('keydown',event=>{const echo=event.target.closest('[data-echo]');if(echo&&event.key==='Enter'&&state.echoSel===Number(echo.dataset.echo)){event.preventDefault();state.echoPanel=state.echoSel;renderEchoes()}});
 let debounce;
 for(const id of ['min_notes','min_pitch','min_rhythm','min_distinct'])$('#'+id).addEventListener('input',()=>{updateOutputs();clearTimeout(debounce);debounce=setTimeout(resetSearch,150)});
 $('#performer').addEventListener('change',resetSearch);$('#sort').addEventListener('change',resetSearch);
@@ -394,6 +400,7 @@ $('#pair-dialog').addEventListener('close',()=>{state.openId=null;if(state.lastT
 
 async function init(){
   updateOutputs();
+  try{const portraits=await fetch(apiURL('/artist-portraits.json'));if(portraits.ok)state.portraits=await portraits.json()}catch{}
   try{setView(localStorage.getItem('atlas-view')==='echoes'?'echoes':'crate')}catch{}
   try{const res=await fetch(apiURL('/api/bootstrap'));if(!res.ok)throw new Error('Index unavailable');const data=await res.json();
     const collections=data.corpus.collections||{WJazzD:data.corpus.solos};
