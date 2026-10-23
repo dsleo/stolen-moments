@@ -56,9 +56,43 @@ python3 -m unittest discover -s tests
 
 `evaluate` reports sensitivity on planted 8–12-note transposed passages with one changed interval, plus current human-review coverage. The planted check is **not** a real-world recall estimate. Human-review shares are descriptive until a blinded, stratified expert set is labeled. The local source passed ingestion validation with 456 solos and 200,809 note events.
 
+## How matching works
+
+Search is **seed-and-extend over a prebuilt index**, not a sliding window over every pair of solos. `python3 -m jazzmine build` does it once; the UI only filters the result.
+
+1. **Intervals.** Each solo becomes its list of pitch intervals in semitones, so a transposed phrase matches itself. Rhythm and octave are not part of this step.
+2. **Seed index.** Every run of 5 consecutive intervals is stored in an inverted index (seed → solo, position). A second pass indexes runs of 4, but keeps only matches whose exact run is shorter than 7 intervals, to recover short motifs.
+3. **Pairing.** Two positions that share a seed, in **different solos**, form a candidate. Each exact run is generated once, from its leftmost seed.
+4. **Extension.** The match grows outward from the exact run. A mismatch is allowed only if an exact interval follows it: a substitution, or a gap of one interval on either side. At most **2 edits in total**, and at most **8 intervals beyond the exact run on each side**.
+5. **Filtering at build time.** Candidates under **8 notes** are dropped. Overlapping windows for the same pair of solos (65% overlap on both sides) collapse to the longest, best-scored one.
+6. **Scoring.** `score = 100 × (0.35 pitch + 0.22 rhythm + 0.25 distinctiveness + 0.18 length)`, minus penalties for the same tune (12), the same track (24) and looping cells (up to 28). Pitch is the exact share of aligned intervals; rhythm compares inter-onset spacing in beats (in seconds, tempo-normalised, when DTL1000 is involved); distinctiveness falls with the number of solos containing the seed.
+
+### Which settings can the UI change?
+
+| Setting | Where | Can the UI change it? |
+| --- | --- | --- |
+| Matched notes, pitch/rhythm/distinctiveness thresholds, pitch edits (0–2), performer, tune, decade, instrument, sort | Settings drawer and crate shelf | Yes, instantly. They filter the stored candidates. |
+| Seed length (5, and 4 for short motifs) | `INDEX_INTERVALS` in `jazzmine/mining.py` | No. Needs a rebuild. |
+| Common-seed cutoff (80 occurrences; 30 in the length-4 pass) | `MAX_POSTINGS` in `jazzmine/mining.py` | No. Needs a rebuild. |
+| Minimum notes at build time (8), edit budget (2), extension length (8) | `mining.py` | No. The UI can tighten these, never loosen them: a "Matched notes" of 6 or "Exact/One/Two edits" above 2 cannot reveal candidates that were never built. |
+
+After changing a constant, run `python3 -m jazzmine build` again. The index records its pipeline version in the `meta` table.
+
+## Limitations of the current approach
+
+- **Common seeds are skipped.** A seed seen more than 80 times (30 in the length-4 pass) is discarded entirely. This removes scales, arpeggios and stock patterns, but it also removes a genuinely common lick, and a phrase built only from such seeds is never found. The number of skipped seeds is reported by `build`.
+- **Variants are shallow.** There are at most 2 edits in total, each a single-interval substitution or gap, and each must be followed by an exact interval. The matcher finds a phrase with a changed or dropped note. It does not find a phrase with several changes in a row, a reordered phrase, an ornamented phrase with extra passing notes, or one with a stretched or compressed rhythm.
+- **Every match needs an exact core** of 4 or 5 intervals (so 5 or 6 notes) and ends up at least 8 notes long. Shorter motifs are out of scope.
+- **Pitch only in retrieval.** Rhythm is scored after a candidate is found and never creates one. Octave displacement or contour-preserving variants (same shape, different interval sizes) are not matched.
+- **Different solos only.** A phrase repeated inside one solo is not reported, though the same performer across two solos is.
+- **Distinctiveness is relative to the corpus.** It is computed against the indexed solos (456 for WJazzD alone), so it shifts if the corpus changes.
+- **The score is a heuristic** with hand-set weights. It orders listening; it is not calibrated against expert labels.
+- **Small corpus.** Only WJazzD (456 solos, 78 performers) is indexed. DTL1000 support exists in the code but is not in the index (see above).
+- **Index and server load everything in memory.** All 86,736 candidates are scanned in Python per request, which is fine at this size but would need SQL-side filtering for a much larger corpus.
+
 ## Boundaries
 
-The first release searches WJazzD solo transcriptions, not every song a soloist might quote. Candidate matches can reflect common jazz vocabulary, a shared composition, or chance. The search skips extremely common short seeds, and its variant matcher is anchored on exact runs of four or five intervals. It can miss heavily transformed quotations. Dates are presented as recorded by WJazzD; they do not establish influence or authorship. Media links require manual performance verification.
+The first release searches WJazzD solo transcriptions, not every song a soloist might quote. Candidate matches can reflect common jazz vocabulary, a shared composition, or chance. See the limitations above: the search skips very common seeds and its variant matcher is anchored on exact runs of four or five intervals, so it can miss heavily transformed quotations. Dates are presented as recorded by WJazzD; they do not establish influence or authorship. Media links require manual performance verification.
 
 The suggested [Jazz-Ml-Dataset](https://github.com/SaiKayala/Jazz-Ml-Dataset) is a collection of song MIDI files and a derived note CSV, with many full arrangements and non-jazz songs. Its files do not identify real solo performances or their audio timestamps. We inspected the archive: only 84 labeled melody tracks were nearly monophonic by a basic overlap check, often with doubled parts. It is a possible future **composition melody reference** after tune identity and duplicate checks, but it is not interchangeable with the WJazzD solo corpus and has not been added to the quotation ranking.
 
