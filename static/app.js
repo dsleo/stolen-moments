@@ -1,6 +1,6 @@
 const API_ORIGIN = location.protocol === 'file:' ? 'http://127.0.0.1:8766' : '';
 const apiURL = path => `${API_ORIGIN}${path}`;
-const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],artistImages:new Map(),albumImages:new Map()};
+const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],artistImages:new Map(),albumImages:new Map()};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
@@ -111,6 +111,7 @@ async function load(append=false){
     $('#result-count').textContent=data.total.toLocaleString();
     $('#result-context').textContent=`${data.total.toLocaleString()} of ${data.unfiltered_total.toLocaleString()} indexed passage pairs meet these controls`;
     histogram(data.histogram);
+    if(!append)state.items=[];state.items.push(...data.items);renderCrate(data.items,append);
     const html=data.items.map((x,i)=>row(x,state.offset+i)).join('');
     if(append)$('#results').insertAdjacentHTML('beforeend',html);
     else $('#results').innerHTML=html||'<div class="empty"><strong>No passages at this setting.</strong>Lower a threshold or include the same tune to broaden the search.</div>';
@@ -119,6 +120,33 @@ async function load(append=false){
   }catch(err){if(serial===state.request){$('#results').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
   finally{if(serial===state.request)state.loading=false}
 }
+
+const hue = name => [...String(name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7);
+const coverSrc = s => apiURL('/api/cover-image?'+new URLSearchParams({performer:s.performer||'',album:s.album||s.title||'',title:s.title||''}));
+// Typographic sleeve underneath; the real cover (if the archive finds one) covers it.
+const sleeve = (s,side) => `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span><img loading="lazy" decoding="async" alt="" src="${esc(coverSrc(s))}"></span>`;
+const crateCard = item => `<button type="button" class="crate-card" role="listitem" data-pull="${item.id}" aria-pressed="false" aria-label="Pull ${esc(item.a.performer)} and ${esc(item.b.performer)}"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${item.heuristic_score.toFixed(1)} · ${item.notes} notes</span></button>`;
+function renderCrate(items,append){
+  const strip=$('#crate-strip');
+  if(!append){strip.innerHTML='';strip.scrollLeft=0;$('#stage').className='stage';$('#stage').innerHTML='<p>Pull a pair from the crate to see both sleeves.</p>'}
+  strip.insertAdjacentHTML('beforeend',items.map(crateCard).join(''));
+}
+function pullPair(id){
+  const item=state.items.find(x=>x.id===id);if(!item)return;
+  document.querySelectorAll('.crate-card').forEach(c=>c.setAttribute('aria-pressed',String(Number(c.dataset.pull)===id)));
+  const stage=$('#stage');stage.className='stage has-pair';
+  stage.innerHTML=`<button type="button" class="stage-open" data-match="${id}" aria-haspopup="dialog" aria-label="Open ${esc(item.a.performer)} and ${esc(item.b.performer)}">${sleeve(item.a,'a')}<span class="stage-x" aria-hidden="true">↔</span>${sleeve(item.b,'b')}</button>
+    <h3>${esc(item.a.performer)} <em>↔</em> ${esc(item.b.performer)}</h3>
+    <p>${esc(item.a.title)} · ${sec(item.a_track_time)} &nbsp;/&nbsp; ${esc(item.b.title)} · ${sec(item.b_track_time)}</p>
+    <p>${item.notes} notes · ${pct(item.pitch_similarity)} pitch · ${pct(item.rhythm_similarity)} rhythm</p>
+    <button type="button" class="drawer-done" data-match="${id}" aria-haspopup="dialog">Hear this pair ↗</button>`;
+}
+function setView(view){
+  document.querySelector('.results-area').dataset.view=view;
+  document.querySelectorAll('[data-view-btn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.viewBtn===view)));
+  try{localStorage.setItem('atlas-view',view)}catch{}
+}
+document.addEventListener('error',e=>{if(e.target.matches?.('.sleeve img'))e.target.hidden=true},true);
 
 function resetSearch(){state.offset=0;state.openId=null;load()}
 function scorePanel(notes,side,id,solo){
@@ -247,6 +275,8 @@ async function submitJSON(url,data){const res=await fetch(apiURL(url),{method:'P
 document.addEventListener('click',event=>{
   const seg=event.target.closest('.segmented button');
   if(seg){const group=seg.closest('.segmented');group.querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===seg));state[group.dataset.name]=group.dataset.name==='max_edits'?Number(seg.dataset.value):seg.dataset.value;resetSearch()}
+  const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
+  const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
   const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
   const find=event.target.closest('[data-find-video]');if(find){find.disabled=true;find.textContent='Checking recording…';submitJSON('/api/discover-video',{trackid:Number(find.dataset.findVideo)}).then(async result=>{toast(result.found?'Video found; opening updated passage':'No reliable video match found');await load();if(state.details[Number(find.dataset.matchId)])toggleDetail(document.querySelector(`[data-match="${find.dataset.matchId}"]`))}).catch(err=>{toast(err.message);find.disabled=false;find.textContent='Check for a video'})}
@@ -368,6 +398,7 @@ $('#pair-dialog').addEventListener('close',()=>{state.openId=null;if(state.lastT
 
 async function init(){
   updateOutputs();
+  try{setView(localStorage.getItem('atlas-view')==='list'?'list':'crate')}catch{}
   try{const res=await fetch(apiURL('/api/bootstrap'));if(!res.ok)throw new Error('Index unavailable');const data=await res.json();
     const collections=data.corpus.collections||{WJazzD:data.corpus.solos};
     if(collections.DTL1000){

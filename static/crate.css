@@ -1,0 +1,41 @@
+/* Crate view: pairs as stacked sleeves in a box; the pulled pair sits on a stage above. */
+.view-toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; margin-right: 12px; }
+.view-toggle button { min-height: 44px; padding: 0 16px; border: 0; background: transparent; color: var(--muted); font-size: 13px; }
+.view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper-light); }
+.results-area[data-view="crate"] #results, .results-area[data-view="crate"] .list-heading { display: none; }
+.results-area[data-view="list"] .crate { display: none; }
+
+.stage { min-height: 300px; margin: 8px 0 20px; padding: 20px 16px; border: 1px dashed var(--line); text-align: center; display: grid; place-items: center; align-content: center; gap: 12px; color: var(--muted); }
+.stage.has-pair { border-style: solid; background: var(--paper-light); animation: stage-in .35s cubic-bezier(.25,1,.5,1) both; }
+@keyframes stage-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.stage h3 { margin: 0; font: 400 clamp(22px,5vw,32px)/1.1 var(--display); color: var(--ink); }
+.stage p { margin: 0; font-size: 14px; }
+.stage-open { display: flex; align-items: center; justify-content: center; gap: clamp(6px,2vw,20px); padding: 0; border: 0; background: transparent; width: 100%; }
+.stage-open .sleeve { width: min(34vw, 230px); }
+.stage-open .sleeve.a { transform: rotate(-2deg); }
+.stage-open .sleeve.b { transform: rotate(2deg); }
+.stage-open:hover .sleeve.a, .stage-open:focus-visible .sleeve.a { transform: translateX(-8px) rotate(-3deg); }
+.stage-open:hover .sleeve.b, .stage-open:focus-visible .sleeve.b { transform: translateX(8px) rotate(3deg); }
+.stage-x { color: var(--rust); font-size: 22px; }
+
+.sleeve { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: 3px; box-shadow: 0 6px 16px #1c1a1455; transition: transform .3s cubic-bezier(.25,1,.5,1); background: hsl(var(--h) 26% 30%); }
+.sleeve-fallback { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; padding: 8px; color: #f3e9d2; text-align: center; font: 600 clamp(22px,7vw,40px)/1 var(--display); }
+.sleeve-fallback small { font: 500 clamp(9px,2.4vw,12px)/1.2 var(--ui); opacity: .75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.sleeve img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.crate { position: relative; margin: 0 -16px; padding: 14px 0 0; background: #3a2c1f; border-radius: 6px 6px 0 0; }
+.crate-label { margin: 0 16px 8px; color: #d9c29a; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.crate-strip { display: flex; gap: 10px; overflow-x: auto; padding: 26px 16px 18px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.crate-card { flex: 0 0 clamp(150px,44vw,190px); scroll-snap-align: start; display: grid; gap: 6px; padding: 0 0 8px; border: 0; background: transparent; color: #f3e9d2; text-align: left; transition: transform .3s cubic-bezier(.25,1,.5,1); }
+.crate-card .sleeves { position: relative; display: block; padding: 0 22px 22px 0; }
+.crate-card .sleeve.b { position: absolute; right: 0; bottom: 0; width: 82%; transform: rotate(3deg); }
+.crate-card .sleeve.a { width: 82%; }
+.crate-card:hover, .crate-card:focus-visible { transform: translateY(-8px); }
+.crate-card[aria-pressed="true"] { transform: translateY(-14px); }
+.crate-card[aria-pressed="true"] .sleeve { box-shadow: 0 0 0 2px #e8b67d, 0 8px 18px #0008; }
+.crate-names { font-size: 13px; line-height: 1.25; }
+.crate-score { color: #e8b67d; font-size: 12px; }
+.crate::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(#5a4430, #46341f); border-top: 2px solid #7a5c3c; pointer-events: none; }
+.crate-strip { padding-bottom: 34px; }
+@media (min-width: 900px) { .crate { margin: 0; } .crate-card { flex-basis: 200px; } }
+@media (prefers-reduced-motion: reduce) { .stage.has-pair { animation: none; } .sleeve, .crate-card { transition: none; } }
