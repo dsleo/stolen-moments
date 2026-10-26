@@ -1,10 +1,33 @@
 # Stolen Moments
 
+**Current app:** the joint pitch-and-rhythm search is published as a read-only,
+fully static WJazzD site. See [STATIC_SITE.md](STATIC_SITE.md) for the build,
+hosting, recording-link behavior, and current collection coverage. The older
+server and search notes below describe the previous local workbench.
+
 A local web app for exploring melodic reuse in the 456 solo transcriptions of the Weimar Jazz Database (WJazzD) v2.1. It finds transposed interval matches and bounded variants, then lets a musician adjust thresholds, compare score excerpts, hear a synthesized rendering, and find a source-recording link.
 
 ## DTL1000 note tracks
 
 The [current DTL1000 metadata export](https://dig-that-lick.hfm-weimar.de/similarity_search/documentation) lists 1,685 solos. Its solo-detail pages expose pitches, onsets, and durations for MIDI playback, so audio files are not needed for motif search. A local importer and cross-collection search support are prepared, but the site blocked bulk requests after 750 note tracks were fetched; its [robots rules](https://dig-that-lick.hfm-weimar.de/robots.txt) also disallow automated crawling. The app deliberately continues to show only the complete WJazzD index. Completing the DTL1000 import requires an authorized note-track export or permission from the project. DTL1000 notes are automatic transcriptions and have no annotated beat or harmony grid.
+
+The [23 October reconciliation](data/DTL_STATUS.md) verifies the original archive,
+lists the 935 missing note tracks, and documents timestamp discrepancies between
+the JSON and CSV. Run `python3 -m jazzmine export-dtl /path/to/dtl_1000.json` to
+produce a staging JSON with available notes, original metadata, and a gap report.
+
+### Jazz Trio Database pilot
+
+A balanced pilot of 120 performances from the [Jazz Trio Database](https://github.com/HuwCheston/Jazz-Trio-Database)
+is available in the local index. Its chordal piano MIDI is represented by a
+provisional highest-note line, so motif matches are exploratory. The imported
+annotation data is MIT-licensed; linked recordings retain their own terms. To
+rebuild the local pilot database from the official release archive, run
+`python3 -m jazzmine import-jtd-pilot /path/to/jazz-trio-database-v02.zip`.
+The app currently combines WJazzD with this pilot; use **Jazz Trio Database
+only** to inspect its internal matches.
+The [pilot report](data/JTD_PILOT.md) records source details, extraction method,
+and initial match counts.
 
 ## Start
 
@@ -27,8 +50,9 @@ The workspace already contains the downloaded source and built index, so startin
 - **Pitch agreement:** fraction of aligned intervals that match exactly. Transposition is allowed.
 - **Pitch edits:** zero, one, or two substitutions/short gaps around an exact seed.
 - **Rhythm agreement:** similarity of inter-onset spacing measured in beats.
-- **Distinctiveness:** how uncommon the seed is across different WJazzD solos.
-- **Performers / composition:** explore self-reuse, cross-performer reuse, same tune, or different tunes.
+- **Distinctiveness:** how uncommon the seed is across different solos in the indexed collections.
+- **Musician:** type a name and choose an archive suggestion to limit results to passages involving that musician.
+- **All-data search:** searches always span every collection, performer relationship, and composition currently in the index. Decade and instrument browsing remain available from the crate shelf.
 
 The count and score distribution update after every control change. Open a passage to inspect source note IDs, track times, two staff-notation extracts, component scores, and the two synthesized transcriptions. The notation uses stored MIDI pitches and note spacing in beats, quantized to sixteenths; it is an approximate rhythmic sketch rather than an edited publication score. The **ranking score is a heuristic**, not a probability of quotation, intent, or influence. Repeated short cells are penalized because long loops can otherwise dominate the ranking.
 
@@ -71,10 +95,12 @@ Search is **seed-and-extend over a prebuilt index**, not a sliding window over e
 
 | Setting | Where | Can the UI change it? |
 | --- | --- | --- |
-| Matched notes, pitch/rhythm/distinctiveness thresholds, pitch edits (0–2), performer, tune, decade, instrument, sort | Settings drawer and crate shelf | Yes, instantly. They filter the stored candidates. |
+| Matched notes and sort order | Crate result-settings menu | Yes, instantly. They filter or reorder the stored candidates. |
+| Pitch/rhythm/distinctiveness thresholds, pitch edits (0–2), musician | Search drawer | Yes, instantly. They filter the stored candidates while searching all indexed collections. |
+| Decade and instrument | Crate shelf | Yes, instantly. They filter the stored candidates. |
 | Seed length (5, and 4 for short motifs) | `INDEX_INTERVALS` in `jazzmine/mining.py` | No. Needs a rebuild. |
 | Common-seed cutoff (80 occurrences; 30 in the length-4 pass) | `MAX_POSTINGS` in `jazzmine/mining.py` | No. Needs a rebuild. |
-| Minimum notes at build time (8), edit budget (2), extension length (8) | `mining.py` | No. The UI can tighten these, never loosen them: a "Matched notes" of 6 or "Exact/One/Two edits" above 2 cannot reveal candidates that were never built. |
+| Minimum notes at build time (8), edit budget (2), extension length (8) | `mining.py` | No. The UI can tighten these, never loosen them: a "Matched notes" below 8 or more than two pitch edits cannot reveal candidates that were never built. |
 
 After changing a constant, run `python3 -m jazzmine build` again. The index records its pipeline version in the `meta` table.
 

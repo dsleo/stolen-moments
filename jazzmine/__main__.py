@@ -15,6 +15,12 @@ def main():
     sub.add_parser("download", help="Download the official WJazzD SQLite database")
     check = sub.add_parser("validate", help="Validate the source corpus")
     check.add_argument("--all", action="store_true", help="Include a complete DTL1000 import")
+    dtl = sub.add_parser("export-dtl", help="Reconcile a DTL archive JSON with cached metadata and notes")
+    dtl.add_argument("archive", help="Path to the official dtl_1000.json")
+    dtl.add_argument("--output", default="data/dtl-reconciled.json")
+    jtd = sub.add_parser("import-jtd-pilot", help="Import a balanced Jazz Trio Database pilot")
+    jtd.add_argument("archive", help="Path to the Jazz Trio Database annotations ZIP")
+    jtd.add_argument("--limit", type=int, default=120)
     sub.add_parser("build", help="Build the candidate search index")
     sub.add_parser("evaluate", help="Report synthetic sensitivity and human review progress")
     videos = sub.add_parser("discover-videos", help="Find duration-matched YouTube recordings")
@@ -38,6 +44,25 @@ def main():
     elif args.command == "validate":
         corpus = load_combined_corpus(require_dtl=True) if args.all else load_corpus()
         print(json.dumps(validate_corpus(corpus, combined_source_checksum() if args.all else source_checksum()), indent=2))
+    elif args.command == "export-dtl":
+        from pathlib import Path
+        from .dtl_export import reconcile
+        result = reconcile(Path(args.archive))
+        output = Path(args.output)
+        if output.resolve() == Path(args.archive).resolve():
+            parser.error("Output must not overwrite the original archive")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(result, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+        report_path = output.with_name(output.stem + "-report.json")
+        report_path.write_text(json.dumps(result["report"], indent=2) + "\n", encoding="utf-8")
+        print(json.dumps({"output": str(output), "report": str(report_path),
+                          "available_note_solos": result["report"]["available_note_solos"],
+                          "missing_note_solos": len(result["report"]["missing_note_solos"]),
+                          "ready_for_app_import": result["report"]["ready_for_app_import"]}, indent=2))
+    elif args.command == "import-jtd-pilot":
+        from pathlib import Path
+        from .jtd import import_pilot
+        print(json.dumps(import_pilot(Path(args.archive), limit=args.limit), indent=2))
     elif args.command == "build":
         print(json.dumps(build_index(), indent=2))
     elif args.command == "evaluate":
