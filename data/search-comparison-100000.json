@@ -1,0 +1,67 @@
+{
+  "scope": "WJazzD only; sampled five-interval seeds before production deduplication",
+  "corpus": {
+    "solos": 456,
+    "notes": 200809,
+    "source_sha256": "af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12"
+  },
+  "settings": {
+    "seed_intervals": 5,
+    "max_postings": 80,
+    "total_budget": 6.0,
+    "run_budget": 2.0,
+    "onset_tolerance": 0.125,
+    "duration_tolerance": 0.125,
+    "pitch_scale": 2.0,
+    "onset_scale": 0.5,
+    "duration_scale": 0.5,
+    "min_pairs": 8
+  },
+  "random_seed": 41,
+  "seeds": {
+    "eligible": 662700,
+    "sampled": 100000,
+    "index_seconds": 0.479
+  },
+  "baseline": {
+    "found": 45384,
+    "sample_seconds": 1.599,
+    "median_notes": 9,
+    "p90_notes": 11
+  },
+  "joint": {
+    "found": 66502,
+    "sample_seconds": 4.172,
+    "median_pairs": 9,
+    "p90_pairs": 11,
+    "median_similarity": 0.7892,
+    "median_cost": 1.8676,
+    "after_containment": 64026,
+    "after_cutoffs": {
+      "pairs>=8,similarity>=0.75": 54691,
+      "pairs>=8,similarity>=0.8": 24292,
+      "pairs>=8,similarity>=0.85": 1798,
+      "pairs>=8,similarity>=0.9": 64,
+      "pairs>=10,similarity>=0.75": 14700,
+      "pairs>=10,similarity>=0.8": 9750,
+      "pairs>=10,similarity>=0.85": 1244,
+      "pairs>=10,similarity>=0.9": 30,
+      "pairs>=12,similarity>=0.75": 3362,
+      "pairs>=12,similarity>=0.8": 1788,
+      "pairs>=12,similarity>=0.85": 580,
+      "pairs>=12,similarity>=0.9": 24
+    },
+    "explored_states_median": 7,
+    "explored_states_p90": 20,
+    "explored_states_max": 1007
+  },
+  "same_seed": {
+    "both_found": 32492,
+    "joint_longer": 12781,
+    "baseline_longer": 10966,
+    "equal_pairs": 8745,
+    "joint_further_right_in_both": 27895,
+    "baseline_further_right_in_both": 1276
+  },
+  "caution": "No listener labels exist. Detection, length, and runtime do not measure musical relevance. The baseline also extends left and uses a second four-interval pass in its full build."
+}

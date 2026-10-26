@@ -1,0 +1,67 @@
+{
+  "scope": "WJazzD only; sampled five-interval seeds before production deduplication",
+  "corpus": {
+    "solos": 456,
+    "notes": 200809,
+    "source_sha256": "af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12"
+  },
+  "settings": {
+    "seed_intervals": 5,
+    "max_postings": 80,
+    "total_budget": 6.0,
+    "run_budget": 2.0,
+    "onset_tolerance": 0.125,
+    "duration_tolerance": 0.125,
+    "pitch_scale": 2.0,
+    "onset_scale": 0.5,
+    "duration_scale": 0.5,
+    "min_pairs": 8
+  },
+  "random_seed": 41,
+  "seeds": {
+    "eligible": 662700,
+    "sampled": 662700,
+    "index_seconds": 0.325
+  },
+  "baseline": {
+    "found": 301240,
+    "sample_seconds": 10.253,
+    "median_notes": 9,
+    "p90_notes": 11
+  },
+  "joint": {
+    "found": 441357,
+    "sample_seconds": 28.117,
+    "median_pairs": 9,
+    "p90_pairs": 11,
+    "median_similarity": 0.7892,
+    "median_cost": 1.8668,
+    "after_containment": 360578,
+    "after_cutoffs": {
+      "pairs>=8,similarity>=0.75": 307905,
+      "pairs>=8,similarity>=0.8": 131822,
+      "pairs>=8,similarity>=0.85": 8436,
+      "pairs>=8,similarity>=0.9": 269,
+      "pairs>=10,similarity>=0.75": 79076,
+      "pairs>=10,similarity>=0.8": 51474,
+      "pairs>=10,similarity>=0.85": 5780,
+      "pairs>=10,similarity>=0.9": 98,
+      "pairs>=12,similarity>=0.75": 16908,
+      "pairs>=12,similarity>=0.8": 8650,
+      "pairs>=12,similarity>=0.85": 2490,
+      "pairs>=12,similarity>=0.9": 67
+    },
+    "explored_states_median": 7,
+    "explored_states_p90": 20,
+    "explored_states_max": 1160
+  },
+  "same_seed": {
+    "both_found": 215429,
+    "joint_longer": 84321,
+    "baseline_longer": 72888,
+    "equal_pairs": 58220,
+    "joint_further_right_in_both": 184912,
+    "baseline_further_right_in_both": 8042
+  },
+  "caution": "No listener labels exist. Detection, length, and runtime do not measure musical relevance. The baseline also extends left and uses a second four-interval pass in its full build."
+}
