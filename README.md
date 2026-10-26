@@ -1,108 +1,64 @@
 # Stolen Moments
 
-**Current app:** the joint pitch-and-rhythm search is published as a read-only,
-fully static WJazzD site. See [STATIC_SITE.md](STATIC_SITE.md) for the build,
-hosting, recording-link behavior, and current collection coverage. The older
-server and search notes below describe the previous local workbench.
+A read-only web app for discovering shared phrases in the 456 solo transcriptions of the Weimar Jazz Database (WJazzD) v2.1. Pick a pair of solos, hear both, see the notes line up, and jump to the recording at that moment. The whole archive is **precomputed**, so the published site is plain static files: no server, database or build step at view time. See [STATIC_SITE.md](STATIC_SITE.md) for hosting details.
 
-A local web app for exploring melodic reuse in the 456 solo transcriptions of the Weimar Jazz Database (WJazzD) v2.1. It finds transposed interval matches and bounded variants, then lets a musician adjust thresholds, compare score excerpts, hear a synthesized rendering, and find a source-recording link.
+## Quick start
 
-## DTL1000 note tracks
-
-The [current DTL1000 metadata export](https://dig-that-lick.hfm-weimar.de/similarity_search/documentation) lists 1,685 solos. Its solo-detail pages expose pitches, onsets, and durations for MIDI playback, so audio files are not needed for motif search. A local importer and cross-collection search support are prepared, but the site blocked bulk requests after 750 note tracks were fetched; its [robots rules](https://dig-that-lick.hfm-weimar.de/robots.txt) also disallow automated crawling. The app deliberately continues to show only the complete WJazzD index. Completing the DTL1000 import requires an authorized note-track export or permission from the project. DTL1000 notes are automatic transcriptions and have no annotated beat or harmony grid.
-
-The [23 October reconciliation](data/DTL_STATUS.md) verifies the original archive,
-lists the 935 missing note tracks, and documents timestamp discrepancies between
-the JSON and CSV. Run `python3 -m jazzmine export-dtl /path/to/dtl_1000.json` to
-produce a staging JSON with available notes, original metadata, and a gap report.
-
-### Jazz Trio Database pilot
-
-A balanced pilot of 120 performances from the [Jazz Trio Database](https://github.com/HuwCheston/Jazz-Trio-Database)
-is available in the local index. Its chordal piano MIDI is represented by a
-provisional highest-note line, so motif matches are exploratory. The imported
-annotation data is MIT-licensed; linked recordings retain their own terms. To
-rebuild the local pilot database from the official release archive, run
-`python3 -m jazzmine import-jtd-pilot /path/to/jazz-trio-database-v02.zip`.
-The app currently combines WJazzD with this pilot; use **Jazz Trio Database
-only** to inspect its internal matches.
-The [pilot report](data/JTD_PILOT.md) records source details, extraction method,
-and initial match counts.
-
-## Start
-
-Requires Python 3.11 or newer. The application has no third-party Python dependencies.
+Browsing the existing site needs only a static file server:
 
 ```sh
-python3 -m jazzmine download
-python3 -m jazzmine build
-python3 -m jazzmine sync-jazztube
-python3 -m jazzmine serve --port 8766
+python3 -m http.server 8766 -d static
 ```
 
-Open [http://127.0.0.1:8766](http://127.0.0.1:8766). `download` fetches the official 42 MB SQLite database to `data/wjazzd.db`; `build` creates a local search index in `data/workbench.db`. Both databases stay on your computer and are excluded from Git. The build takes roughly a minute on a recent laptop. On this machine it produced 86,736 passage pairs.
+Open [http://127.0.0.1:8766](http://127.0.0.1:8766). It cannot be opened as `file://`, because the browser has to fetch compressed data files.
 
-The workspace already contains the downloaded source and built index, so starting the server is enough here.
+`python3 -m jazzmine serve --port 8766` also works. It serves the same `static/` folder.
 
-## Use the controls
+## What the app does
 
-- **Matched notes:** minimum aligned phrase length (8–24 notes).
-- **Pitch agreement:** fraction of aligned intervals that match exactly. Transposition is allowed.
-- **Pitch edits:** zero, one, or two substitutions/short gaps around an exact seed.
-- **Rhythm agreement:** similarity of inter-onset spacing measured in beats.
-- **Distinctiveness:** how uncommon the seed is across different solos in the indexed collections.
-- **Musician:** type a name and choose an archive suggestion to limit results to passages involving that musician.
-- **All-data search:** searches always span every collection, performer relationship, and composition currently in the index. Decade and instrument browsing remain available from the crate shelf.
+- **Crate:** one sleeve per passage pair, with album art, the two musicians, similarity and note count. The filter button narrows by decade, instrument or musician (searchable) and by minimum paired notes. The sort button offers *Best matches*, *Longest passages* and *Most similar*. Active filters show as removable tags.
+- **Passage view:** two score excerpts, a synthesized rendering of each (the database notes, not the original audio), and links into the source recordings.
+- **Echoes:** a timeline of musicians and the strongest connections between them. Select a musician to trace who echoes whom.
 
-The count and score distribution update after every control change. Open a passage to inspect source note IDs, track times, two staff-notation extracts, component scores, and the two synthesized transcriptions. The notation uses stored MIDI pitches and note spacing in beats, quantized to sixteenths; it is an approximate rhythmic sketch rather than an edited publication score. The **ranking score is a heuristic**, not a probability of quotation, intent, or influence. Repeated short cells are penalized because long loops can otherwise dominate the ranking.
+Scores are heuristics for listening, not evidence of quotation or influence.
 
-**Export CSV** downloads the currently filtered results.
-
-## Recording links
-
-Each result shows both source-track timestamps. [JazzTube](http://mir.audiolabs.uni-erlangen.de/jazztube/downloads) publishes YouTube IDs and video start/end times for 329 WJazzD solos. `sync-jazztube` imports its CSV (988 video entries), checks each candidate against YouTube, and keeps the first currently available video for each solo. On this machine that yielded 297 linked solos. The app maps passage positions into the corresponding video. These links open actual YouTube video IDs with timestamps. The timestamp is approximate: it interpolates between JazzTube's solo bounds and the WJazzD note extent, and video availability can change later. Open the JazzTube alignment link in a passage to inspect its source. A manually verified track/video mapping takes precedence.
-
-For other solos, the app can still find a likely video using artist, tune, album, and near-identical duration against the source's MusicBrainz recording. Those positions are estimated from source-track time. Open a passage and choose **Check for a video** to search a track that has not been matched yet. Expanded passages also show the album, official WJazzD transcription, and MusicBrainz recording record when available. To import a local copy of JazzTube's CSV, use `python3 -m jazzmine sync-jazztube --csv /path/to/csv_youtube.csv`.
-
-Automatic discovery requires `yt-dlp` on the local machine and network access. `python3 -m jazzmine discover-videos --limit 50` checks the tracks most prominent in current default results and caches strong metadata matches. MusicBrainz permits at most one request per second, so this may take several minutes. The video discovery process does not download or redistribute audio.
-
-The **Hear the transcription** buttons synthesize the database notes in the browser. They are useful for comparison, but they are not original recording audio.
-
-Score excerpts are rendered locally with a bundled copy of abcjs 6.7.2 (MIT license in `static/vendor/abcjs-LICENSE.md`), so they remain available without a third-party page load.
-
-## Validation and evaluation
+## How it is built
 
 ```sh
-python3 -m jazzmine validate
-python3 -m jazzmine evaluate
-python3 -m unittest discover -s tests
+python3 -m jazzmine download                 # WJazzD SQLite source -> data/wjazzd.db
+python3 -m jazzmine sync-jazztube            # YouTube links with solo alignments
+python3 -m jazzmine.joint_store              # joint search -> data/joint-search.db (about 1 minute)
+python3 -m jazzmine.static_export            # -> static/catalog/
 ```
 
-`evaluate` reports sensitivity on planted 8–12-note transposed passages with one changed interval, plus current human-review coverage. The planted check is **not** a real-world recall estimate. Human-review shares are descriptive until a blinded, stratified expert set is labeled. The local source passed ingestion validation with 456 solos and 200,809 note events.
+The databases in `data/` stay on your computer and are excluded from Git; `static/catalog/` is the generated output that the site serves. Rebuild and re-export whenever the source, search settings or recording links change.
 
 ## How matching works
 
-Search is **seed-and-extend over a prebuilt index**, not a sliding window over every pair of solos. `python3 -m jazzmine build` does it once; the UI only filters the result.
+The current search is a **joint pitch-and-rhythm alignment** seeded by pitch intervals. [JOINT_SEARCH_REPORT.md](JOINT_SEARCH_REPORT.md) has the full specification and benchmarks, and [JOINT_THRESHOLD_ANALYSIS.md](JOINT_THRESHOLD_ANALYSIS.md) explains the similarity floor.
 
-1. **Intervals.** Each solo becomes its list of pitch intervals in semitones, so a transposed phrase matches itself. Rhythm and octave are not part of this step.
-2. **Seed index.** Every run of 5 consecutive intervals is stored in an inverted index (seed → solo, position). A second pass indexes runs of 4, but keeps only matches whose exact run is shorter than 7 intervals, to recover short motifs.
-3. **Pairing.** Two positions that share a seed, in **different solos**, form a candidate. Each exact run is generated once, from its leftmost seed.
-4. **Extension.** The match grows outward from the exact run. A mismatch is allowed only if an exact interval follows it: a substitution, or a gap of one interval on either side. At most **2 edits in total**, and at most **8 intervals beyond the exact run on each side**.
-5. **Filtering at build time.** Candidates under **8 notes** are dropped. Overlapping windows for the same pair of solos (65% overlap on both sides) collapse to the longest, best-scored one.
-6. **Scoring.** `score = 100 × (0.35 pitch + 0.22 rhythm + 0.25 distinctiveness + 0.18 length)`, minus penalties for the same tune (12), the same track (24) and looping cells (up to 28). Pitch is the exact share of aligned intervals; rhythm compares inter-onset spacing in beats (in seconds, tempo-normalised, when DTL1000 is involved); distinctiveness falls with the number of solos containing the seed.
+1. **Seeds.** Every run of 5 consecutive pitch intervals (in semitones, so transposed phrases match) goes into an inverted index. Seeds that occur more than 80 times are discarded as stock patterns. Two occurrences in *different solos* form an anchor.
+2. **Alignment.** From each anchor the match extends to the right note by note. Each step pairs two notes, or skips a note on one side. A paired note costs up to 0.5 for pitch difference, 0.25 for onset spacing in beats and 0.25 for duration in beats; a skipped note costs 1. Total cost may not exceed 6, and cost since the last perfect pair may not exceed 2.
+3. **Endpoint.** The longest reachable passage is kept, with at least 8 paired notes.
+4. **Similarity** is `1 - cost / (paired + skipped notes)`. The site shows passages at **80% or above**. *Best matches* orders by paired notes minus cost.
+5. **Clean-up.** Windows contained in another window for the same pair of solos are removed, then overlapping windows are merged (see below).
 
-### Which settings can the UI change?
+Pitch intervals alone create candidates; rhythm only scores them. Dates come from WJazzD and do not establish influence or authorship.
 
-| Setting | Where | Can the UI change it? |
-| --- | --- | --- |
-| Matched notes and sort order | Crate result-settings menu | Yes, instantly. They filter or reorder the stored candidates. |
-| Pitch/rhythm/distinctiveness thresholds, pitch edits (0–2), musician | Search drawer | Yes, instantly. They filter the stored candidates while searching all indexed collections. |
-| Decade and instrument | Crate shelf | Yes, instantly. They filter the stored candidates. |
-| Seed length (5, and 4 for short motifs) | `INDEX_INTERVALS` in `jazzmine/mining.py` | No. Needs a rebuild. |
-| Common-seed cutoff (80 occurrences; 30 in the length-4 pass) | `MAX_POSTINGS` in `jazzmine/mining.py` | No. Needs a rebuild. |
-| Minimum notes at build time (8), edit budget (2), extension length (8) | `mining.py` | No. The UI can tighten these, never loosen them: a "Matched notes" below 8 or more than two pitch edits cannot reveal candidates that were never built. |
+## Recording links
 
-After changing a constant, run `python3 -m jazzmine build` again. The index records its pipeline version in the `meta` table.
+Links open YouTube at the calculated passage onset. Priority: a manually verified track mapping, then [JazzTube](http://mir.audiolabs.uni-erlangen.de/jazztube/downloads)'s solo alignment (`sync-jazztube`, or `--csv /path/to/csv_youtube.csv` for a local copy), then a duration-matched likely recording found with `discover-videos` (needs `yt-dlp` and network access, one MusicBrainz request per second). `python3 -m jazzmine.video_audit` re-checks (over the network, and rewrites `data/joint-video-audit.json`) that the linked videos still exist; unavailable ones are replaced from `data/joint-video-replacements.json` or dropped at export. Video discovery never downloads or redistributes audio.
+
+Score excerpts are rendered locally with a bundled copy of abcjs 6.7.2 (MIT license in `static/vendor/abcjs-LICENSE.md`).
+
+## Checks
+
+```sh
+python3 -m jazzmine validate
+python3 -m pytest
+```
+
+`validate` checks ingestion of the source (456 solos, 200,809 note events).
 
 ## Near-duplicate passages (joint search)
 
@@ -126,17 +82,41 @@ Most affected solo pairs lost one passage (2,370); the rest lost two to eight.
 - Alternate takes of one tune by the same performer (for example two "The Oracle" solos) are separate solos and can each match the same other solo at the same notes. About 140 such take pairs exist; they are different recordings and are not merged.
 - The 50% threshold is a judgement call, not tuned against labels.
 
-## Limitations of the current approach
+## Limitations
 
-- **Common seeds are skipped.** A seed seen more than 80 times (30 in the length-4 pass) is discarded entirely. This removes scales, arpeggios and stock patterns, but it also removes a genuinely common lick, and a phrase built only from such seeds is never found. The number of skipped seeds is reported by `build`.
-- **Variants are shallow.** There are at most 2 edits in total, each a single-interval substitution or gap, and each must be followed by an exact interval. The matcher finds a phrase with a changed or dropped note. It does not find a phrase with several changes in a row, a reordered phrase, an ornamented phrase with extra passing notes, or one with a stretched or compressed rhythm.
-- **Every match needs an exact core** of 4 or 5 intervals (so 5 or 6 notes) and ends up at least 8 notes long. Shorter motifs are out of scope.
-- **Pitch only in retrieval.** Rhythm is scored after a candidate is found and never creates one. Octave displacement or contour-preserving variants (same shape, different interval sizes) are not matched.
+- **Common seeds are skipped.** A phrase built only from seeds seen more than 80 times is never found.
+- **Exact core required.** Every match starts from 5 identical intervals (6 notes) and ends up at least 8 paired notes long. Shorter motifs, and heavily reworked quotations, are out of scope.
+- **Pitch creates candidates; rhythm does not.** Octave displacement and contour-preserving variants with different interval sizes are not matched.
+- **Rightward extension only.** The alignment starts at the seed and grows right, so a passage may begin a few notes after its true start; neighbouring seeds are merged by the clean-up above.
 - **Different solos only.** A phrase repeated inside one solo is not reported, though the same performer across two solos is.
-- **Distinctiveness is relative to the corpus.** It is computed against the indexed solos (456 for WJazzD alone), so it shifts if the corpus changes.
-- **The score is a heuristic** with hand-set weights. It orders listening; it is not calibrated against expert labels.
-- **Small corpus.** Only WJazzD (456 solos, 78 performers) is indexed. DTL1000 support exists in the code but is not in the index (see above).
-- **Index and server load everything in memory.** All 86,736 candidates are scanned in Python per request, which is fine at this size but would need SQL-side filtering for a much larger corpus.
+- **Single collection.** Only WJazzD (456 solos) is in the site. DTL1000 and the Jazz Trio Database pilot are prepared but not included (below).
+- **Scoring is a heuristic** with hand-set weights, not calibrated against expert labels.
+- **Recording links are approximate.** Timestamps are interpolated from JazzTube's solo alignment and rounded down to the second; a particular upload may need manual correction, and 90,910 of the 253,048 passage sides currently have no matched video.
+- **Everything loads in the browser.** The compact index is about 3 MB compressed; passage details and notes are fetched on demand.
+
+## Other collections
+
+### DTL1000 note tracks
+
+The [current DTL1000 metadata export](https://dig-that-lick.hfm-weimar.de/similarity_search/documentation) lists 1,685 solos. Its solo-detail pages expose pitches, onsets, and durations for MIDI playback, so audio files are not needed for motif search. A local importer and cross-collection search support are prepared, but the site blocked bulk requests after 750 note tracks were fetched; its [robots rules](https://dig-that-lick.hfm-weimar.de/robots.txt) also disallow automated crawling. The app deliberately continues to show only the complete WJazzD index. Completing the DTL1000 import requires an authorized note-track export or permission from the project. DTL1000 notes are automatic transcriptions and have no annotated beat or harmony grid.
+
+The [23 October reconciliation](data/DTL_STATUS.md) verifies the original archive,
+lists the 935 missing note tracks, and documents timestamp discrepancies between
+the JSON and CSV. Run `python3 -m jazzmine export-dtl /path/to/dtl_1000.json` to
+produce a staging JSON with available notes, original metadata, and a gap report.
+
+### Jazz Trio Database pilot
+
+A balanced pilot of 120 performances from the [Jazz Trio Database](https://github.com/HuwCheston/Jazz-Trio-Database)
+is available in the local index. Its chordal piano MIDI is represented by a
+provisional highest-note line, so motif matches are exploratory. The imported
+annotation data is MIT-licensed; linked recordings retain their own terms. To
+rebuild the local pilot database from the official release archive, run
+`python3 -m jazzmine import-jtd-pilot /path/to/jazz-trio-database-v02.zip`.
+The app currently combines WJazzD with this pilot; use **Jazz Trio Database
+only** to inspect its internal matches.
+The [pilot report](data/JTD_PILOT.md) records source details, extraction method,
+and initial match counts.
 
 ## Boundaries
 
