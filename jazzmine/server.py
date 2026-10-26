@@ -87,6 +87,8 @@ class App:
             return False
         if p["collection"] == "dtl" and (source_a != "DTL1000" or source_b != "DTL1000"):
             return False
+        if p["collection"] == "jtd" and (source_a != "JTD" or source_b != "JTD"):
+            return False
         if p["collection"] == "cross" and source_a == source_b:
             return False
         if r["notes"] < p["min_notes"] or r["edits"] > p["max_edits"]:

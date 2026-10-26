@@ -70,12 +70,18 @@ def source_checksum() -> str:
 
 
 def combined_source_checksum() -> str:
-    """Identify the exact WJazzD and optional DTL1000 data used for an index."""
+    """Identify the exact source databases used for an index."""
     from .dtl import DTL_SOURCE
-    if not _dtl_complete(DTL_SOURCE):
+    paths = [SOURCE]
+    if _dtl_complete(DTL_SOURCE):
+        paths.append(DTL_SOURCE)
+    jtd_path = ROOT / "data" / "jtd.db"
+    if jtd_path.exists():
+        paths.append(jtd_path)
+    if len(paths) == 1:
         return source_checksum()
     h = hashlib.sha256()
-    for path in (SOURCE, DTL_SOURCE):
+    for path in paths:
         h.update(path.name.encode())
         with path.open("rb") as fh:
             for block in iter(lambda: fh.read(1024 * 1024), b""):
@@ -206,7 +212,8 @@ def load_dtl_corpus(path: Path | None = None, require_complete: bool = False) ->
             if not pitches:
                 continue
             solo_id = r["solo_id"]
-            track_id = solo_id.split("_", 1)[0]
+            # The audio fingerprint itself can contain underscores.
+            track_id = solo_id.rsplit("_", 1)[0]
             mid = _stable_external_id(solo_id, 1_000_000)
             tid = _stable_external_id(track_id, 2_000_000)
             if mid in solos:
@@ -240,11 +247,50 @@ def load_combined_corpus(require_dtl: bool = False) -> dict[int, Solo]:
     if not _dtl_complete(DTL_SOURCE):
         if require_dtl:
             raise ValueError("A complete DTL1000 note-track export is needed before indexing it.")
-        return solos
-    external = load_dtl_corpus(require_complete=True)
-    if set(solos) & set(external):
-        raise ValueError("WJazzD and DTL1000 solo IDs overlap")
-    solos.update(external)
+    else:
+        external = load_dtl_corpus(require_complete=True)
+        if set(solos) & set(external):
+            raise ValueError("WJazzD and DTL1000 solo IDs overlap")
+        solos.update(external)
+    jtd_path = ROOT / "data" / "jtd.db"
+    if jtd_path.exists():
+        jtd = load_jtd_corpus(jtd_path)
+        if set(solos) & set(jtd):
+            raise ValueError("JTD and another collection share solo IDs")
+        solos.update(jtd)
+    return solos
+
+
+def load_jtd_corpus(path: Path | None = None) -> dict[int, Solo]:
+    path = path or ROOT / "data" / "jtd.db"
+    if not path.exists():
+        return {}
+    db = sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True)
+    db.row_factory = sqlite3.Row
+    solos = {}
+    try:
+        for r in db.execute("SELECT * FROM solo ORDER BY solo_id"):
+            pitches, onsets, durations = (json.loads(r[k]) for k in ("pitches", "onsets", "durations"))
+            if not pitches or not len(pitches) == len(onsets) == len(durations):
+                continue
+            mid = _stable_external_id(r["solo_id"], 3_000_000)
+            if mid in solos:
+                raise ValueError(f"JTD solo ID collision: {r['solo_id']}")
+            solos[mid] = Solo(
+                melid=mid, trackid=_stable_external_id(r["track_id"], 4_000_000),
+                performer=r["pianist"], title=r["title"], album=r["album"],
+                album_artist=r["bandleader"], instrument="piano · top-note projection",
+                recording_date=r["year"], year=year_from_text(r["year"]),
+                composition_id=_stable_external_id(r["title"].casefold(), 5_000_000),
+                solo_start=float(r["solo_start"]), musicbrainz_id=r["musicbrainz_id"],
+                pitches=pitches, onsets=onsets, durations=durations,
+                eventids=list(range(1, len(pitches) + 1)),
+                beat_positions=[float(x) for x in json.loads(r["beat_positions"])],
+                phrase_ids=[None] * len(pitches), chords=[None] * len(pitches),
+                source="JTD", source_id=r["solo_id"], source_url=r["source_url"],
+            )
+    finally:
+        db.close()
     return solos
 
 

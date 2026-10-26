@@ -3,6 +3,8 @@ __pycache__/
 data/*.db
 data/*.db-*
 data/dtl_metadata_v0.9.csv
+data/dtl-reconciled*.json
+data/jtd.db
 .DS_Store
 *.log
 .qa/

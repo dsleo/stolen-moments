@@ -14,7 +14,7 @@ from .corpus import STORE, Solo, combined_source_checksum, load_combined_corpus,
 INDEX_INTERVALS = 5
 MAX_POSTINGS = 80
 MIN_EXACT_NOTES = 8
-PIPELINE = "interval-seed-5-4-v3-dtl1000"
+PIPELINE = "interval-seed-5-4-v4-multicollection"
 
 
 def connect_store(path: Path = STORE) -> sqlite3.Connection:
