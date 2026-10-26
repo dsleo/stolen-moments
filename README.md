@@ -128,4 +128,6 @@ See [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) for the research rationale 
 
 ## Data and attribution
 
-WJazzD is published by the Jazzomat Research Project under the Open Database License, with individual database contents under the Database Contents License. See the [official download and license page](https://jazzomat.hfm-weimar.de/download/download.html), the [schema](https://jazzomat.hfm-weimar.de/dbformat/dbformat.html), and the citation requested by the project: Pfleiderer, Frieler, Abeßer, Zaddach & Burkhart (eds.), *Inside the Jazzomat: New Perspectives for Jazz Research* (2017). Assess redistribution obligations before publishing derived data.
+WJazzD is published by the Jazzomat Research Project under the Open Database License (ODbL) 1.0, with individual contents under the Database Contents License. The static catalog is a derived database and is offered under the same ODbL terms with the required attribution; see [static/DATA_LICENSE.txt](static/DATA_LICENSE.txt), which is also linked from the site footer. Third-party material (album covers, YouTube videos, portraits) is not covered by that licence.
+
+See the [official download and license page](https://jazzomat.hfm-weimar.de/download/download.html), the [schema](https://jazzomat.hfm-weimar.de/dbformat/dbformat.html), and the citation requested by the project: Pfleiderer, Frieler, Abeßer, Zaddach & Burkhart (eds.), *Inside the Jazzomat: New Perspectives for Jazz Research* (2017).

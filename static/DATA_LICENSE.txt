@@ -1,0 +1,30 @@
+# Data licence and attribution
+
+The passage catalog in `catalog/` is a **derived database** of the Weimar Jazz
+Database (WJazzD) v2.1, produced by the Jazzomat Research Project (HfM Weimar).
+WJazzD is published under the
+[Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/);
+its individual contents are under the
+[Database Contents License](https://opendatacommons.org/licenses/dbcl/1-0/).
+
+**Attribution.** Contains information from WJazzD v2.1 (Pfleiderer, Frieler,
+Abeßer, Zaddach & Burkhart, eds., *Inside the Jazzomat: New Perspectives for
+Jazz Research*, 2017), available at
+<https://jazzomat.hfm-weimar.de/download/download.html>.
+
+**Changes.** Solo transcriptions were re-indexed and aligned in pairs to find
+shared phrases. The catalog stores each matched passage with its note positions,
+alignment, similarity score, solo metadata, and recording links. Scores are
+heuristics and are not part of the source data.
+
+**Share-alike.** This derived catalog is made available under the ODbL 1.0. If
+you redistribute it or a further adapted database, keep this notice and the same
+licence. Visual material produced from it (the website) is a produced work and
+must credit the source as above.
+
+**Not covered by this licence.**
+- Album covers come from the iTunes Search API and the Cover Art Archive and
+  remain the property of their rights holders.
+- Recording links point to third-party YouTube videos. JazzTube alignments are
+  from <http://mir.audiolabs.uni-erlangen.de/jazztube/>.
+- Artist portraits keep their own sources and terms.
