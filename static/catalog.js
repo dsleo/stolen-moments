@@ -4,8 +4,11 @@
   async function readGzip(path){
     const res=await fetch(path);
     if(!res.ok)throw new Error(`Could not load ${path}`);
+    const bytes=new Uint8Array(await res.arrayBuffer());
+    // A host that sends Content-Encoding: gzip lets the browser unpack the file already.
+    if(bytes[0]!==0x1f||bytes[1]!==0x8b)return JSON.parse(new TextDecoder().decode(bytes));
     if(!('DecompressionStream' in window))throw new Error('This browser needs gzip decompression support');
-    return JSON.parse(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).text());
+    return JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
   }
   class Catalog{
     constructor(data){
