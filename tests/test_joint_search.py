@@ -77,3 +77,15 @@ class JointSearchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_consolidate_merges_shifted_windows_only():
+    import sqlite3
+    from jazzmine.joint_store import consolidate
+    db = sqlite3.connect(":memory:")
+    db.execute("""CREATE TABLE candidate (a_id,b_id,a_start,a_end,b_start,b_end,evidence)""")
+    db.executemany("INSERT INTO candidate VALUES (1,2,?,?,?,?,?)", [
+        (514, 539, 369, 394, 22.0), (516, 542, 368, 394, 23.3), (519, 545, 368, 394, 23.3),
+        (66, 74, 117, 125, 6.1), (460, 468, 49, 57, 6.5)])
+    assert consolidate(db) == 2
+    assert db.execute("SELECT COUNT(*) FROM candidate").fetchone()[0] == 3

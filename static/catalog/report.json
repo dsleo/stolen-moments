@@ -1,14 +1,14 @@
 {
-  "passages": 131822,
+  "passages": 126524,
   "solos": 455,
   "floor": 0.8,
   "recording_sides": {
-    "aligned": 165334,
-    "none": 95025,
-    "estimated": 3285
+    "aligned": 158913,
+    "none": 90910,
+    "estimated": 3225
   },
   "cached_covers": 128,
   "resolved_covers": 161,
-  "index_bytes": 3295378,
-  "total_bytes": 28010168
+  "index_bytes": 3167401,
+  "total_bytes": 27678535
 }

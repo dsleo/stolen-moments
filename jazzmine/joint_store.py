@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import sqlite3
 import time
@@ -13,6 +14,35 @@ from .joint_search import Settings, anchors, extend, wjazzd_beat_durations
 
 
 DEFAULT_STORE = ROOT / "data" / "joint-search.db"
+
+
+def overlap(s0: int, s1: int, t0: int, t1: int) -> float:
+    """Shared span as a fraction of the shorter of two note ranges."""
+    return max(0, min(s1, t1) - max(s0, t0)) / max(1, min(s1 - s0, t1 - t0))
+
+
+def consolidate(db: sqlite3.Connection, min_overlap: float = .5) -> int:
+    """Keep one window per passage within each ordered solo pair.
+
+    Every seed inside one long shared phrase extends to nearly the same window,
+    shifted by a few notes, so containment alone leaves near-duplicates. Windows
+    that overlap a stronger one by `min_overlap` on both solos are the same
+    passage; the highest-evidence window is kept. Distant repeats stay separate.
+    """
+    rows = db.execute("""SELECT rowid,a_id,b_id,a_start,a_end,b_start,b_end
+                         FROM candidate ORDER BY a_id,b_id,evidence DESC,a_start,b_start""").fetchall()
+    dropped = []
+    for _, group in itertools.groupby(rows, key=lambda r: (r[1], r[2])):
+        kept = []
+        for r in group:
+            if any(overlap(r[3], r[4], k[3], k[4]) >= min_overlap and
+                   overlap(r[5], r[6], k[5], k[6]) >= min_overlap for k in kept):
+                dropped.append((r[0],))
+            else:
+                kept.append(r)
+    db.executemany("DELETE FROM candidate WHERE rowid=?", dropped)
+    db.commit()
+    return len(dropped)
 
 
 def build(path: Path = DEFAULT_STORE, settings: Settings = Settings(),
@@ -92,9 +122,10 @@ def build(path: Path = DEFAULT_STORE, settings: Settings = Settings(),
             frontier.append((a0, a1, b0, b1))
     if contained:
         db.executemany("DELETE FROM candidate WHERE rowid=?", contained)
+    consolidate(db)
     with db:
         db.executemany("INSERT OR REPLACE INTO meta VALUES (?,?)", [
-            ("pipeline", "joint-seed-5-right-v1"),
+            ("pipeline", "joint-seed-5-right-v2"),
             ("source_sha256", report["source_sha256"]),
             ("settings", json.dumps(asdict(settings))),
             ("eligible_anchors_processed", str(count)),
@@ -112,6 +143,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=DEFAULT_STORE)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--consolidate-only", action="store_true",
+                        help="Merge overlapping windows in an existing store without rebuilding")
     parser.add_argument("--total-budget", type=float, default=6.0)
     parser.add_argument("--run-budget", type=float, default=2.0)
     args = parser.parse_args()
@@ -119,6 +152,13 @@ def main() -> None:
         parser.error("--limit must be positive")
     if args.total_budget <= 0 or args.run_budget <= 0:
         parser.error("budgets must be positive")
+    if args.consolidate_only:
+        db = sqlite3.connect(args.output)
+        removed = consolidate(db)
+        db.execute("INSERT OR REPLACE INTO meta VALUES ('pipeline','joint-seed-5-right-v2')")
+        db.commit()
+        print(json.dumps({"removed": removed, "kept": db.execute("SELECT COUNT(*) FROM candidate").fetchone()[0]}))
+        return
     print(json.dumps(build(args.output,
                            Settings(total_budget=args.total_budget,
                                     run_budget=args.run_budget), args.limit), indent=2))
