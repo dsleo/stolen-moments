@@ -1,5 +1,7 @@
 # Stolen Moments
 
+**Live site: <https://dsleo.github.io/stolen-moments/>**
+
 A read-only web app for discovering shared phrases in the 456 solo transcriptions of the Weimar Jazz Database (WJazzD) v2.1. Pick a pair of solos, hear both, see the notes line up, and jump to the recording at that moment. The whole archive is **precomputed**, so the published site is plain static files: no server, database or build step at view time. See [STATIC_SITE.md](STATIC_SITE.md) for hosting details.
 
 ## Quick start
@@ -21,6 +23,10 @@ Open [http://127.0.0.1:8766](http://127.0.0.1:8766). It cannot be opened as `fil
 - **Echoes:** a timeline of musicians and the strongest connections between them. Select a musician to trace who echoes whom.
 
 Scores are heuristics for listening, not evidence of quotation or influence.
+
+## Deployment
+
+Pushing to `main` runs `.github/workflows/pages.yml`, which publishes the `static/` folder to GitHub Pages. Rebuild and commit `static/catalog/` first when the data changes.
 
 ## How it is built
 
