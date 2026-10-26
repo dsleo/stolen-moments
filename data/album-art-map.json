@@ -1,0 +1,868 @@
+{
+  "Art Pepper\u0000Art Pepper, The Compelete Galaxy Recordings, CD 3": {
+    "path": "data/covers/album-itunes-a178a2bb38a3.jpg",
+    "source": "itunes",
+    "collection_id": 1440779313,
+    "release_title": "The Complete Galaxy Recordings",
+    "artist": "Art Pepper",
+    "match_score": 0.825
+  },
+  "Art Pepper\u0000Art Pepper, The Compelete Galaxy Recordings, CD 4": {
+    "path": "data/covers/album-itunes-a178a2bb38a3.jpg",
+    "source": "itunes",
+    "collection_id": 1440779313,
+    "release_title": "The Complete Galaxy Recordings",
+    "artist": "Art Pepper",
+    "match_score": 0.825
+  },
+  "Benny Carter / Oscar Peterson\u0000Benny Carter meets Oscar Peterson": {
+    "path": "data/covers/album-a427c605-d0a3-4e6a-a71c-d8168afda648.jpg",
+    "release_id": "a427c605-d0a3-4e6a-a71c-d8168afda648",
+    "release_title": "Benny Carter Meets Oscar Peterson",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Benny Carter\u0000Battle of Saxes Volume 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Benny Goodman\u0000From Swing to Bebop": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Benny Goodman\u0000Combos (1935-41)": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Ben Webster\u0000Ben Webster \"The Frog\" with: Art Tatum, Oscar Peterson, Hank Jones, guest: Harry Edison,1956-1962": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Bix Beiderbecke / Kid Ory\u0000The Cradle Of Jazz - Jazz Lips CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Bix Beiderbecke\u0000The Gold Collection - 40 Classic Performances": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Bob Berg\u0000Enter The Spirit": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Cedar Walton Quartet\u0000Second Set": {
+    "path": "data/covers/album-091b764d-0c2e-4f94-9106-0e748288c23e.jpg",
+    "release_id": "091b764d-0c2e-4f94-9106-0e748288c23e",
+    "release_title": "Second Set",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Bob Berg\u0000Another Standard": {
+    "path": "data/covers/album-10ac5ae4-45bb-4dba-8044-136ceb8dcdb9.jpg",
+    "release_id": "10ac5ae4-45bb-4dba-8044-136ceb8dcdb9",
+    "release_title": "Another Standard",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Lester Young\u0000Quadromania Jazz Edition, Lester Young, Lester's Be-Bop Boogie CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Lester Young\u0000Quadromania Jazz Edition, Lester Young, Lester's Be-Bop Boogie CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Miles Davis\u0000Kind Of Blue": {
+    "path": "data/covers/album-79ed3ff2-1b33-3245-8755-947554bc8b3d.jpg",
+    "release_id": "79ed3ff2-1b33-3245-8755-947554bc8b3d",
+    "release_title": "Kind of Blue",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Cannonball Adderley\u0000The Cannonball Adderley Quintet in San Francisco": {
+    "path": "data/covers/album-5ba46ef5-af26-48d0-a07b-6ea438425412.jpg",
+    "release_id": "5ba46ef5-af26-48d0-a07b-6ea438425412",
+    "release_title": "The Cannonball Adderley Quintet in San Francisco",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Cannonball Adderley\u0000Work Song 1960-1969": {
+    "path": "data/covers/album-c5612f87-5c5c-475b-8cdc-b751e78d4cd5.jpg",
+    "release_id": "c5612f87-5c5c-475b-8cdc-b751e78d4cd5",
+    "release_title": "Work Song: 1960-1969",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Charlie Parker\u0000Boss Bird Disc 4": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Charlie Parker\u0000Boss Bird Disc 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Charlie Parker\u0000Boss Bird Disc 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Charlie Parker\u0000Boss Bird Disc 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Sidney Bechet\u0000The Cradle Of Jazz -Sidney Bechet - Chant In The Night CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Chet Baker\u0000Let's Get Lost": {
+    "path": "data/covers/album-70ba8fd0-303c-4c3a-aec7-0b3badc1b559.jpg",
+    "release_id": "70ba8fd0-303c-4c3a-aec7-0b3badc1b559",
+    "release_title": "Let's Get Lost",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Jim Hall\u0000Jim Hall, Concierto": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Tom Cohen\u0000Diggin' In, Diggin' Out": {
+    "path": "data/covers/album-itunes-205185ed2061.jpg",
+    "source": "itunes",
+    "collection_id": 252377153,
+    "release_title": "Diggin' In - Digging Out",
+    "artist": "Tom Cohen",
+    "match_score": 0.976
+  },
+  "Chris Potter\u0000Concentric Circles": {
+    "path": "data/covers/album-b314c6ac-c90c-4f6d-aa00-59167090bb43.jpg",
+    "release_id": "b314c6ac-c90c-4f6d-aa00-59167090bb43",
+    "release_title": "Concentric Circles",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Steve Swallow\u0000Damaged In Transit": {
+    "path": "data/covers/album-7e62048b-2d4d-4924-bb61-f3414759f324.jpg",
+    "release_id": "7e62048b-2d4d-4924-bb61-f3414759f324",
+    "release_title": "Damaged in Transit",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Chris Potter's Underground\u0000Follow The Red Line: Live At The Village Vanguard": {
+    "path": "data/covers/album-itunes-6d5c2b973189.jpg",
+    "source": "itunes",
+    "collection_id": 259802301,
+    "release_title": "Follow the Red Line: Live At the Village Vanguard",
+    "artist": "Chris Potter Underground",
+    "match_score": 1.0
+  },
+  "Chris Potter's Underground\u0000Ultrahang": {
+    "path": "data/covers/album-35380e96-55b2-4a27-867c-786e6091e02b.jpg",
+    "release_id": "35380e96-55b2-4a27-867c-786e6091e02b",
+    "release_title": "Ultrahang",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Clifford Brown\u0000Quadromania Jazz Edition, Clifford Brown, Easy Living, CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Clifford Brown\u0000Brownie - The Complete EmArecy Recordings of Clifford Brown (Disc 9)": {
+    "path": "data/covers/album-bdda3672-b05f-4612-902c-d732c455c146.jpg",
+    "release_id": "bdda3672-b05f-4612-902c-d732c455c146",
+    "release_title": "Brownie: The Complete EmArcy Recordings of Clifford Brown",
+    "source": "cover-art-archive",
+    "match_score": 0.99
+  },
+  "Clifford Brown\u0000Quadromania Jazz Edition, Clifford Brown, Easy Living, CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Clifford Brown\u0000Brownie - The Complete EmArcy Recordings of Clifford Brown (Disc 2)": {
+    "path": "data/covers/album-itunes-27fb2b41df59.jpg",
+    "source": "itunes",
+    "collection_id": 1429198597,
+    "release_title": "Brownie: The Complete EmArcy Recordings Of Clifford Brown",
+    "artist": "Clifford Brown",
+    "match_score": 1.0
+  },
+  "Clifford Brown\u0000Brownie - The Complete EmArcy Recordings of Clifford Brown (Disc 9)": {
+    "path": "data/covers/album-itunes-27fb2b41df59.jpg",
+    "source": "itunes",
+    "collection_id": 1429198597,
+    "release_title": "Brownie: The Complete EmArcy Recordings Of Clifford Brown",
+    "artist": "Clifford Brown",
+    "match_score": 1.0
+  },
+  "Coleman Hawkins\u0000Quadromania Jazz Edition, Coleman Hawkins, Dear Old Southland, CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Coleman Hawkins\u0000Dear Old Southland": {
+    "path": null,
+    "source": "not-found"
+  },
+  "John Coltrane\u0000Blue Train": {
+    "path": "data/covers/album-itunes-a5f358ec699c.jpg",
+    "source": "itunes",
+    "collection_id": 1468202477,
+    "release_title": "Blue Train",
+    "artist": "John Coltrane",
+    "match_score": 1.0
+  },
+  "Art Blakey\u0000Art Blakey Jazz Profile Nr 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Dave Liebman\u0000Plays The Music Of Cole Porter": {
+    "path": null,
+    "source": "not-found"
+  },
+  "David Liebman\u0000Quest/Standards, The Jazz Workshop Series, David Liebman / Richard Beirach / Ron McClure / Billy Hart": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Dave Liebman\u0000Setting The Standards": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Dave Liebman\u0000Return Of The Tenor": {
+    "path": "data/covers/album-itunes-c7664b97dd5f.jpg",
+    "source": "itunes",
+    "collection_id": 215587605,
+    "release_title": "Return of the Tenor - Standards",
+    "artist": "Dave Liebman",
+    "match_score": 0.75
+  },
+  "David Murray Quartet\u0000Morning Song": {
+    "path": "data/covers/album-29af768c-f7a5-4fbf-87ac-95835931db9a.jpg",
+    "release_id": "29af768c-f7a5-4fbf-87ac-95835931db9a",
+    "release_title": "Morning Song",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "George Arvanitas / David Murray\u0000Tea For Two - George Arvantitas Presents the ballad artistry of David Murray": {
+    "path": "data/covers/album-9b821c39-c075-41d9-8720-2287cbf75e31.jpg",
+    "release_id": "9b821c39-c075-41d9-8720-2287cbf75e31",
+    "release_title": "Tea for Two the Ballad Artistry Of... David Murray",
+    "source": "cover-art-archive",
+    "match_score": 0.761
+  },
+  "Dexter Gordon\u0000Gone With The Wind CD1": {
+    "path": "data/covers/album-b93dbac4-ca2b-43f2-8ab4-a9f89a583db9.jpg",
+    "release_id": "b93dbac4-ca2b-43f2-8ab4-a9f89a583db9",
+    "release_title": "Gone With the Wind",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Dexter Gordon\u0000The Tower Of Power": {
+    "path": "data/covers/album-itunes-8c48e09c29a3.jpg",
+    "source": "itunes",
+    "collection_id": 1443258782,
+    "release_title": "The Tower of Power (Remastered)",
+    "artist": "Dexter Gordon",
+    "match_score": 1.0
+  },
+  "Lester Young\u0000Lester's Be-Bop Boogie": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Dizzy Gillespie\u0000Jazz Gallery, Dizzy Gillespie, CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Don Byas\u0000Quadromania Jazz Edition, Don Byas, Moon Nocturne CD 4": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Don Byas\u0000The Chronological Classis: Don Byas 1947": {
+    "path": "data/covers/album-edc788ac-0daa-44d7-94f9-0522c37c02aa.jpg",
+    "release_id": "edc788ac-0daa-44d7-94f9-0522c37c02aa",
+    "release_title": "The Chronological Classics: Don Byas 1947",
+    "source": "cover-art-archive",
+    "match_score": 0.986
+  },
+  "Cannonball Adderley\u0000The Cannonball Adderley Quintet  Plus": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Don Byas\u0000Moon Nocturne": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Don Ellis\u0000Giants of Jazz: Don Ellis featuring Paul Bley, Steve Swallow, Gary Peacock, Nick Martins, Jaki Byard, Ron Carter and Charlie Persip": {
+    "path": null,
+    "source": "not-found"
+  },
+  "John Coltrane\u0000The Heavyweight Champion - The Complete Atlantic Recordings CD 6": {
+    "path": "data/covers/album-itunes-78cfda0ab6df.jpg",
+    "source": "itunes",
+    "collection_id": 968615768,
+    "release_title": "The Heavyweight Champion: The Complete Atlantic Recordings",
+    "artist": "John Coltrane",
+    "match_score": 1.0
+  },
+  "Eric Dolphy\u0000Eric Dolphy": {
+    "path": "data/covers/album-itunes-eb9ab22fe8f9.jpg",
+    "source": "itunes",
+    "collection_id": 1524986996,
+    "release_title": "Eric Dolphy",
+    "artist": "Eric Dolphy",
+    "match_score": 1.0
+  },
+  "Fats Navarro\u0000From Swing to Bebop, Double Talk, Fats Navarro CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Fats Navarro\u0000From Swing to Bebop, Double Talk, Fats Navarro CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Eric Dolphy\u0000Outward Bound": {
+    "path": "data/covers/album-2b01b641-ad01-4903-8028-e07e145d5b54.jpg",
+    "release_id": "2b01b641-ad01-4903-8028-e07e145d5b54",
+    "release_title": "Outward Bound",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Herbie Hancock\u0000Maiden Voyage": {
+    "path": "data/covers/album-itunes-398dbd79fafe.jpg",
+    "source": "itunes",
+    "collection_id": 1476739989,
+    "release_title": "Maiden Voyage",
+    "artist": "Herbie Hancock",
+    "match_score": 1.0
+  },
+  "Dexter Gordon\u0000The Best Of Dexter Gordon": {
+    "path": "data/covers/album-e868a962-67a7-43e4-9e19-3cc6f17357df.jpg",
+    "release_id": "e868a962-67a7-43e4-9e19-3cc6f17357df",
+    "release_title": "The Best of Dexter Gordon",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Wayne Shorter\u0000Speak No Evil": {
+    "path": "data/covers/album-itunes-f605728c5a70.jpg",
+    "source": "itunes",
+    "collection_id": 1453750007,
+    "release_title": "Speak No Evil",
+    "artist": "Wayne Shorter",
+    "match_score": 1.0
+  },
+  "Gerry Mulligan\u0000Gerry Mulligan meets the Saxophonists": {
+    "path": "data/covers/album-249d57fd-5d5c-4be0-8148-ceec7d0dbde1.jpg",
+    "release_id": "249d57fd-5d5c-4be0-8148-ceec7d0dbde1",
+    "release_title": "Gerry Mulligan Meets the Saxophonists",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Gerry Mulligan\u0000Gerry Mulligan Quartet with Chet Baker": {
+    "path": "data/covers/album-itunes-a59a1136f23b.jpg",
+    "source": "itunes",
+    "collection_id": 723734657,
+    "release_title": "The Best of the Gerry Mulligan Quartet with Chet Baker",
+    "artist": "Gerry Mulligan Quartet",
+    "match_score": 0.905
+  },
+  "Horace Silver\u0000Quadromania Jazz Edition, Horace Silver, Down Home; CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Horace Silver\u0000Quadromania Jazz Edition, Horace Silver, Down Home; CD 4": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Hank Mobley\u0000Soul Station": {
+    "path": "data/covers/album-itunes-655e4a0497b0.jpg",
+    "source": "itunes",
+    "collection_id": 1459439349,
+    "release_title": "Soul Station",
+    "artist": "Hank Mobley",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000Miles Smiles": {
+    "path": "data/covers/album-itunes-39ea795fbfc6.jpg",
+    "source": "itunes",
+    "collection_id": 209407331,
+    "release_title": "Miles Smiles",
+    "artist": "Miles Davis Quintet",
+    "match_score": 1.0
+  },
+  "Miles Davis Quintett\u0000Nefertiti": {
+    "path": "data/covers/album-08360be0-9882-4503-bc62-320310058b0a.jpg",
+    "release_id": "08360be0-9882-4503-bc62-320310058b0a",
+    "release_title": "Nefertiti",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Stan Getz / JJ Johnson\u0000Stan Getz and J.J. Johnson At The Opera House": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Sonny Stitt\u0000Quadromania Jazz Edition, Sonny Stitt, One O'Clock Jump, CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Miles Davis\u0000Walkin'": {
+    "path": "data/covers/album-2105e781-cf9c-4f53-8b69-3cfa932f871c.jpg",
+    "release_id": "2105e781-cf9c-4f53-8b69-3cfa932f871c",
+    "release_title": "WALKIN’",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Joe Henderson\u0000Lush Life: The Music of Billy Strayhorn": {
+    "path": "data/covers/album-itunes-64b72b3c1f73.jpg",
+    "source": "itunes",
+    "collection_id": 1442903381,
+    "release_title": "Lush Life - The Music of Billy Strayhorn",
+    "artist": "Joe Henderson",
+    "match_score": 1.0
+  },
+  "Joe Henderson\u0000In'n'Out": {
+    "path": "data/covers/album-58dd7902-b3f1-4925-88e9-322adf6b859c.jpg",
+    "release_id": "58dd7902-b3f1-4925-88e9-322adf6b859c",
+    "release_title": "In 'n Out",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Lee Morgan\u0000The Sidewinder": {
+    "path": "data/covers/album-itunes-c9446e758117.jpg",
+    "source": "itunes",
+    "collection_id": 1458548311,
+    "release_title": "The Sidewinder",
+    "artist": "Lee Morgan",
+    "match_score": 1.0
+  },
+  "Joe Lovano\u0000From the Soul": {
+    "path": "data/covers/album-itunes-11ecb59fac89.jpg",
+    "source": "itunes",
+    "collection_id": 724648147,
+    "release_title": "From the Soul",
+    "artist": "Joe Lovano",
+    "match_score": 1.0
+  },
+  "Bill Dobbins\u0000Modern Jazz Classics Vol. 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Joe Lovano\u0000Live at the Village Vanguard CD1": {
+    "path": "data/covers/album-b9a96287-cd9f-4e01-a5c0-f1ba28f553f2.jpg",
+    "release_id": "b9a96287-cd9f-4e01-a5c0-f1ba28f553f2",
+    "release_title": "Quartets: Live at the Village Vanguard",
+    "source": "cover-art-archive",
+    "match_score": 0.842
+  },
+  "Joe Lovano\u0000Live at the Village Vanguard CD2": {
+    "path": "data/covers/album-b9a96287-cd9f-4e01-a5c0-f1ba28f553f2.jpg",
+    "release_id": "b9a96287-cd9f-4e01-a5c0-f1ba28f553f2",
+    "release_title": "Quartets: Live at the Village Vanguard",
+    "source": "cover-art-archive",
+    "match_score": 0.842
+  },
+  "John Coltrane Quartett\u0000Crescent": {
+    "path": "data/covers/album-itunes-1ec1afd0700c.jpg",
+    "source": "itunes",
+    "collection_id": 1440856835,
+    "release_title": "Crescent",
+    "artist": "John Coltrane Quartet",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000Cookin' With The Miles Davis Quintet": {
+    "path": "data/covers/album-itunes-c3b594158bef.jpg",
+    "source": "itunes",
+    "collection_id": 1442376779,
+    "release_title": "Cookin' With the Miles Davis Quintet",
+    "artist": "Miles Davis Quintet",
+    "match_score": 1.0
+  },
+  "John Coltrane\u0000The Heavyweight Champion - The Complete Atlantic Recordings CD 4": {
+    "path": "data/covers/album-itunes-78cfda0ab6df.jpg",
+    "source": "itunes",
+    "collection_id": 968615768,
+    "release_title": "The Heavyweight Champion: The Complete Atlantic Recordings",
+    "artist": "John Coltrane",
+    "match_score": 1.0
+  },
+  "John Coltrane\u0000The John Coltrane Quartet Plays": {
+    "path": "data/covers/album-itunes-00b87c316720.jpg",
+    "source": "itunes",
+    "collection_id": 1863143922,
+    "release_title": "The John Coltrane Quartet Plays",
+    "artist": "John Coltrane Quartet",
+    "match_score": 1.0
+  },
+  "John Coltrane\u0000Trane's Blues": {
+    "path": "data/covers/album-itunes-3e399cf818d4.jpg",
+    "source": "itunes",
+    "collection_id": 723469730,
+    "release_title": "Trane's Blues",
+    "artist": "John Coltrane",
+    "match_score": 1.0
+  },
+  "Louis Armstrong\u0000College Music Sociecty Sourcebooks in American Music, Louis Armstrong, The Original Hot Five Recordings of Louis Armstrogn": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Johnny Hodges\u0000Jazz Masters 35": {
+    "path": "data/covers/album-6ef507b9-595b-46ed-9630-78f82ef57ad6.jpg",
+    "release_id": "6ef507b9-595b-46ed-9630-78f82ef57ad6",
+    "release_title": "Verve Jazz Masters 35",
+    "source": "cover-art-archive",
+    "match_score": 0.833
+  },
+  "Joshua Redman\u0000Freedom In The Groove": {
+    "path": "data/covers/album-itunes-e2e040ddb3f9.jpg",
+    "source": "itunes",
+    "collection_id": 302189547,
+    "release_title": "Freedom In the Groove",
+    "artist": "Joshua Redman",
+    "match_score": 1.0
+  },
+  "Joshua Redman\u0000Joshua Redman": {
+    "path": "data/covers/album-itunes-00589cd76418.jpg",
+    "source": "itunes",
+    "collection_id": 302158863,
+    "release_title": "Joshua Redman",
+    "artist": "Joshua Redman",
+    "match_score": 1.0
+  },
+  "Joshua Redman\u0000MoodSwing": {
+    "path": "data/covers/album-6098648b-3b1c-4ddd-908a-24dab3bbd84f.jpg",
+    "release_id": "6098648b-3b1c-4ddd-908a-24dab3bbd84f",
+    "release_title": "MoodSwing",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Joshua Redman\u0000Wish": {
+    "path": "data/covers/album-itunes-7e715d465eba.jpg",
+    "source": "itunes",
+    "collection_id": 305687509,
+    "release_title": "Wish",
+    "artist": "Joshua Redman",
+    "match_score": 1.0
+  },
+  "Sonny Stitt\u0000Quadromania Jazz Edition, Sonny Stitt, One O'Clock Jump, CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Dave Holland Quintett\u0000Seeds Of Time": {
+    "path": "data/covers/album-e5762fb3-0d74-4bc5-b86d-1f21839424cb.jpg",
+    "release_id": "e5762fb3-0d74-4bc5-b86d-1f21839424cb",
+    "release_title": "Seeds of Time",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Steve Coleman\u0000Rhythm In Mind": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Lee Konitz\u0000Jazz Edition, Quadromania, Lee Konitz, Sax of a Kind CD 4": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Lee Konitz\u0000Sax of a Kind": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Lester Young\u0000The Lester Young Story CD 2": {
+    "path": "data/covers/album-d5c17e93-fae6-494f-a8ee-0f832f6cfb49.jpg",
+    "release_id": "d5c17e93-fae6-494f-a8ee-0f832f6cfb49",
+    "release_title": "The Lester Young Story",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Lionel Hampton / Red Norvo / Jimmy Guiffre\u0000From Swing to Bebop. Jazz in History II": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Chick Corea\u0000Three Quartets": {
+    "path": "data/covers/album-itunes-3ecbe405375b.jpg",
+    "source": "itunes",
+    "collection_id": 1442860798,
+    "release_title": "Three Quartets (Reissue)",
+    "artist": "Chick Corea",
+    "match_score": 0.778
+  },
+  "Michael Brecker\u0000Two Blocks from the Edge": {
+    "path": "data/covers/album-447067cf-178f-46bc-80be-36c0ee835722.jpg",
+    "release_id": "447067cf-178f-46bc-80be-36c0ee835722",
+    "release_title": "Two Blocks From the Edge",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "McCoy Tyner Trio\u0000Infinity": {
+    "path": "data/covers/album-6433005a-926d-4c1d-89d7-0d1b65c721b7.jpg",
+    "release_id": "6433005a-926d-4c1d-89d7-0d1b65c721b7",
+    "release_title": "Infinity",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Michael Brecker\u0000Tales from the Hudson": {
+    "path": "data/covers/album-itunes-fca2054b9d1e.jpg",
+    "source": "itunes",
+    "collection_id": 1444001865,
+    "release_title": "Tales from the Hudson",
+    "artist": "Michael Brecker",
+    "match_score": 1.0
+  },
+  "Michael Brecker\u0000Now You See It...(Now You Don't)": {
+    "path": "data/covers/album-itunes-e05f0949335f.jpg",
+    "source": "itunes",
+    "collection_id": 1443198250,
+    "release_title": "Now You See It ... (Now You Don't)",
+    "artist": "Michael Brecker",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000Chronicle: The Complete Prestige Recordings (1951 - 1956), CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Miles Davis\u0000Bitches Brew, CD1": {
+    "path": "data/covers/album-itunes-0146b8ca9980.jpg",
+    "source": "itunes",
+    "collection_id": 168376392,
+    "release_title": "Bitches Brew",
+    "artist": "Miles Davis",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000E.S.P.": {
+    "path": "data/covers/album-itunes-7a15ab8defa5.jpg",
+    "source": "itunes",
+    "collection_id": 203773370,
+    "release_title": "E.S.P. (2022 Remaster)",
+    "artist": "Miles Davis",
+    "match_score": 0.75
+  },
+  "Miles Davis\u0000Bitches Brew, CD2": {
+    "path": "data/covers/album-itunes-0146b8ca9980.jpg",
+    "source": "itunes",
+    "collection_id": 168376392,
+    "release_title": "Bitches Brew",
+    "artist": "Miles Davis",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000Relaxin' With The Miles Davis Quintet": {
+    "path": "data/covers/album-itunes-00869d0b527a.jpg",
+    "source": "itunes",
+    "collection_id": 1440950650,
+    "release_title": "Relaxin' With the Miles Davis Quintet (Remastered)",
+    "artist": "Miles Davis Quintet",
+    "match_score": 1.0
+  },
+  "Miles Davis\u0000Quadromenia \"Morpheus\", CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Miles Davis\u0000Chronicle: The Complete Prestige Recordings (1951 - 1956), CD 5": {
+    "path": "data/covers/album-1763e87a-bcb2-4889-9357-ce0144153dd7.jpg",
+    "release_id": "1763e87a-bcb2-4889-9357-ce0144153dd7",
+    "release_title": "Chronicle: The Complete Prestige Recordings (1951–1956)",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Milt Jackson\u0000Quadromania Jazz Edition, Milt Jackson, La Ronde Suite, CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Ornette Coleman\u0000The Shape Of Jazz To Come": {
+    "path": "data/covers/album-itunes-9d3af702fc6a.jpg",
+    "source": "itunes",
+    "collection_id": 921051612,
+    "release_title": "The Shape of Jazz to Come (Mono)",
+    "artist": "Ornette Coleman",
+    "match_score": 0.894
+  },
+  "Ornette Coleman\u0000Change of the Century": {
+    "path": "data/covers/album-itunes-9367e0497201.jpg",
+    "source": "itunes",
+    "collection_id": 81872895,
+    "release_title": "Change of the Century",
+    "artist": "Ornette Coleman",
+    "match_score": 1.0
+  },
+  "Michael Brecker\u0000Michael Brecker": {
+    "path": "data/covers/album-itunes-f06ae02c932d.jpg",
+    "source": "itunes",
+    "collection_id": 1444171168,
+    "release_title": "Michael Brecker",
+    "artist": "Michael Brecker",
+    "match_score": 1.0
+  },
+  "Paul Desmond\u0000Take Ten": {
+    "path": "data/covers/album-26652312-feab-310b-a2c1-844f07de147e.jpg",
+    "release_id": "26652312-feab-310b-a2c1-844f07de147e",
+    "release_title": "Take Ten",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Dave Brubeck\u0000Time Out": {
+    "path": "data/covers/album-itunes-a30a214f5521.jpg",
+    "source": "itunes",
+    "collection_id": 193085545,
+    "release_title": "Time Out",
+    "artist": "The Dave Brubeck Quartet",
+    "match_score": 1.0
+  },
+  "Paul Desmond\u0000Bossa Antigua": {
+    "path": "data/covers/album-itunes-57b385c250c2.jpg",
+    "source": "itunes",
+    "collection_id": 270573062,
+    "release_title": "Bossa Antigua",
+    "artist": "Paul Desmond",
+    "match_score": 1.0
+  },
+  "Lee Morgan\u0000The Cooker": {
+    "path": "data/covers/album-itunes-6786a0f727fe.jpg",
+    "source": "itunes",
+    "collection_id": 715754452,
+    "release_title": "The Cooker",
+    "artist": "Lee Morgan",
+    "match_score": 1.0
+  },
+  "Chet Baker\u0000Chet": {
+    "path": "data/covers/album-itunes-6b21eb8e124b.jpg",
+    "source": "itunes",
+    "collection_id": 1554008306,
+    "release_title": "Chet",
+    "artist": "Chet Baker",
+    "match_score": 1.0
+  },
+  "Benny Carter And His Orchestra\u0000Further Definitions": {
+    "path": "data/covers/album-itunes-91095c692cd0.jpg",
+    "source": "itunes",
+    "collection_id": 1584387773,
+    "release_title": "Further Definitions",
+    "artist": "Benny Carter and His Orchestra",
+    "match_score": 1.0
+  },
+  "Phil Woods\u0000Battle of Saxes Volume 2, CD 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Zoot Sims\u0000Quadromania Jazz Edition, Zoot Sims, That Old Feeling, CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Roy Eldridge\u0000Minor Jive": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Sidney Bechet\u0000The Cradle Of Jazz -Sidney Bechet - Chant In The Night CD 1": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Sonny Rollins\u00001956": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Clifford Brown\u0000Brownie - The Complete EmArcy Recordings of Clifford Brown (Disc 10)": {
+    "path": "data/covers/album-itunes-27fb2b41df59.jpg",
+    "source": "itunes",
+    "collection_id": 1429198597,
+    "release_title": "Brownie: The Complete EmArcy Recordings Of Clifford Brown",
+    "artist": "Clifford Brown",
+    "match_score": 1.0
+  },
+  "Sonny Rollins\u0000Next Album": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Sonny Rollins\u0000Saxophone Collosus": {
+    "path": "data/covers/album-e29d9fea-4e28-412f-8b92-93b67bcd4f85.jpg",
+    "release_id": "e29d9fea-4e28-412f-8b92-93b67bcd4f85",
+    "release_title": "Saxophone Colossus",
+    "source": "cover-art-archive",
+    "match_score": 0.944
+  },
+  "Stan Getz\u0000The Essential Stan Getz": {
+    "path": "data/covers/album-itunes-5dfed5fc87ae.jpg",
+    "source": "itunes",
+    "collection_id": 1484572773,
+    "release_title": "The Essential Stan Getz: The Getz Songbook",
+    "artist": "Stan Getz",
+    "match_score": 0.75
+  },
+  "Stan Getz\u0000Body and Soul": {
+    "path": "data/covers/album-8a7fd6a5-069b-4040-934a-10f0c9fd5b81.jpg",
+    "release_id": "8a7fd6a5-069b-4040-934a-10f0c9fd5b81",
+    "release_title": "Body and Soul",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Dave Holland Quartet\u0000Extensions": {
+    "path": "data/covers/album-itunes-6fde97226738.jpg",
+    "source": "itunes",
+    "collection_id": 1442277732,
+    "release_title": "Extensions",
+    "artist": "Dave Holland Quartet",
+    "match_score": 1.0
+  },
+  "Dave Holland Trio\u0000Triplicate": {
+    "path": "data/covers/album-itunes-3113f5f9dbec.jpg",
+    "source": "itunes",
+    "collection_id": 1443182478,
+    "release_title": "Triplicate",
+    "artist": "Dave Holland Trio",
+    "match_score": 1.0
+  },
+  "Steve Lacy\u0000Steve Lacy plays Thelonious Monk - Reflections": {
+    "path": "data/covers/album-itunes-21f28936f49c.jpg",
+    "source": "itunes",
+    "collection_id": 1443175181,
+    "release_title": "Reflections: Steve Lacy Plays Thelonious Monk",
+    "artist": "Steve Lacy",
+    "match_score": 1.0
+  },
+  "Steve Lacy\u0000Steve Lacy featuring Roswell Rudd, Don Cherry, Carl Brown, Bill Higgins, Winton Kelly, Buell Neidlinger, Dennis Charles and Henry Grimes": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Woody Shaw\u0000Imagination": {
+    "path": "data/covers/album-itunes-37d4e5bf8715.jpg",
+    "source": "itunes",
+    "collection_id": 1439397342,
+    "release_title": "Imagination",
+    "artist": "Woody Shaw",
+    "match_score": 1.0
+  },
+  "Wayne Shorter\u0000The Blue Note Years - The Best of Wayne Shorter": {
+    "path": "data/covers/album-itunes-da584540dd57.jpg",
+    "source": "itunes",
+    "collection_id": 726130583,
+    "release_title": "The Blue Note Years: The Best of Wayne Shorter",
+    "artist": "Wayne Shorter",
+    "match_score": 1.0
+  },
+  "Woody Shaw\u0000Rosewood": {
+    "path": "data/covers/album-itunes-1f0d73de5d9a.jpg",
+    "source": "itunes",
+    "collection_id": 516412401,
+    "release_title": "Rosewood",
+    "artist": "Woody Shaw",
+    "match_score": 1.0
+  },
+  "Woody Shaw\u0000Stepping Stones: Live at the Village Vanguard": {
+    "path": "data/covers/album-itunes-ff1347fb192e.jpg",
+    "source": "itunes",
+    "collection_id": 171446200,
+    "release_title": "Stepping Stones: Live At The Village Vanguard",
+    "artist": "Woody Shaw",
+    "match_score": 1.0
+  },
+  "Wynton Marsalis Quartet\u0000Marsalis Standard Time, Vol. 1": {
+    "path": "data/covers/album-6064b8b6-f4d1-43df-be6e-fa8c092e90d3.jpg",
+    "release_id": "6064b8b6-f4d1-43df-be6e-fa8c092e90d3",
+    "release_title": "Marsalis Standard Time, Vol. 1",
+    "source": "cover-art-archive",
+    "match_score": 1.0
+  },
+  "Wynton Marsalis Quartet\u0000The Resolution of Romance - Standard Time, Vol. 3": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Zoot Sims\u0000Quadromania Jazz Edition, Zoot Sims, That Old Feeling, CD 2": {
+    "path": null,
+    "source": "not-found"
+  },
+  "Roy Eldridge\u0000Quadromania Jazz Edition, Zoot Sims, That Old Feeling, CD 1": {
+    "path": null,
+    "source": "not-found"
+  }
+}
