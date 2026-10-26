@@ -4,11 +4,11 @@
   "floor": 0.8,
   "recording_sides": {
     "aligned": 158913,
-    "none": 90910,
-    "estimated": 3225
+    "none": 67306,
+    "estimated": 26829
   },
   "cached_covers": 128,
   "resolved_covers": 161,
-  "index_bytes": 3167401,
-  "total_bytes": 27678535
+  "index_bytes": 3192104,
+  "total_bytes": 27703238
 }
