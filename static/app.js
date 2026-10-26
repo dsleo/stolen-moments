@@ -29,7 +29,6 @@ async function load(append=false){
     const items=ids.map(id=>state.catalog.item(id));
     if(serial!==state.request)return;
     $('#result-count').textContent=total.toLocaleString();
-    $('#result-context').textContent=`${total.toLocaleString()} of ${state.catalog.visibleTotal.toLocaleString()} distinct-song passage pairs`;
     if(!append)state.items=[];state.items.push(...items);renderCrate(items,append);
     if(!append&&!items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower the similarity or length minimum to broaden the search.</div>';
     state.nextOffset=state.offset+items.length<total?state.offset+items.length:null;
