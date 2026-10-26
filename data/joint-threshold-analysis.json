@@ -1,0 +1,620 @@
+{
+  "scope": "complete WJazzD experimental joint index",
+  "source_sha256": "af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12",
+  "settings": {
+    "seed_intervals": 5,
+    "max_postings": 80,
+    "total_budget": 6.0,
+    "run_budget": 2.0,
+    "onset_tolerance": 0.125,
+    "duration_tolerance": 0.125,
+    "pitch_scale": 2.0,
+    "onset_scale": 0.5,
+    "duration_scale": 0.5,
+    "min_pairs": 8
+  },
+  "full_sqlite_bytes": 91082752,
+  "static_format": "compact JSON search index; 1024-result alignment shards; one full note file per used solo; gzip level 6; no artwork, audio, video metadata, or reviews",
+  "thresholds": {
+    "0.00": {
+      "results": 360578,
+      "mean_paired": 9.19,
+      "median_paired": 9,
+      "p90_paired": 11,
+      "with_gap_pct": 5.48,
+      "mean_gaps": 0.061,
+      "paired_at_least_12": 26630,
+      "paired_at_least_16": 2982,
+      "paired_at_least_24": 84,
+      "same_performer_pct": 4.09,
+      "same_composition_pct": 0.48,
+      "cross_performer_distinct_composition": 344834,
+      "unique_solos": 456,
+      "unique_solo_pairs": 67863,
+      "mean_cost": 1.999,
+      "cost_share_pct": {
+        "pitch": 55.77,
+        "onset": 23.2,
+        "duration": 17.97,
+        "skips": 3.05
+      },
+      "sizes": {
+        "search_index_raw_bytes": 20653976,
+        "search_index_gzip_bytes": 6815673,
+        "detail_shards": 353,
+        "detail_shards_raw_bytes": 34497007,
+        "detail_shards_gzip_bytes": 13144578,
+        "median_detail_shard_gzip_bytes": 36623,
+        "solo_note_files": 456,
+        "solo_note_files_raw_bytes": 7709403,
+        "solo_note_files_gzip_bytes": 2726858,
+        "all_content_gzip_bytes": 22687109
+      },
+      "current_top_overlap": {
+        "top_100": 99,
+        "top_500": 477,
+        "top_1000": 941
+      }
+    },
+    "0.70": {
+      "results": 347885,
+      "mean_paired": 9.17,
+      "median_paired": 9,
+      "p90_paired": 11,
+      "with_gap_pct": 4.45,
+      "mean_gaps": 0.048,
+      "paired_at_least_12": 24594,
+      "paired_at_least_16": 2761,
+      "paired_at_least_24": 84,
+      "same_performer_pct": 4.13,
+      "same_composition_pct": 0.48,
+      "cross_performer_distinct_composition": 332543,
+      "unique_solos": 456,
+      "unique_solo_pairs": 66597,
+      "mean_cost": 1.951,
+      "cost_share_pct": {
+        "pitch": 56.6,
+        "onset": 23.09,
+        "duration": 17.85,
+        "skips": 2.46
+      },
+      "sizes": {
+        "search_index_raw_bytes": 19930211,
+        "search_index_gzip_bytes": 6550528,
+        "detail_shards": 340,
+        "detail_shards_raw_bytes": 33176562,
+        "detail_shards_gzip_bytes": 12641463,
+        "median_detail_shard_gzip_bytes": 36529,
+        "solo_note_files": 456,
+        "solo_note_files_raw_bytes": 7709403,
+        "solo_note_files_gzip_bytes": 2726858,
+        "all_content_gzip_bytes": 21918849
+      },
+      "current_top_overlap": {
+        "top_100": 99,
+        "top_500": 474,
+        "top_1000": 937
+      }
+    },
+    "0.75": {
+      "results": 307905,
+      "mean_paired": 9.08,
+      "median_paired": 9,
+      "p90_paired": 11,
+      "with_gap_pct": 2.19,
+      "mean_gaps": 0.023,
+      "paired_at_least_12": 16908,
+      "paired_at_least_16": 1774,
+      "paired_at_least_24": 84,
+      "same_performer_pct": 4.22,
+      "same_composition_pct": 0.48,
+      "cross_performer_distinct_composition": 294045,
+      "unique_solos": 456,
+      "unique_solo_pairs": 63204,
+      "mean_cost": 1.849,
+      "cost_share_pct": {
+        "pitch": 57.58,
+        "onset": 23.17,
+        "duration": 18.01,
+        "skips": 1.23
+      },
+      "sizes": {
+        "search_index_raw_bytes": 17648205,
+        "search_index_gzip_bytes": 5752167,
+        "detail_shards": 301,
+        "detail_shards_raw_bytes": 29037751,
+        "detail_shards_gzip_bytes": 11066696,
+        "median_detail_shard_gzip_bytes": 36398,
+        "solo_note_files": 456,
+        "solo_note_files_raw_bytes": 7709403,
+        "solo_note_files_gzip_bytes": 2726858,
+        "all_content_gzip_bytes": 19545721
+      },
+      "current_top_overlap": {
+        "top_100": 96,
+        "top_500": 455,
+        "top_1000": 897
+      }
+    },
+    "0.78": {
+      "results": 212140,
+      "mean_paired": 9.22,
+      "median_paired": 9,
+      "p90_paired": 11,
+      "with_gap_pct": 1.51,
+      "mean_gaps": 0.016,
+      "paired_at_least_12": 11476,
+      "paired_at_least_16": 1098,
+      "paired_at_least_24": 77,
+      "same_performer_pct": 4.57,
+      "same_composition_pct": 0.53,
+      "cross_performer_distinct_composition": 201829,
+      "unique_solos": 456,
+      "unique_solo_pairs": 53520,
+      "mean_cost": 1.752,
+      "cost_share_pct": {
+        "pitch": 61.06,
+        "onset": 21.42,
+        "duration": 16.64,
+        "skips": 0.89
+      },
+      "sizes": {
+        "search_index_raw_bytes": 12199471,
+        "search_index_gzip_bytes": 3958382,
+        "detail_shards": 208,
+        "detail_shards_raw_bytes": 20303707,
+        "detail_shards_gzip_bytes": 7736591,
+        "median_detail_shard_gzip_bytes": 36538,
+        "solo_note_files": 456,
+        "solo_note_files_raw_bytes": 7709403,
+        "solo_note_files_gzip_bytes": 2726858,
+        "all_content_gzip_bytes": 14421831
+      },
+      "current_top_overlap": {
+        "top_100": 92,
+        "top_500": 423,
+        "top_1000": 830
+      }
+    },
+    "0.80": {
+      "results": 131822,
+      "mean_paired": 9.42,
+      "median_paired": 9,
+      "p90_paired": 11,
+      "with_gap_pct": 1.46,
+      "mean_gaps": 0.015,
+      "paired_at_least_12": 8650,
+      "paired_at_least_16": 729,
+      "paired_at_least_24": 56,
+      "same_performer_pct": 5.01,
+      "same_composition_pct": 0.58,
+      "cross_performer_distinct_composition": 124811,
+      "unique_solos": 455,
+      "unique_solo_pairs": 42558,
+      "mean_cost": 1.678,
+      "cost_share_pct": {
+        "pitch": 63.71,
+        "onset": 19.81,
+        "duration": 15.6,
+        "skips": 0.88
+      },
+      "sizes": {
+        "search_index_raw_bytes": 7625733,
+        "search_index_gzip_bytes": 2467897,
+        "detail_shards": 129,
+        "detail_shards_raw_bytes": 12871448,
+        "detail_shards_gzip_bytes": 4901491,
+        "median_detail_shard_gzip_bytes": 36644,
+        "solo_note_files": 455,
+        "solo_note_files_raw_bytes": 7707639,
+        "solo_note_files_gzip_bytes": 2726182,
+        "all_content_gzip_bytes": 10095570
+      },
+      "current_top_overlap": {
+        "top_100": 87,
+        "top_500": 394,
+        "top_1000": 755
+      }
+    },
+    "0.82": {
+      "results": 59690,
+      "mean_paired": 9.75,
+      "median_paired": 9,
+      "p90_paired": 12,
+      "with_gap_pct": 1.5,
+      "mean_gaps": 0.015,
+      "paired_at_least_12": 6371,
+      "paired_at_least_16": 467,
+      "paired_at_least_24": 44,
+      "same_performer_pct": 5.77,
+      "same_composition_pct": 0.7,
+      "cross_performer_distinct_composition": 56033,
+      "unique_solos": 453,
+      "unique_solo_pairs": 27197,
+      "mean_cost": 1.596,
+      "cost_share_pct": {
+        "pitch": 65.77,
+        "onset": 18.32,
+        "duration": 14.95,
+        "skips": 0.96
+      },
+      "sizes": {
+        "search_index_raw_bytes": 3506516,
+        "search_index_gzip_bytes": 1131722,
+        "detail_shards": 59,
+        "detail_shards_raw_bytes": 6019894,
+        "detail_shards_gzip_bytes": 2289377,
+        "median_detail_shard_gzip_bytes": 36946,
+        "solo_note_files": 453,
+        "solo_note_files_raw_bytes": 7701449,
+        "solo_note_files_gzip_bytes": 2723767,
+        "all_content_gzip_bytes": 6144866
+      },
+      "current_top_overlap": {
+        "top_100": 83,
+        "top_500": 342,
+        "top_1000": 637
+      }
+    },
+    "0.83": {
+      "results": 34057,
+      "mean_paired": 10.0,
+      "median_paired": 10,
+      "p90_paired": 12,
+      "with_gap_pct": 1.56,
+      "mean_gaps": 0.016,
+      "paired_at_least_12": 5203,
+      "paired_at_least_16": 359,
+      "paired_at_least_24": 39,
+      "same_performer_pct": 6.27,
+      "same_composition_pct": 0.82,
+      "cross_performer_distinct_composition": 31785,
+      "unique_solos": 453,
+      "unique_solo_pairs": 18767,
+      "mean_cost": 1.553,
+      "cost_share_pct": {
+        "pitch": 65.31,
+        "onset": 18.38,
+        "duration": 15.29,
+        "skips": 1.02
+      },
+      "sizes": {
+        "search_index_raw_bytes": 2039985,
+        "search_index_gzip_bytes": 655622,
+        "detail_shards": 34,
+        "detail_shards_raw_bytes": 3518137,
+        "detail_shards_gzip_bytes": 1335200,
+        "median_detail_shard_gzip_bytes": 40040,
+        "solo_note_files": 453,
+        "solo_note_files_raw_bytes": 7701449,
+        "solo_note_files_gzip_bytes": 2723767,
+        "all_content_gzip_bytes": 4714589
+      },
+      "current_top_overlap": {
+        "top_100": 72,
+        "top_500": 298,
+        "top_1000": 546
+      }
+    },
+    "0.84": {
+      "results": 17590,
+      "mean_paired": 10.37,
+      "median_paired": 10,
+      "p90_paired": 13,
+      "with_gap_pct": 1.76,
+      "mean_gaps": 0.018,
+      "paired_at_least_12": 3842,
+      "paired_at_least_16": 286,
+      "paired_at_least_24": 37,
+      "same_performer_pct": 7.46,
+      "same_composition_pct": 0.97,
+      "cross_performer_distinct_composition": 16203,
+      "unique_solos": 447,
+      "unique_solo_pairs": 11271,
+      "mean_cost": 1.516,
+      "cost_share_pct": {
+        "pitch": 64.92,
+        "onset": 18.39,
+        "duration": 15.52,
+        "skips": 1.18
+      },
+      "sizes": {
+        "search_index_raw_bytes": 1094691,
+        "search_index_gzip_bytes": 349168,
+        "detail_shards": 18,
+        "detail_shards_raw_bytes": 1879652,
+        "detail_shards_gzip_bytes": 711122,
+        "median_detail_shard_gzip_bytes": 40180,
+        "solo_note_files": 447,
+        "solo_note_files_raw_bytes": 7677173,
+        "solo_note_files_gzip_bytes": 2714635,
+        "all_content_gzip_bytes": 3774925
+      },
+      "current_top_overlap": {
+        "top_100": 65,
+        "top_500": 244,
+        "top_1000": 423
+      }
+    },
+    "0.85": {
+      "results": 8436,
+      "mean_paired": 10.78,
+      "median_paired": 10,
+      "p90_paired": 13,
+      "with_gap_pct": 1.84,
+      "mean_gaps": 0.019,
+      "paired_at_least_12": 2490,
+      "paired_at_least_16": 244,
+      "paired_at_least_24": 33,
+      "same_performer_pct": 9.02,
+      "same_composition_pct": 1.23,
+      "cross_performer_distinct_composition": 7636,
+      "unique_solos": 437,
+      "unique_solo_pairs": 6079,
+      "mean_cost": 1.473,
+      "cost_share_pct": {
+        "pitch": 63.83,
+        "onset": 18.73,
+        "duration": 16.17,
+        "skips": 1.27
+      },
+      "sizes": {
+        "search_index_raw_bytes": 566075,
+        "search_index_gzip_bytes": 178116,
+        "detail_shards": 9,
+        "detail_shards_raw_bytes": 936728,
+        "detail_shards_gzip_bytes": 353335,
+        "median_detail_shard_gzip_bytes": 40236,
+        "solo_note_files": 437,
+        "solo_note_files_raw_bytes": 7627665,
+        "solo_note_files_gzip_bytes": 2696342,
+        "all_content_gzip_bytes": 3227793
+      },
+      "current_top_overlap": {
+        "top_100": 48,
+        "top_500": 179,
+        "top_1000": 305
+      }
+    },
+    "0.86": {
+      "results": 3860,
+      "mean_paired": 11.19,
+      "median_paired": 11,
+      "p90_paired": 14,
+      "with_gap_pct": 1.76,
+      "mean_gaps": 0.018,
+      "paired_at_least_12": 1475,
+      "paired_at_least_16": 191,
+      "paired_at_least_24": 26,
+      "same_performer_pct": 10.7,
+      "same_composition_pct": 1.61,
+      "cross_performer_distinct_composition": 3430,
+      "unique_solos": 419,
+      "unique_solo_pairs": 2979,
+      "mean_cost": 1.417,
+      "cost_share_pct": {
+        "pitch": 62.73,
+        "onset": 19.12,
+        "duration": 16.85,
+        "skips": 1.3
+      },
+      "sizes": {
+        "search_index_raw_bytes": 298632,
+        "search_index_gzip_bytes": 91831,
+        "detail_shards": 4,
+        "detail_shards_raw_bytes": 444928,
+        "detail_shards_gzip_bytes": 166577,
+        "median_detail_shard_gzip_bytes": 45360,
+        "solo_note_files": 419,
+        "solo_note_files_raw_bytes": 7498329,
+        "solo_note_files_gzip_bytes": 2648108,
+        "all_content_gzip_bytes": 2906516
+      },
+      "current_top_overlap": {
+        "top_100": 40,
+        "top_500": 128,
+        "top_1000": 212
+      }
+    },
+    "0.87": {
+      "results": 1637,
+      "mean_paired": 11.6,
+      "median_paired": 11,
+      "p90_paired": 15,
+      "with_gap_pct": 1.47,
+      "mean_gaps": 0.015,
+      "paired_at_least_12": 731,
+      "paired_at_least_16": 147,
+      "paired_at_least_24": 20,
+      "same_performer_pct": 13.26,
+      "same_composition_pct": 2.38,
+      "cross_performer_distinct_composition": 1413,
+      "unique_solos": 370,
+      "unique_solo_pairs": 1292,
+      "mean_cost": 1.329,
+      "cost_share_pct": {
+        "pitch": 60.39,
+        "onset": 20.18,
+        "duration": 18.28,
+        "skips": 1.15
+      },
+      "sizes": {
+        "search_index_raw_bytes": 160433,
+        "search_index_gzip_bytes": 47545,
+        "detail_shards": 2,
+        "detail_shards_raw_bytes": 195145,
+        "detail_shards_gzip_bytes": 72927,
+        "median_detail_shard_gzip_bytes": 51591,
+        "solo_note_files": 370,
+        "solo_note_files_raw_bytes": 7057149,
+        "solo_note_files_gzip_bytes": 2486467,
+        "all_content_gzip_bytes": 2606939
+      },
+      "current_top_overlap": {
+        "top_100": 26,
+        "top_500": 72,
+        "top_1000": 121
+      }
+    },
+    "0.88": {
+      "results": 766,
+      "mean_paired": 11.74,
+      "median_paired": 11,
+      "p90_paired": 16,
+      "with_gap_pct": 1.17,
+      "mean_gaps": 0.013,
+      "paired_at_least_12": 333,
+      "paired_at_least_16": 104,
+      "paired_at_least_24": 16,
+      "same_performer_pct": 15.01,
+      "same_composition_pct": 2.87,
+      "cross_performer_distinct_composition": 648,
+      "unique_solos": 316,
+      "unique_solo_pairs": 594,
+      "mean_cost": 1.198,
+      "cost_share_pct": {
+        "pitch": 58.39,
+        "onset": 20.58,
+        "duration": 19.94,
+        "skips": 1.09
+      },
+      "sizes": {
+        "search_index_raw_bytes": 100023,
+        "search_index_gzip_bytes": 28407,
+        "detail_shards": 1,
+        "detail_shards_raw_bytes": 92578,
+        "detail_shards_gzip_bytes": 34069,
+        "median_detail_shard_gzip_bytes": 34069,
+        "solo_note_files": 316,
+        "solo_note_files_raw_bytes": 6286151,
+        "solo_note_files_gzip_bytes": 2211452,
+        "all_content_gzip_bytes": 2273928
+      },
+      "current_top_overlap": {
+        "top_100": 16,
+        "top_500": 46,
+        "top_1000": 71
+      }
+    },
+    "0.90": {
+      "results": 269,
+      "mean_paired": 10.66,
+      "median_paired": 9,
+      "p90_paired": 17,
+      "with_gap_pct": 0.74,
+      "mean_gaps": 0.007,
+      "paired_at_least_12": 67,
+      "paired_at_least_16": 37,
+      "paired_at_least_24": 5,
+      "same_performer_pct": 10.41,
+      "same_composition_pct": 4.46,
+      "cross_performer_distinct_composition": 240,
+      "unique_solos": 197,
+      "unique_solo_pairs": 201,
+      "mean_cost": 0.845,
+      "cost_share_pct": {
+        "pitch": 52.49,
+        "onset": 21.57,
+        "duration": 25.06,
+        "skips": 0.88
+      },
+      "sizes": {
+        "search_index_raw_bytes": 49973,
+        "search_index_gzip_bytes": 13938,
+        "detail_shards": 1,
+        "detail_shards_raw_bytes": 29712,
+        "detail_shards_gzip_bytes": 11271,
+        "median_detail_shard_gzip_bytes": 11271,
+        "solo_note_files": 197,
+        "solo_note_files_raw_bytes": 4278724,
+        "solo_note_files_gzip_bytes": 1500738,
+        "all_content_gzip_bytes": 1525947
+      },
+      "current_top_overlap": {
+        "top_100": 1,
+        "top_500": 11,
+        "top_1000": 17
+      }
+    },
+    "0.92": {
+      "results": 118,
+      "mean_paired": 9.03,
+      "median_paired": 8,
+      "p90_paired": 10,
+      "with_gap_pct": 0.0,
+      "mean_gaps": 0.0,
+      "paired_at_least_12": 6,
+      "paired_at_least_16": 4,
+      "paired_at_least_24": 2,
+      "same_performer_pct": 4.24,
+      "same_composition_pct": 2.54,
+      "cross_performer_distinct_composition": 112,
+      "unique_solos": 121,
+      "unique_solo_pairs": 99,
+      "mean_cost": 0.534,
+      "cost_share_pct": {
+        "pitch": 48.44,
+        "onset": 23.4,
+        "duration": 28.15,
+        "skips": 0.0
+      },
+      "sizes": {
+        "search_index_raw_bytes": 28237,
+        "search_index_gzip_bytes": 8162,
+        "detail_shards": 1,
+        "detail_shards_raw_bytes": 11276,
+        "detail_shards_gzip_bytes": 4366,
+        "median_detail_shard_gzip_bytes": 4366,
+        "solo_note_files": 121,
+        "solo_note_files_raw_bytes": 2553735,
+        "solo_note_files_gzip_bytes": 897400,
+        "all_content_gzip_bytes": 909928
+      },
+      "current_top_overlap": {
+        "top_100": 0,
+        "top_500": 5,
+        "top_1000": 6
+      }
+    },
+    "0.95": {
+      "results": 29,
+      "mean_paired": 8.79,
+      "median_paired": 9,
+      "p90_paired": 10,
+      "with_gap_pct": 0.0,
+      "mean_gaps": 0.0,
+      "paired_at_least_12": 1,
+      "paired_at_least_16": 0,
+      "paired_at_least_24": 0,
+      "same_performer_pct": 3.45,
+      "same_composition_pct": 3.45,
+      "cross_performer_distinct_composition": 28,
+      "unique_solos": 42,
+      "unique_solo_pairs": 27,
+      "mean_cost": 0.299,
+      "cost_share_pct": {
+        "pitch": 31.76,
+        "onset": 28.63,
+        "duration": 39.61,
+        "skips": 0.0
+      },
+      "sizes": {
+        "search_index_raw_bytes": 9195,
+        "search_index_gzip_bytes": 3089,
+        "detail_shards": 1,
+        "detail_shards_raw_bytes": 2691,
+        "detail_shards_gzip_bytes": 1066,
+        "median_detail_shard_gzip_bytes": 1066,
+        "solo_note_files": 42,
+        "solo_note_files_raw_bytes": 954269,
+        "solo_note_files_gzip_bytes": 333768,
+        "all_content_gzip_bytes": 337923
+      },
+      "current_top_overlap": {
+        "top_100": 0,
+        "top_500": 1,
+        "top_1000": 1
+      }
+    }
+  }
+}
