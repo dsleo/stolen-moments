@@ -47,22 +47,11 @@ body:not(.atlas-open) { overflow: hidden; }
 .desk-deck-button:focus-visible::after { content: ""; position: absolute; inset: 12%; border: 2px solid #e8c58a; transform: rotate(14deg); }
 .desk-deck-button:disabled { cursor: default; }
 
-.stylus-control { position: absolute; left: 71.7%; top: 18.7%; width: 10.8%; height: 48.9%; min-width: 44px; padding: 0; border: 0; background: transparent; opacity: 0; visibility: hidden; cursor: pointer; transition: opacity 400ms ease-out; }
-.stylus-control svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.stylus-control path { fill: transparent; stroke: #f6d9a2; stroke-width: 1.5; opacity: 0; transition: opacity 180ms ease-out; }
-.stylus-control:hover path, .stylus-control:focus-visible path { opacity: .85; }
-.stylus-control:focus-visible { outline: none; }
-.stylus-hint { position: absolute; left: 73.7%; top: 68%; color: #f4e5c6; white-space: nowrap; font-size: clamp(9px,.8vw,12px); font-weight: 500; letter-spacing: .06em; text-shadow: 0 1px 6px #120c07,0 1px 16px #120c07; opacity: 0; transform: translateY(5px); transition: opacity 400ms ease-out, transform 400ms cubic-bezier(.25,1,.5,1); pointer-events: none; }
-.stylus-hint span { padding-left: 5px; color: #f2c18d; }
-.listening-desk[data-phase="open"] .stylus-control { opacity: 1; visibility: visible; }
-.listening-desk[data-phase="open"] .stylus-hint { opacity: 1; transform: none; }
-.desk-actions { position: absolute; bottom: 24px; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); display: flex; justify-content: space-between; gap: 24px; opacity: 0; visibility: hidden; transition: opacity 400ms ease-out; }
+.listening-desk[data-phase="open"] .listening-desk[data-phase="open"] .desk-actions { position: absolute; bottom: 24px; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); display: flex; justify-content: space-between; gap: 24px; opacity: 0; visibility: hidden; transition: opacity 400ms ease-out; }
 .desk-actions button, .desk-actions a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; border: 0; padding: 0; background: transparent; color: #f2e3c5; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: .13em; text-shadow: 0 1px 10px #160f08; }
 .desk-actions span { color: #eab385; font-size: 16px; }
 .desk-actions :is(a,button):hover { color: #fff5df; }
 .listening-desk[data-phase="open"] .desk-actions { opacity: 1; visibility: visible; }
-.settings-dialog[open] .settings-drawer { animation: settings-enter 320ms cubic-bezier(.25,1,.5,1) both; }
-@keyframes settings-enter { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
 
 /* Keep the entire instrument and its stylus in reach on a portrait screen. */
 @media (max-aspect-ratio: 6/5) {
@@ -75,8 +64,7 @@ body:not(.atlas-open) { overflow: hidden; }
   .landing-copy > p { margin-bottom: 12px; }
   .landing-prompt { margin-top: 16px; }
   .landing-meta { font-size: 8px; }
-  .stylus-hint { left: 70%; top: 72%; font-size: 10px; }
-  .desk-actions { bottom: 24px; }
+    .desk-actions { bottom: 24px; }
 }
 @media (max-width: 400px) {
   .desk-actions { gap: 12px; }
@@ -90,7 +78,5 @@ body:not(.atlas-open) { overflow: hidden; }
   .desk-actions { bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .desk-camera, .desk-shade, .landing-intro, .stylus-control, .stylus-hint, .desk-actions { transition: none; }
-  .listening-desk:is([data-phase="arriving"],[data-phase="open"]) .desk-camera { transform: none; }
-  .settings-dialog[open] .settings-drawer { animation: none; }
+  .desk-camera, .desk-shade, .landing-intro,   .listening-desk:is([data-phase="arriving"],[data-phase="open"]) .desk-camera { transform: none; }
 }

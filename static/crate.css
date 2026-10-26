@@ -23,6 +23,7 @@
 .sleeve-fallback { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; padding: 8px; color: #f3e9d2; text-align: center; font: 600 clamp(22px,7vw,40px)/1 var(--display); }
 .sleeve-fallback small { font: 500 clamp(9px,2.4vw,12px)/1.2 var(--ui); opacity: .75; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .sleeve img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.sleeve .portrait-tag { position: absolute; z-index: 1; right: 3px; bottom: 3px; padding: 3px 5px; background: #211a16dc; color: #fff8eb; font: 600 8px/1.1 var(--ui); letter-spacing: .03em; }
 
 .crate { position: relative; margin: 40px -16px 0; padding: 10px 0 0; background: #3a2c1f; border-radius: 6px 6px 0 0; }
 .crate-strip { display: flex; gap: 10px; overflow-x: auto; padding: 26px 16px 18px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
@@ -42,11 +43,36 @@
 
 /* Facet shelf: dividers that re-file the crate by decade, instrument or musician. */
 .shelf { margin: 0 0 4px; }
-.shelf-toggle { position: relative; width: 44px; height: 40px; margin: 0 16px 4px; display: grid; place-items: center; border: 1px solid #7a5c3c; border-radius: 4px; background: transparent; color: #e8b67d; }
+.shelf-tools { display: flex; min-height: 48px; align-items: center; justify-content: flex-start; gap: 8px; position: relative; padding: 0 16px; }
+.crate-tools-label { margin-right: auto; color: #d9c29a; font: 600 10px/1 var(--ui); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+.shelf-toggle { position: relative; width: 40px; height: 40px; margin: 0; display: grid; flex: 0 0 40px; place-items: center; border: 1px solid #7a5c3c; border-radius: 4px; background: transparent; color: #e8b67d; cursor: pointer; }
 .shelf-toggle:hover,.shelf-toggle[aria-expanded="true"] { background: #5a4430; }
 .shelf-toggle.has-pick::after { content: ""; position: absolute; width: 6px; height: 6px; right: 5px; top: 5px; border-radius: 50%; background: #e8b67d; }
 .shelf-toggle svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
-.shelf-options[hidden] { display: none; }
+.crate-options[hidden],.sort-options[hidden] { display: none; }
+.crate-options,.sort-options { position: absolute; z-index: 3; top: 46px; left: 16px; border: 1px solid #7a5c3c; border-radius: 4px; background: #f4f1e8; color: var(--ink); box-shadow: 0 12px 28px #1a120d66; }
+.crate-options { width: min(360px, calc(100vw - 48px)); padding: 16px 18px 3px; }
+.crate-options-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+.crate-options-head strong { font: 600 16px/1.2 var(--display); }
+.clear-filters { border: 0; background: transparent; color: var(--rust); font: 600 11px/1 var(--ui); text-decoration: underline; cursor: pointer; }
+.crate-options .shelf-kinds { padding: 0 0 12px; }
+.crate-options .shelf-kinds button { border-color: #cacabe; background: #fbf9f2; color: #3d4238; }
+.crate-options .shelf-kinds button[aria-pressed="true"] { border-color: var(--rust); background: var(--rust); color: #fff8eb; }
+.crate-options .shelf-chips { padding: 0 0 12px; }
+.crate-options .shelf-chip { min-height: 36px; border-radius: 3px; background: #e8e2d3; color: #3d4238; }
+.crate-options .shelf-chip[aria-pressed="true"] { background: #a54d32; color: #fff8eb; }
+.crate-result-settings { border-top: 1px solid #d6d4c9; padding-top: 14px; }
+.result-setting { margin: 0 0 16px; }
+.result-setting label { display: block; margin: 0 0 7px; color: #3d4238; font-size: 12px; font-weight: 700; }
+.result-setting .range-label { margin-bottom: 6px; }
+.result-setting input[type="range"] { width: 100%; margin: 6px 0 0; accent-color: var(--rust); cursor: pointer; }
+.sort-options { width: min(252px, calc(100vw - 48px)); padding: 8px; }
+.sort-options p { margin: 4px 9px 7px; color: #777c70; font: 700 10px/1 var(--ui); letter-spacing: .12em; text-transform: uppercase; }
+.sort-options button { display: flex; width: 100%; flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 11px; border: 0; border-radius: 3px; background: transparent; color: var(--ink); text-align: left; cursor: pointer; }
+.sort-options button:hover,.sort-options button[aria-pressed="true"] { background: #e8e2d3; }
+.sort-options button[aria-pressed="true"] span::after { content: " ✓"; color: var(--rust); }
+.sort-options button span { font: 700 12px/1.2 var(--ui); }
+.sort-options button small { color: #777c70; font: 400 10px/1.2 var(--ui); }
 .shelf-kinds { display: flex; gap: 6px; padding: 0 16px 8px; }
 .shelf-kinds button { min-height: 36px; padding: 0 12px; border: 1px solid #7a5c3c; border-radius: 999px; background: transparent; color: #d9c29a; font-size: 12px; }
 .shelf-kinds button[aria-pressed="true"] { background: #d9c29a; color: #3a2c1f; }
@@ -56,3 +82,16 @@
 .shelf-chip { flex: none; min-height: 44px; padding: 0 14px; border: 0; border-radius: 4px 4px 0 0; background: #5a4430; color: #f3e9d2; font-size: 13px; white-space: nowrap; }
 .shelf-chip small { opacity: .65; font-size: 11px; }
 .shelf-chip[aria-pressed="true"] { background: #e8b67d; color: #2b2015; }
+
+/* Wrapped facet list, state bar, sort reset. */
+.crate-options .shelf-chips { flex-wrap: wrap; overflow-x: visible; overflow-y: auto; max-height: 220px; }
+.crate-options .shelf-chip { flex: none; min-height: 32px; padding: 0 10px; }
+#facet-search { width: 100%; box-sizing: border-box; margin: 0 0 10px; min-height: 36px; padding: 0 10px; border: 1px solid #cacabe; border-radius: 3px; background: #fbf9f2; color: var(--ink); font: 13px var(--ui); }
+#facet-search[hidden] { display: none; }
+.sort-options .crate-options-head { margin: 4px 9px 7px; }
+.sort-options .crate-options-head p { margin: 0; }
+.crate-state { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 16px 4px; color: #d9c29a; font-size: 12px; }
+.crate-state[hidden] { display: none; }
+.state-tag { min-height: 28px; padding: 0 10px; border: 1px solid #e8b67d; border-radius: 999px; background: transparent; color: #f3e9d2; font-size: 12px; cursor: pointer; }
+.state-tag:hover { background: #5a4430; }
+.sort-options { left: 64px; }

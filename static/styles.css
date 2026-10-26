@@ -21,6 +21,8 @@ main{min-width:0}
 .segmented button.selected{background:var(--paper-light);color:var(--ink);box-shadow:0 1px 3px #2026161e}
 .control-field{margin:0 0 25px}
 .control-field select,.result-tools select{width:100%;border:1px solid #cacabe;background:var(--paper-light);padding:10px 11px;color:var(--ink);border-radius:3px}
+.control-field input[type=text]{width:100%;border:1px solid #cacabe;background:var(--paper-light);padding:10px 11px;color:var(--ink);border-radius:3px}
+.field-help{font-size:11px;line-height:1.5;color:#777c70;margin:7px 0 0}
 .divider{height:1px;background:#d0d0c3;margin:29px 0}
 .range-field{margin:0 0 27px}
 .range-label{display:flex;align-items:center;justify-content:space-between}
@@ -110,23 +112,11 @@ footer span{display:block;margin-bottom:5px}}
 .needle{position:absolute;width:4px;height:27px;background:#ded2aa;left:10px;bottom:-20px;transform:rotate(-10deg);box-shadow:0 2px 2px #20231e}
 .needle:after{content:"";position:absolute;bottom:-4px;left:-2px;width:8px;height:8px;border-radius:50%;background:#d4a260}
 @keyframes record-spin{to{transform:rotate(360deg)}}
-/* Focused settings drawer */
-.settings-dialog,.pair-dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none}
-.settings-dialog::backdrop,.pair-dialog::backdrop{background:#17201999;backdrop-filter:blur(3px)}
-.settings-dialog{margin:0 0 0 auto;height:100vh;width:min(440px,100vw)}
-.settings-drawer{height:100%;overflow:auto;background:#eeece2;padding:35px clamp(24px,4vw,42px) 42px;box-shadow:-20px 0 50px #1a211630}
-.settings-head{display:flex;justify-content:space-between;gap:22px;margin-bottom:30px}
-.settings-head h2{font:400 34px/1.05 var(--display);letter-spacing:-.04em;margin:12px 0 8px}
-.settings-head p:last-child{font-size:12px;color:var(--muted);margin:0}
+/* Pair dialog */
+.pair-dialog{border:0;padding:0;background:transparent;max-width:none;max-height:none}
+.pair-dialog::backdrop{background:#17201999;backdrop-filter:blur(3px)}
 .dialog-close{border:0;background:transparent;color:#6d7465;font-size:32px;line-height:1;width:34px;height:34px;padding:0}
 .dialog-close:hover{color:var(--rust)}
-.settings-drawer fieldset{border:0;padding:0;margin:0 0 24px;min-width:0}
-.settings-drawer legend,.settings-drawer .control-field label,.settings-drawer .range-label label{display:block;color:#3d4238;font-size:12px;font-weight:700;margin-bottom:10px}
-.settings-drawer .control-field{margin-bottom:25px}
-.settings-drawer .divider{margin:28px 0}
-.settings-drawer .control-actions{display:flex;align-items:center;justify-content:space-between}
-.drawer-done{border:0;background:var(--rust);color:#fff6e6;padding:10px 17px;font-size:11px;font-weight:700}
-.drawer-done:hover{background:#873c28}
 /* Pair comparison card */
 .pair-dialog{width:min(1180px,calc(100vw - 32px));height:min(920px,calc(100vh - 32px));margin:auto;overflow:hidden}
 .pair-card{height:100%;overflow:auto;background:var(--paper);color:var(--ink);padding:clamp(24px,4vw,52px)}
@@ -193,8 +183,6 @@ footer span{display:block;margin-bottom:5px}}
 .pair-card-score{grid-template-columns:repeat(2,1fr);gap:16px}
 .artist-panel{padding:24px 4px 28px}
 .artist-heading h3{font-size:26px}
-.settings-dialog{width:100vw}
-.settings-drawer{padding:27px 20px 34px}}
 @media(prefers-reduced-motion:reduce){.record{animation:none}}
 .record{z-index:1}
 /* Signal Cut — the home page is a working jazz instrument{position:relative;isolation:isolate;min-height:calc(100vh - 60px);padding:clamp(52px,8vw,118px) clamp(24px,7vw,116px) clamp(54px,7vw,104px);grid-template-columns:minmax(300px,.9fr) minmax(460px,1.12fr);gap:clamp(24px,5vw,86px);background:linear-gradient(112deg,#f4f0e5 0 48%,#e8ddc7 100%)}
@@ -235,6 +223,7 @@ footer span{display:block;margin-bottom:5px}}
 .artist-panel.b .artist-visual .album-placeholder{background:repeating-linear-gradient(45deg,#914d38 0 6px,#5e3329 6px 12px)}
 .artist-visual .album-placeholder span{font-size:clamp(72px,9vw,150px);line-height:1}
 .artist-visual .album-art{z-index:1;object-fit:cover;box-shadow:none}
+.artist-visual .album-kind{position:absolute;z-index:2;left:16px;bottom:16px;max-width:calc(100% - 32px);padding:7px 10px;background:#211a16e8;color:#fff8eb;font:600 11px/1.25 var(--ui);letter-spacing:.02em}
 .artist-visual .album-credit{display:none}
 .artist-info{display:grid;grid-template-rows:112px 78px auto auto;align-content:start}
 .artist-heading{min-height:0}

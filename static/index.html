@@ -14,9 +14,10 @@
   <link rel="preload" as="image" href="assets/jazz-desk-base.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="styles.css?v=perf-2">
   <link rel="stylesheet" href="desk.css">
-  <link rel="stylesheet" href="crate.css">
+  <link rel="stylesheet" href="crate.css?v=crate-3">
   <link rel="stylesheet" href="echoes.css">
-  <script src="app.js?v=ui-8" defer></script>
+  <script src="catalog.js?v=joint-1" defer></script>
+  <script src="app.js?v=joint-1" defer></script>
 </head>
 <body>
   <div class="app-shell">
@@ -49,16 +50,12 @@
               <path id="lid-glint" class="lid-glint"/>
             </svg>
             <button id="enter-atlas" class="desk-deck-button" type="button" aria-label="Lift the turntable lid" aria-describedby="landing-prompt"></button>
-            <button id="open-tonearm" class="stylus-control" type="button" aria-label="Open search parameters" aria-haspopup="dialog" aria-controls="settings-dialog" aria-describedby="stylus-hint" inert>
-              <svg viewBox="0 0 180 460" aria-hidden="true"><path d="M115 16 L159 28 L68 429 L15 414 Z"/></svg>
-            </button>
-            <span id="stylus-hint" class="stylus-hint" aria-hidden="true">Tune the search <span>↗</span></span>
           </div>
         </div>
         <div class="desk-shade" aria-hidden="true"></div>
         <div class="landing-intro">
           <div class="landing-meta"><span>Stolen Moments</span><span>Jazz phrase archive</span></div>
-          <div class="landing-copy"><p>Vol. 02 · WJazzD</p><h1 id="landing-title">A desk for<br>close listening.</h1><button type="button" id="landing-prompt" class="landing-prompt" data-lift-lid>Lift the lid <span aria-hidden="true">↗</span></button></div>
+          <div class="landing-copy"><p>Vol. 02 · WJazzD</p><h1 id="landing-title">Stolen<br>Moment</h1><button type="button" id="landing-prompt" class="landing-prompt" data-lift-lid>Lift the lid <span aria-hidden="true">↗</span></button></div>
         </div>
         <div class="desk-actions" inert>
           <button id="close-deck" type="button" aria-label="Close the lid and return home"><span aria-hidden="true">↙</span> Close the lid</button>
@@ -76,39 +73,21 @@
               <button type="button" data-view-btn="echoes" aria-pressed="false" aria-label="Echoes: explore musicians and connections" title="Echoes · musician connections"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="6" cy="16" r="2.5"/><circle cx="26" cy="8" r="2.5"/><circle cx="26" cy="24" r="2.5"/><path d="M9 15C15 15 17 9 23 8M9 17c6 0 8 6 14 7M13 13c3 3 3 5 0 7"/></svg></button>
             </div></div>
           </div>
-          <div class="crate"><div class="shelf"><button type="button" id="open-shelf" class="shelf-toggle" aria-label="Browse by decade, instrument, or musician" title="Browse by decade, instrument, or musician" aria-expanded="false" aria-controls="shelf-options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M9 19h6"/><circle cx="8" cy="5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg><span class="sr-only">Browse filters</span></button><div id="shelf-options" class="shelf-options" hidden><div class="shelf-kinds" role="group" aria-label="Browse the crate by"><button type="button" data-facet-kind="decade">Decade</button><button type="button" data-facet-kind="instrument">Instrument</button><button type="button" data-facet-kind="performer">Musician</button></div><div id="shelf-chips" class="shelf-chips"></div></div></div>
-          <div id="crate-strip" class="crate-strip" role="list"></div></div>
+          <div class="crate"><div class="shelf-tools"><button type="button" id="open-shelf" class="shelf-toggle" aria-label="Filter passage pairs" title="Filter passage pairs" aria-expanded="false" aria-controls="crate-options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M6 12h12M9 19h6"/><circle cx="8" cy="5" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button type="button" id="open-sort" class="shelf-toggle" aria-label="Sort passage pairs" title="Sort passage pairs" aria-expanded="false" aria-controls="sort-options"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h14M3 11h10M3 16h6M18 10v10m0 0-3-3m3 3 3-3"/></svg></button><div id="crate-options" class="crate-options" hidden><div class="crate-options-head"><strong>Filter pairs</strong><button type="button" id="clear-crate-filters" class="clear-filters" hidden>Clear</button></div><div class="shelf-kinds" role="group" aria-label="Filter by"><button type="button" data-facet-kind="decade">Decade</button><button type="button" data-facet-kind="instrument">Instrument</button><button type="button" data-facet-kind="performer">Musician</button></div><input id="facet-search" type="search" placeholder="Search musicians" aria-label="Search musicians" autocomplete="off" hidden><div id="shelf-chips" class="shelf-chips"></div><div class="crate-result-settings"><div class="result-setting"><div class="range-label"><label for="min_notes">Paired notes</label><output id="min_notes_value" for="min_notes">8+</output></div><input id="min_notes" name="min_notes" type="range" min="8" max="24" value="8"></div></div></div><div id="sort-options" class="sort-options" hidden><div class="crate-options-head"><p>Sort pairs</p><button type="button" id="clear-sort" class="clear-filters" hidden>Reset</button></div><button type="button" data-sort="evidence" aria-pressed="true"><span>Best matches</span><small>Length and likeness together</small></button><button type="button" data-sort="length" aria-pressed="false"><span>Longest passages</span><small>Most paired notes first</small></button><button type="button" data-sort="similarity" aria-pressed="false"><span>Most similar</span><small>Closest pitch and rhythm first</small></button></div></div>
+          <div id="crate-state" class="crate-state" hidden></div><div id="crate-strip" class="crate-strip" role="list"></div></div>
           <div id="stage" class="stage" aria-live="polite"></div>
           <div id="echoes" class="echoes"><p id="echoes-note" class="echoes-note"></p><div class="echoes-body"><div id="echoes-scroll" class="echoes-scroll"></div><aside id="echoes-panel" class="echoes-panel" aria-live="polite"></aside></div></div>
         </div>
       </section>
       <section class="method" id="method">
         <div><p class="small-caps">Reading the atlas</p><h2>Hear the pattern.<br><em>See the phrase.</em></h2></div>
-        <div class="method-copy"><p>Each result is a candidate built from transposition-invariant pitch intervals. The ranking score helps order listening; it is not a probability of quotation or influence.</p><p id="method-rhythm">“Matched notes” counts the aligned phrase. Pitch agreement measures interval matches after limited edits. Rhythm agreement compares note spacing in beats. Distinctiveness reflects how widely the seed appears in this corpus. The score excerpts show stored pitches with approximate note values.</p><p id="dtl-method" hidden>DTL1000 notes were automatically extracted and can contain transcription errors. When DTL1000 is involved, rhythm agreement compares note-onset timing after adjusting for tempo.</p><p>Direct video links use source-track times and may need timing correction for a particular upload. A quotation outside the indexed collections may be absent.</p><a href="https://jazzomat.hfm-weimar.de/dbformat/dbformat.html" target="_blank" rel="noopener">WJazzD schema ↗</a><span id="dtl-method-link" hidden> · <a href="https://dig-that-lick.hfm-weimar.de/similarity_search/documentation" target="_blank" rel="noopener">DTL1000 documentation ↗</a></span></div>
+        <div class="method-copy"><p>Each result begins with five identical pitch intervals and extends rightward while pitch and rhythm differences stay within the search budget. Extra notes on either side are allowed after the anchor.</p><p id="method-rhythm">Similarity is 1 minus the total alignment cost divided by paired notes plus skipped notes. Each paired note can cost up to 0.5 for pitch difference, 0.25 for onset difference in beats, and 0.25 for duration difference in beats; each skipped note costs 1. Best matches orders passages by paired notes minus total cost. These scores guide listening and are not probabilities of quotation or influence.</p><p>YouTube links start at the calculated passage onset, rounded down to a whole second. JazzTube timestamps are interpolated from its solo alignment, so a particular upload may still need manual timing correction.</p><a href="https://jazzomat.hfm-weimar.de/dbformat/dbformat.html" target="_blank" rel="noopener">WJazzD schema ↗</a></div>
       </section>
-      <footer><span>Stolen Moments · a local research instrument</span><span id="footer-source">Source: WJazzD v2.1 · ODbL</span></footer>
+      <footer><span>Stolen Moments · a research instrument</span><span id="footer-source">Source: WJazzD v2.1 · ODbL</span></footer>
       </div>
     </main>
   </div>
-  <dialog id="settings-dialog" class="settings-dialog" aria-labelledby="controls-heading">
-    <div class="settings-drawer">
-      <div class="settings-head"><div><p class="small-caps">Archive settings</p><h2 id="controls-heading">Tune the search</h2><p>Set the needle. Find a phrase worth hearing.</p></div><button type="button" class="dialog-close" data-close-settings aria-label="Close settings">×</button></div>
-      <form id="filters">
-        <div class="control-field" id="collection-control" hidden><label for="collection">Collections</label><select id="collection"><option value="all">All collection pairs</option><option value="wjazzd">WJazzD only</option><option value="dtl">DTL1000 only</option><option value="cross">Across collections</option></select></div>
-        <fieldset><legend>Performers</legend><div class="segmented" data-name="scope"><button type="button" data-value="all" class="selected">All</button><button type="button" data-value="same">Same</button><button type="button" data-value="cross">Across</button></div></fieldset>
-        <fieldset><legend>Composition</legend><div class="segmented" data-name="composition"><button type="button" data-value="distinct" class="selected">Different</button><button type="button" data-value="all">All</button><button type="button" data-value="same">Same tune</button></div></fieldset>
-        <div class="control-field"><label for="performer">Find a musician</label><select id="performer" name="performer"><option value="">Any performer</option></select></div>
-        <div class="control-field"><label for="sort">Sort results</label><select id="sort"><option value="score">Best lead</option><option value="length">Longest phrase</option><option value="rhythm">Closest rhythm</option><option value="rare">Rarest motif</option></select></div>
-        <div class="divider"></div>
-        <div class="range-field"><div class="range-label"><label for="min_notes">Matched notes</label><output id="min_notes_value" for="min_notes">9+</output></div><input id="min_notes" name="min_notes" type="range" min="8" max="24" value="9"><p>Longer phrases tend to be more distinctive.</p></div>
-        <div class="range-field"><div class="range-label"><label for="min_pitch">Pitch agreement</label><output id="min_pitch_value" for="min_pitch">80%</output></div><input id="min_pitch" name="min_pitch" type="range" min="60" max="100" value="80"><p>Allow interval changes within a motif.</p></div>
-        <fieldset class="edit-field"><legend>Pitch edits allowed</legend><div class="segmented" data-name="max_edits"><button type="button" data-value="0">Exact</button><button type="button" data-value="1" class="selected">One</button><button type="button" data-value="2">Two</button></div></fieldset>
-        <div class="range-field"><div class="range-label"><label for="min_rhythm">Rhythm agreement</label><output id="min_rhythm_value" for="min_rhythm">45%</output></div><input id="min_rhythm" name="min_rhythm" type="range" min="0" max="100" value="45"><p>Compares note spacing against the beat.</p></div>
-        <div class="range-field"><div class="range-label"><label for="min_distinct">Distinctiveness</label><output id="min_distinct_value" for="min_distinct">40%</output></div><input id="min_distinct" name="min_distinct" type="range" min="0" max="100" value="40"><p>Favors motifs less common across solos.</p></div>
-        <div class="control-actions"><button type="button" id="reset" class="text-button">Reset controls ↺</button><button type="button" class="drawer-done" data-close-settings>Done</button></div>
-      </form>
-    </div>
-  </dialog>
+  <input id="performer" type="hidden">
   <dialog id="pair-dialog" class="pair-dialog" aria-labelledby="pair-dialog-title"></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>

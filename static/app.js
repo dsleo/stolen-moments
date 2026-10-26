@@ -1,29 +1,16 @@
-const API_ORIGIN = location.protocol === 'file:' ? 'http://127.0.0.1:8766' : '';
-const apiURL = path => `${API_ORIGIN}${path}`;
-const state = {scope:'all',composition:'distinct',collection:'all',max_edits:1,offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null};
+const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredIds:[],sort:'evidence'};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
 const sec = n => {const t=Math.max(0,Math.round(n));return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`};
 const initials = name => String(name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(part=>part[0]).join('').toUpperCase();
-const recordingLink = (item,side) => {
-  const s=item[side],recording=item[`recording_${side}`],time=item[`${side}_track_time`];
-  const label=side.toUpperCase();
-  return `<span class="recording-action"><span class="recording-time">${label} · ${sec(time)} in source track</span>${recording?
-    `<a href="${esc(recording.url)}" target="_blank" rel="noopener noreferrer">${recording.verified?'▶ Verified recording':recording.aligned?'▶ JazzTube video':recording.estimated?'▶ Video near motif':'▶ Candidate video'} ↗</a>`:
-    `<span class="no-video">No matched video yet</span>`}</span>`;
-};
-const params = () => ({scope:state.scope,composition:state.composition,collection:state.collection,max_edits:state.max_edits,
-  min_notes:$('#min_notes').value,min_pitch:Number($('#min_pitch').value)/100,
-  min_rhythm:Number($('#min_rhythm').value)/100,min_distinct:Number($('#min_distinct').value)/100,
-  performer:$('#performer').value,decade:state.decade,instrument:state.instrument,sort:$('#sort').value,limit:50,offset:state.offset});
-const query = p => new URLSearchParams(p).toString();
+const params = () => ({min_notes:Number($('#min_notes').value),min_similarity:.8,
+  performer:$('#performer').value.trim(),decade:state.decade,instrument:state.instrument,sort:state.sort});
 let toastTimer;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3600)}
 
 function updateOutputs(){
   $('#min_notes_value').textContent=$('#min_notes').value+'+';
-  for(const id of ['min_pitch','min_rhythm','min_distinct']) $(`#${id}_value`).textContent=$(`#${id}`).value+'%';
   for(const input of document.querySelectorAll('input[type=range]')){
     const q=(Number(input.value)-Number(input.min))/(Number(input.max)-Number(input.min))*100;
     input.style.background=`linear-gradient(to right, #a54d32 0%, #a54d32 ${q}%, #c9ccbd ${q}%, #c9ccbd 100%)`;
@@ -34,26 +21,28 @@ async function load(append=false){
   const serial=++state.request;
   state.loading=true;
   if(!append)state.nextOffset=null;
-  if(!append)refreshFacets(serial);
   try{
-    const response=await fetch(apiURL('/api/matches?'+query(params())));
-    if(!response.ok)throw new Error((await response.json()).error||'Search failed');
-    const data=await response.json();
+    if(!state.catalog)throw new Error('Catalog unavailable');
+    if(!append){state.filteredIds=state.catalog.filtered(params());refreshFacets(serial)}
+    const total=state.filteredIds.length;
+    const ids=state.filteredIds.slice(state.offset,state.offset+50);
+    const items=ids.map(id=>state.catalog.item(id));
     if(serial!==state.request)return;
-    $('#result-count').textContent=data.total.toLocaleString();
-    $('#result-context').textContent=`${data.total.toLocaleString()} of ${data.unfiltered_total.toLocaleString()} indexed passage pairs meet these controls`;
-    if(!append)state.items=[];state.items.push(...data.items);renderCrate(data.items,append);
-    if(!append&&!data.items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower a threshold or include the same tune to broaden the search.</div>';
-    state.nextOffset=data.next_offset;
+    $('#result-count').textContent=total.toLocaleString();
+    $('#result-context').textContent=`${total.toLocaleString()} of ${state.catalog.visibleTotal.toLocaleString()} distinct-song passage pairs`;
+    if(!append)state.items=[];state.items.push(...items);renderCrate(items,append);
+    if(!append&&!items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower the similarity or length minimum to broaden the search.</div>';
+    state.nextOffset=state.offset+items.length<total?state.offset+items.length:null;
   }catch(err){if(serial===state.request){if(!append)$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
   finally{if(serial===state.request)state.loading=false}
 }
 
 const hue = name => [...String(name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7);
-const coverSrc = s => apiURL('/api/cover-image?'+new URLSearchParams({performer:s.performer||'',album:s.album||s.title||'',title:s.title||''}));
+const coverPhoto = s => s.cover?{url:s.cover,kind:'cover'}:
+  state.portraits[s.performer]?.image?{url:state.portraits[s.performer].image,kind:'portrait'}:null;
 // Typographic sleeve underneath; the real cover (if the archive finds one) covers it.
-const sleeve = (s,side) => `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span><img loading="lazy" decoding="async" alt="" src="${esc(coverSrc(s))}"></span>`;
-const crateCard = item => `<button type="button" class="crate-card" role="listitem" data-pull="${item.id}" aria-pressed="false" aria-label="Pull ${esc(item.a.performer)} and ${esc(item.b.performer)}"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${item.heuristic_score.toFixed(1)} · ${item.notes} notes</span></button>`;
+const sleeve = (s,side) => {const photo=coverPhoto(s);return `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span>${photo?`<img loading="lazy" decoding="async" alt="" src="${esc(photo.url)}">`:''}${photo?.kind==='portrait'?'<span class="portrait-tag">Artist photo</span>':''}</span>`};
+const crateCard = item => `<button type="button" class="crate-card" role="listitem" data-pull="${item.id}" aria-pressed="false" aria-label="Pull ${esc(item.a.performer)} and ${esc(item.b.performer)}"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${pct(item.similarity)} similar · ${item.notes} notes</span></button>`;
 function renderCrate(items,append){
   const strip=$('#crate-strip');
   if(!append){strip.innerHTML='';strip.scrollLeft=0;$('#stage').className='stage';$('#stage').innerHTML=''}
@@ -72,7 +61,7 @@ function pullPair(id){
   stage.innerHTML=`<button type="button" class="stage-open" data-match="${id}" aria-haspopup="dialog" aria-label="Open ${esc(item.a.performer)} and ${esc(item.b.performer)}">${sleeve(item.a,'a')}<span class="stage-x" aria-hidden="true">↔</span>${sleeve(item.b,'b')}</button>
     <h3>${esc(item.a.performer)} <em>↔</em> ${esc(item.b.performer)}</h3>
     <p>${esc(item.a.title)} · ${sec(item.a_track_time)} &nbsp;/&nbsp; ${esc(item.b.title)} · ${sec(item.b_track_time)}</p>
-    <p>${item.notes} notes · ${pct(item.pitch_similarity)} pitch · ${pct(item.rhythm_similarity)} rhythm</p>
+    <p>${item.notes} paired notes · ${pct(item.similarity)} similarity${item.gaps?` · ${item.gaps} extra note${item.gaps===1?'':'s'}`:''}</p>
     <button type="button" class="drawer-done" data-match="${id}" aria-haspopup="dialog">Hear this pair ↗</button>`;
 }
 const SPACING=64,NODE_H=84,TOP_N=70;
@@ -115,8 +104,8 @@ new ResizeObserver(()=>{const h=$('#echoes-scroll').clientHeight;if(h&&h!==echoH
 async function loadEchoes(){
   const serial=state.echoSerial=(state.echoSerial||0)+1;
   try{
-    const res=await fetch(apiURL('/api/influence?'+query(params())));if(!res.ok)throw new Error('Echoes unavailable');
-    const d=await res.json();if(serial!==state.echoSerial)return;
+    if(!state.catalog)return;
+    const d=state.catalog.influence(params());if(serial!==state.echoSerial)return;
     state.echoes=d;
     state.echoOrder=d.musicians.map((_,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
     if(state.echoSel!=null&&state.echoSel>=d.musicians.length)state.echoSel=null;
@@ -138,15 +127,28 @@ const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sa
 const FACETS={decade:{label:'Decade',name:v=>`${v}s`},instrument:{label:'Instrument',name:v=>INSTRUMENTS[v]||v.toUpperCase()},performer:{label:'Musician',name:v=>v}};
 const facetValue = kind => kind==='performer'?$('#performer').value:state[kind];
 async function refreshFacets(serial){
-  try{const res=await fetch(apiURL('/api/facets?'+query(params())));if(!res.ok)return;const data=await res.json();if(serial===state.request){state.facetData=data;renderShelf()}}catch{}
+  try{const data=state.catalog.facets(params());if(serial===state.request){state.facetData=data;renderShelf()}}catch{}
 }
 function renderShelf(){
   const data=state.facetData;if(!data)return;
   document.querySelectorAll('[data-facet-kind]').forEach(b=>{const k=b.dataset.facetKind;b.setAttribute('aria-pressed',String(k===state.facetKind));b.classList.toggle('has-pick',!!facetValue(k))});
   const kind=state.facetKind,current=String(facetValue(kind)),{name}=FACETS[kind];
   const chip=(value,label,count)=>`<button type="button" class="shelf-chip" data-facet-value="${esc(value)}" aria-pressed="${String(value)===current}">${esc(label)}${count==null?'':` <small>${count.toLocaleString()}</small>`}</button>`;
-  $('#shelf-chips').innerHTML=chip('','All',null)+data[kind].map(([v,n])=>chip(v,name(v),n)).join('');
-  $('#open-shelf').classList.toggle('has-pick',Object.keys(FACETS).some(k=>!!facetValue(k)));
+  const search=$('#facet-search'),q=kind==='performer'?search.value.trim().toLowerCase():'';
+  search.hidden=kind!=='performer';
+  $('#shelf-chips').innerHTML=chip('','All',null)+data[kind].filter(([v])=>!q||name(v).toLowerCase().includes(q)).map(([v,n])=>chip(v,name(v),n)).join('');
+  const hasFilters=Object.keys(FACETS).some(k=>!!facetValue(k))||Number($('#min_notes').value)>8;
+  $('#open-shelf').classList.toggle('has-pick',hasFilters);
+  $('#clear-crate-filters').hidden=!hasFilters;
+  renderCrateState();
+}
+function renderCrateState(){
+  const tags=Object.keys(FACETS).filter(k=>facetValue(k)).map(k=>`<button type="button" class="state-tag" data-unset="${k}" aria-label="Remove ${esc(FACETS[k].label)} filter">${esc(FACETS[k].label)}: ${esc(FACETS[k].name(facetValue(k)))} ×</button>`);
+  if(Number($('#min_notes').value)>8)tags.push(`<button type="button" class="state-tag" data-unset="notes" aria-label="Remove paired notes filter">${$('#min_notes').value}+ notes ×</button>`);
+  const el=$('#crate-state');el.hidden=!tags.length;
+  el.innerHTML=`${tags.join('')}`;
+  $('#open-sort').classList.toggle('has-pick',state.sort!=='evidence');
+  $('#clear-sort').hidden=state.sort==='evidence';
 }
 function pickFacet(value){
   const kind=state.facetKind;
@@ -208,13 +210,13 @@ function mediaSection(d,side){
   const source=s.source_url?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${s.source==='DTL1000'?'DTL1000 solo details':'Source transcription'} ↗</a>`:'';
   const alignment=recording?.aligned?`<a href="${esc(recording.source_url)}" target="_blank" rel="noopener noreferrer">JazzTube alignment ↗</a>`:'';
   const provenance=(source||alignment)?`<details class="provenance-info"><summary aria-label="Open source information" title="Source information">i</summary><div class="provenance-popover">${source}${alignment}</div></details>`:'';
-  return `<div class="panel-listen"><div class="listen-links">${recording?`<a class="youtube-link" href="${esc(recording.url)}" target="_blank" rel="noopener noreferrer"><span class="youtube-mark">▶</span> ${recording.verified?'Play verified recording':recording.aligned?'Play JazzTube video':recording.estimated?'Play likely recording':'Open candidate video'} ↗</a>`:s.source==='WJazzD'?`<button type="button" class="find-video" data-find-video="${s.trackid}" data-match-id="${d.id}">Check for a video</button>`:'<span class="no-video">No matched video</span>'}${provenance}</div>
+  return `<div class="panel-listen"><div class="listen-links">${recording?`<a class="youtube-link" href="${esc(recording.url)}" target="_blank" rel="noopener noreferrer"><span class="youtube-mark">▶</span> ${recording.verified?'Play verified recording':recording.aligned?'Play JazzTube video':recording.estimated?'Play likely recording':'Open candidate video'}${recording.time_seconds!=null?` at ${sec(recording.time_seconds)}`:''} ↗</a>`:'<span class="no-video">No matched video</span>'}${provenance}</div>
   </div>`;
 }
 
 function albumVisual(s,side){
-  const query=new URLSearchParams({performer:s.performer||'',album:s.album||s.title||'',title:s.title||''});
-  return `<div class="album-visual" data-side="${side}"><div class="album-placeholder" aria-hidden="true"></div><img class="album-art" src="${esc(apiURL(`/api/cover-image?${query}`))}" alt="Album cover for ${esc(s.album||s.title)}" onerror="this.hidden=true"><div class="album-credit" aria-hidden="true"></div></div>`;
+  const photo=coverPhoto(s),portrait=photo?.kind==='portrait';
+  return `<div class="album-visual" data-side="${side}"><div class="album-placeholder" aria-hidden="true"></div>${photo?`<img class="album-art" src="${esc(photo.url)}" alt="${portrait?`Photo of ${esc(s.performer)}; album cover unavailable`:`Album cover for ${esc(s.album||s.title)}`}" onerror="this.hidden=true">`:''}${portrait?'<span class="album-kind">Artist photo · recording cover unavailable</span>':''}</div>`;
 }
 
 function artistPanel(d,side){
@@ -231,12 +233,10 @@ function artistPanel(d,side){
 }
 
 function detailHTML(d){
-  const hasDTL=d.a.source==='DTL1000'||d.b.source==='DTL1000';
   return `<div class="pair-card"><header class="pair-card-head"><div><p class="small-caps">A closer listen</p><h2 id="pair-dialog-title">${esc(d.a.performer)} <em>↔</em> ${esc(d.b.performer)}</h2></div><button type="button" class="dialog-close" data-close-pair aria-label="Close pair detail">×</button></header>
-    ${d.periodicity>.62?'<p class="pair-note">This passage repeats a short cell. Its ranking is reduced because loops can match by chance.</p>':''}
     <div class="pair-split">${artistPanel(d,'a')}${artistPanel(d,'b')}</div>
-    <div class="pair-card-score"><div><strong>${d.notes}</strong><span>matched notes</span></div><div><strong>${pct(d.pitch_similarity)}</strong><span>pitch agreement</span></div><div><strong>${pct(d.rhythm_similarity)}</strong><span>rhythm agreement</span></div><div><strong>${d.heuristic_score.toFixed(1)}</strong><span>ranking score</span></div></div>
-    <footer class="pair-card-foot"><span>${hasDTL?`${esc(d.a.source)} · ${esc(d.b.source)}`:`WJazzD source note IDs: ${d.a_notes.map(n=>n.eventid).join(', ')} / ${d.b_notes.map(n=>n.eventid).join(', ')}.`}</span><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
+    <div class="pair-card-score"><div><strong>${d.notes}</strong><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div><div><strong>${d.evidence.toFixed(1)}</strong><span>evidence</span></div></div>
+    <footer class="pair-card-foot"><span>WJazzD source note IDs: ${d.a_notes.map(n=>n.eventid).join(', ')} / ${d.b_notes.map(n=>n.eventid).join(', ')}.</span><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
   </div>`;
 }
 
@@ -245,7 +245,7 @@ async function toggleDetail(button){
   state.lastTrigger=button;
   state.openId=id;dialog.innerHTML='<div class="pair-loading">Reading both passages…</div>';
   if(!dialog.open)dialog.showModal();
-  try{const res=await fetch(apiURL(`/api/matches/${id}`));if(!res.ok)throw new Error('Could not load passage');const detail=await res.json();state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
+  try{const detail=await state.catalog.detail(id);state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
 }
 
 async function playTranscript(notes){
@@ -267,35 +267,29 @@ async function playTranscript(notes){
   }
 }
 
-async function submitJSON(url,data){const res=await fetch(apiURL(url),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});const body=await res.json();if(!res.ok)throw new Error(body.error||'Could not save');return body}
-
 document.addEventListener('click',event=>{
-  const seg=event.target.closest('.segmented button');
-  if(seg){const group=seg.closest('.segmented');group.querySelectorAll('button').forEach(b=>b.classList.toggle('selected',b===seg));state[group.dataset.name]=group.dataset.name==='max_edits'?Number(seg.dataset.value):seg.dataset.value;resetSearch()}
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
   const facetChip=event.target.closest('[data-facet-value]');if(facetChip)pickFacet(facetChip.dataset.facetValue);
-  if(event.target.closest('#open-shelf')){const options=$('#shelf-options'),open=options.hidden;options.hidden=!open;$('#open-shelf').setAttribute('aria-expanded',String(open))}
+  if(event.target.closest('#open-shelf')){const options=$('#crate-options'),button=$('#open-shelf'),open=options.hidden;options.hidden=!open;button.setAttribute('aria-expanded',String(open));$('#sort-options').hidden=true;$('#open-sort').setAttribute('aria-expanded','false')}
+  if(event.target.closest('#open-sort')){const options=$('#sort-options'),button=$('#open-sort'),open=options.hidden;options.hidden=!open;button.setAttribute('aria-expanded',String(open));$('#crate-options').hidden=true;$('#open-shelf').setAttribute('aria-expanded','false')}
+  const unset=event.target.closest('[data-unset]');if(unset){const k=unset.dataset.unset;if(k==='performer')$('#performer').value='';else if(k==='notes'){$('#min_notes').value=8;updateOutputs()}else state[k]='';$('#facet-search').value='';resetSearch()}
+  if(event.target.closest('#clear-sort')){state.sort='evidence';document.querySelectorAll('[data-sort]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sort==='evidence')));resetSearch()}
+  if(!event.target.closest('#crate-options,#sort-options,#open-shelf,#open-sort')){for(const [panel,btn] of [['#crate-options','#open-shelf'],['#sort-options','#open-sort']]){$(panel).hidden=true;$(btn).setAttribute('aria-expanded','false')}}
+  const sorting=event.target.closest('[data-sort]');if(sorting){state.sort=sorting.dataset.sort;document.querySelectorAll('[data-sort]').forEach(b=>b.setAttribute('aria-pressed',String(b===sorting)));$('#sort-options').hidden=true;$('#open-sort').setAttribute('aria-expanded','false');resetSearch()}
+  if(event.target.closest('#clear-crate-filters')){state.decade='';state.instrument='';$('#performer').value='';$('#min_notes').value=8;updateOutputs();resetSearch()}
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
   const echo=event.target.closest('[data-echo]');if(echo){const i=Number(echo.dataset.echo),now=performance.now();const secondClick=state.lastEchoClick?.index===i&&now-state.lastEchoClick.time<450;state.echoSel=i;state.echoPanel=secondClick?i:null;state.lastEchoClick={index:i,time:now};renderEchoes()}
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
   const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
-  const find=event.target.closest('[data-find-video]');if(find){find.disabled=true;find.textContent='Checking recording…';submitJSON('/api/discover-video',{trackid:Number(find.dataset.findVideo)}).then(async result=>{toast(result.found?'Video found; opening updated passage':'No reliable video match found');await load();if(state.details[Number(find.dataset.matchId)])toggleDetail(document.querySelector(`[data-match="${find.dataset.matchId}"]`))}).catch(err=>{toast(err.message);find.disabled=false;find.textContent='Check for a video'})}
-  if(event.target.closest('[data-close-settings]'))$('#settings-dialog').close();
   if(event.target.closest('[data-close-pair]'))$('#pair-dialog').close();
 });
 document.addEventListener('dblclick',event=>{const echo=event.target.closest('[data-echo]');if(echo){state.echoSel=Number(echo.dataset.echo);state.echoPanel=state.echoSel;renderEchoes()}});
 document.addEventListener('keydown',event=>{const echo=event.target.closest('[data-echo]');if(echo&&event.key==='Enter'&&state.echoSel===Number(echo.dataset.echo)){event.preventDefault();state.echoPanel=state.echoSel;renderEchoes()}});
 let debounce;
-for(const id of ['min_notes','min_pitch','min_rhythm','min_distinct'])$('#'+id).addEventListener('input',()=>{updateOutputs();clearTimeout(debounce);debounce=setTimeout(resetSearch,150)});
-$('#performer').addEventListener('change',resetSearch);$('#sort').addEventListener('change',resetSearch);
-$('#collection').addEventListener('change',()=>{state.collection=$('#collection').value;resetSearch()});
-$('#reset').addEventListener('click',()=>{
-  for(const [id,value] of Object.entries({min_notes:9,min_pitch:80,min_rhythm:45,min_distinct:40}))$('#'+id).value=value;
-  $('#performer').value='';$('#sort').value='score';$('#collection').value='all';state.scope='all';state.composition='distinct';state.collection='all';state.max_edits=1;state.decade='';state.instrument='';
-  document.querySelectorAll('.segmented').forEach(group=>group.querySelectorAll('button').forEach(button=>button.classList.toggle('selected',String(state[group.dataset.name])===button.dataset.value)));
-  updateOutputs();resetSearch();
-});
+$('#facet-search').addEventListener('input',renderShelf);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')for(const [panel,btn] of [['#crate-options','#open-shelf'],['#sort-options','#open-sort']]){$(panel).hidden=true;$(btn).setAttribute('aria-expanded','false')}});
+$('#min_notes').addEventListener('input',()=>{updateOutputs();clearTimeout(debounce);debounce=setTimeout(resetSearch,150)});
 // One photograph and one hinged cover persist through both views. The lid's
 // projected corners rotate around the rear hinges; the record never changes.
 const desk = $('#landing');
@@ -362,9 +356,7 @@ async function openDesk(){
   $('.archive-content').hidden=false;
   $('.archive-content').inert=false;
   $('.desk-actions').inert=false;
-  $('#open-tonearm').inert=false;
-  $('#open-tonearm').focus({preventScroll:true});
-  $('#desk-status').textContent='The lid is open. Select the stylus to tune the search.';
+  $('#desk-status').textContent='The lid is open.';
 }
 
 async function closeDesk(){
@@ -376,7 +368,6 @@ async function closeDesk(){
   $('.archive-content').hidden=true;
   $('.archive-content').inert=true;
   $('.desk-actions').inert=true;
-  $('#open-tonearm').inert=true;
   await animateLid(false);
   deskPhase='closed';
   desk.dataset.phase='closed';
@@ -393,24 +384,17 @@ renderLid(0);
 $('#enter-atlas').addEventListener('click',openDesk);
 $('[data-lift-lid]').addEventListener('click',openDesk);
 $('#close-deck').addEventListener('click',closeDesk);
-$('#open-tonearm').addEventListener('click',()=>$('#settings-dialog').showModal());
-$('#settings-dialog').addEventListener('click',event=>{if(event.target===$('#settings-dialog'))$('#settings-dialog').close()});
 $('#pair-dialog').addEventListener('click',event=>{if(event.target===$('#pair-dialog'))$('#pair-dialog').close()});
 $('#pair-dialog').addEventListener('close',()=>{state.openId=null;if(state.lastTrigger?.isConnected)state.lastTrigger.focus()});
 
 async function init(){
   updateOutputs();
-  try{const portraits=await fetch(apiURL('/artist-portraits.json'));if(portraits.ok)state.portraits=await portraits.json()}catch{}
+  try{const portraits=await fetch('artist-portraits.json');if(portraits.ok)state.portraits=await portraits.json()}catch{}
   try{setView(localStorage.getItem('atlas-view')==='echoes'?'echoes':'crate')}catch{}
-  try{const res=await fetch(apiURL('/api/bootstrap'));if(!res.ok)throw new Error('Index unavailable');const data=await res.json();
-    const collections=data.corpus.collections||{WJazzD:data.corpus.solos};
-    if(collections.DTL1000){
-      $('#footer-source').textContent='Sources: WJazzD v2.1 + DTL1000';
-      $('#method-rhythm').textContent='“Matched notes” counts the aligned phrase. Pitch agreement measures interval matches after limited edits. Rhythm agreement compares beat spacing for WJazzD pairs and tempo-adjusted note spacing when DTL1000 is involved. Distinctiveness reflects how widely the seed appears across both collections. The score excerpts show stored pitches with approximate note values.';
-      $('#dtl-method').hidden=false;$('#dtl-method-link').hidden=false;$('#collection-control').hidden=false;
-    }
-    $('#performer').insertAdjacentHTML('beforeend',data.performers.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join(''));
+  try{
+    state.catalog=await loadCatalog();
     await load();
-  }catch(err){const message=location.protocol==='file:'?'Start the local server with `python3 -m jazzmine serve --port 8766`, then reload this file.':err.message;$('#crate-strip').innerHTML=`<div class="empty"><strong>Could not open the atlas.</strong>${esc(message)}</div>`}
+    if($('.results-area').dataset.view==='echoes')loadEchoes();
+  }catch(err){const message=location.protocol==='file:'?'Open this site over HTTP, for example with `python3 -m http.server 8766 -d static`.':err.message;$('#crate-strip').innerHTML=`<div class="empty"><strong>Could not open the atlas.</strong>${esc(message)}</div>`}
 }
 init();
