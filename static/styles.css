@@ -53,8 +53,10 @@ main{min-width:0}
 .method h2{font:400 clamp(32px,3.6vw,54px)/1.15 var(--display);letter-spacing:-.045em;margin:18px 0}
 .method-copy{max-width:580px}
 .method-copy p{color:#646b61;line-height:1.8;margin:0 0 15px}
-.method-copy a{font-weight:700;font-size:12px;text-decoration:none;color:var(--rust)}
-.method-copy a:hover{text-decoration:underline}
+.method-copy ol{list-style:none;margin:0 0 18px;padding:0;display:grid;gap:14px}
+.method-copy li{display:grid;gap:2px;color:#646b61;line-height:1.5}
+.method-copy li strong{color:var(--ink);font:600 18px/1.3 var(--display)}
+.method-note{font-size:13px}
 footer{padding:23px clamp(24px,4vw,72px);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;color:#8c9287;font-size:10px;letter-spacing:.05em}
 .toast{position:fixed;right:22px;bottom:22px;background:var(--rail);color:#f7f3e8;box-shadow:0 10px 30px #1a211628;padding:12px 17px;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:10;font-size:12px}
 .toast.show{opacity:1;transform:translateY(0)}
