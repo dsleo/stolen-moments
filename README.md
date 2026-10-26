@@ -104,6 +104,28 @@ Search is **seed-and-extend over a prebuilt index**, not a sliding window over e
 
 After changing a constant, run `python3 -m jazzmine build` again. The index records its pipeline version in the `meta` table.
 
+## Near-duplicate passages (joint search)
+
+**Issue.** In the joint pitch-and-rhythm search every 5-interval seed inside a long shared phrase extends to almost the same window, shifted by a few notes. Dropping only windows *contained* in another left these overlapping variants, so one real match appeared several times with start times a second apart (for example Steve Coleman's "The Oracle" against Steve Lacy's "Skippy": five 25-26 note windows starting at notes 514, 516, 519, 522 and 525).
+
+**Fix.** `consolidate()` in `jazzmine/joint_store.py` runs at the end of every build (pipeline `joint-seed-5-right-v2`). Within one ordered solo pair, windows that overlap a stronger one by at least 50% of the shorter range on **both** solos are the same passage; only the highest-evidence one is kept. To apply it to an existing store without rebuilding: `python3 -m jazzmine.joint_store --consolidate-only`, then `python3 -m jazzmine.static_export`.
+
+**Measured on the current store** (similarity ≥ 0.8):
+
+| | Before | After |
+| --- | --- | --- |
+| All candidates | 360,578 | 342,129 (18,449 merged, 5.1%) |
+| Passages in the static catalog | 131,822 | 126,524 (5,298 merged, 4.0%) |
+| Crate count (distinct songs only) | 131,054 | about 125,800 |
+| Solo pairs with a merged passage | | 3,244 of 42,558 |
+
+Most affected solo pairs lost one passage (2,370); the rest lost two to eight.
+
+**Still open.**
+- About 1,500 pairs of kept windows overlap by 25-50% on both solos. Nearly all sit on different diagonals (a different alignment of a repeated motif), so they are treated as distinct passages. Only a few dozen share a diagonal.
+- Alternate takes of one tune by the same performer (for example two "The Oracle" solos) are separate solos and can each match the same other solo at the same notes. About 140 such take pairs exist; they are different recordings and are not merged.
+- The 50% threshold is a judgement call, not tuned against labels.
+
 ## Limitations of the current approach
 
 - **Common seeds are skipped.** A seed seen more than 80 times (30 in the length-4 pass) is discarded entirely. This removes scales, arpeggios and stock patterns, but it also removes a genuinely common lick, and a phrase built only from such seeds is never found. The number of skipped seeds is reported by `build`.
