@@ -275,9 +275,8 @@ function artistPanel(d,side){
 function detailHTML(d){
   return `<div class="pair-card"><header class="pair-card-head"><div><p class="small-caps">A closer listen</p><h2 id="pair-dialog-title">${esc(d.a.performer)} <em>↔</em> ${esc(d.b.performer)}</h2></div><button type="button" class="dialog-close" data-close-pair aria-label="Close pair detail">×</button></header>
     <div class="pair-split">${artistPanel(d,'a')}${artistPanel(d,'b')}</div>
-    ${alignmentPanel(d)}
-    <div class="pair-card-score"><div><strong>${d.notes}</strong><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div><div><strong>${d.evidence.toFixed(1)}</strong><span>evidence</span></div></div>
-    <footer class="pair-card-foot"><span>WJazzD source note IDs: ${d.a_notes.map(n=>n.eventid).join(', ')} / ${d.b_notes.map(n=>n.eventid).join(', ')}.</span><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
+    <div class="pair-card-score"><div><strong>${d.notes}</strong><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div><div class="alignment-score-cell">${alignmentPanel(d)}</div></div>
+    <footer class="pair-card-foot"><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
   </div>`;
 }
 

@@ -104,11 +104,14 @@
 .sort-options { left: 64px; }
 
 /* Keep alignment details collapsed until a listener asks to inspect them. */
-.alignment-disclosure { margin: 22px 0 8px; }
-.alignment-disclosure > summary { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 13px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper-light); color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 700; list-style: none; }
+.alignment-score-cell { min-width: 0; }
+.alignment-disclosure { margin: 0; }
+.alignment-disclosure > summary { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 37px; padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; font: 700 12px var(--ui); list-style: none; }
 .alignment-disclosure > summary::-webkit-details-marker { display: none; }
 .alignment-disclosure > summary svg { width: 20px; height: 20px; fill: none; stroke: var(--rust); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.alignment-disclosure > summary:hover,.alignment-disclosure[open] > summary { background: #e8e2d3; }
+.alignment-score-cell .alignment-disclosure > summary span { color: var(--ink); font-size: 12px; letter-spacing: 0; text-transform: none; }
+.alignment-disclosure > summary:hover span,.alignment-disclosure[open] > summary span { color: var(--rust); }
+.alignment-disclosure > summary:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
 .alignment-panel { margin: 12px 0 8px; padding: 18px clamp(14px,2.5vw,30px); border: 1px solid var(--line); background: var(--paper-light); }
 .alignment-panel h3 { margin: 0 0 4px; font: 600 20px/1.2 var(--display); }
 .alignment-panel > p { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
