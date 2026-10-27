@@ -70,18 +70,17 @@ python3 -m pytest
 
 **Issue.** In the joint pitch-and-rhythm search every 5-interval seed inside a long shared phrase extends to almost the same window, shifted by a few notes. Dropping only windows *contained* in another left these overlapping variants, so one real match appeared several times with start times a second apart (for example Steve Coleman's "The Oracle" against Steve Lacy's "Skippy": five 25-26 note windows starting at notes 514, 516, 519, 522 and 525).
 
-**Fix.** `consolidate()` in `jazzmine/joint_store.py` runs at the end of every build (pipeline `joint-seed-5-right-v2`). Within one ordered solo pair, windows that overlap a stronger one by at least 50% of the shorter range on **both** solos are the same passage; only the highest-evidence one is kept. To apply it to an existing store without rebuilding: `python3 -m jazzmine.joint_store --consolidate-only`, then `python3 -m jazzmine.static_export`.
+**Fix.** `consolidate()` in `jazzmine/joint_store.py` runs at the end of every build (pipeline `joint-seed-5-right-v3`). The aligner now retains the longest endpoint that still meets the 80% export floor, then consolidates overlapping windows within each ordered solo pair. Windows that overlap a stronger one by at least 50% of the shorter range on **both** solos are treated as the same passage; the highest-evidence window is kept. To rebuild and publish: `python3 -m jazzmine.joint_store`, then `python3 -m jazzmine.static_export`.
 
-**Measured on the current store** (similarity ≥ 0.8):
+**Current catalog** (27 October 2026, similarity ≥ 0.8):
 
-| | Before | After |
-| --- | --- | --- |
-| All candidates | 360,578 | 342,129 (18,449 merged, 5.1%) |
-| Passages in the static catalog | 131,822 | 126,524 (5,298 merged, 4.0%) |
-| Crate count (distinct songs only) | 131,054 | about 125,800 |
-| Solo pairs with a merged passage | | 3,244 of 42,558 |
+| Measure | Count |
+| --- | ---: |
+| Passages in the static catalog | 215,084 |
+| Crate results (different compositions) | 213,870 |
+| Source solos represented | 456 |
 
-Most affected solo pairs lost one passage (2,370); the rest lost two to eight.
+The endpoint change increased the catalog because qualifying prefixes survive a poorer continuation. The 50% overlap threshold remains a judgement call and has not been tuned against listener labels.
 
 **Still open.**
 - About 1,500 pairs of kept windows overlap by 25-50% on both solos. Nearly all sit on different diagonals (a different alignment of a repeated motif), so they are treated as distinct passages. Only a few dozen share a diagonal.
@@ -97,8 +96,8 @@ Most affected solo pairs lost one passage (2,370); the rest lost two to eight.
 - **Different solos only.** A phrase repeated inside one solo is not reported, though the same performer across two solos is.
 - **Single collection.** Only WJazzD (456 solos) is in the site. DTL1000 and the Jazz Trio Database pilot are prepared but not included (below).
 - **Scoring is a heuristic** with hand-set weights, not calibrated against expert labels.
-- **Recording links are approximate.** Timestamps are interpolated from JazzTube's solo alignment and rounded down to the second; a particular upload may need manual correction, and 90,910 of the 253,048 passage sides currently have no matched video.
-- **Everything loads in the browser.** The compact index is about 3 MB compressed; passage details and notes are fetched on demand.
+- **Recording links are approximate.** Timestamps are interpolated from JazzTube's solo alignment and rounded down to the second; a particular upload may need manual correction, and 114,813 of the 430,168 passage sides in the current catalog have no matched video.
+- **Everything loads in the browser.** The compact index is about 5.4 MB compressed; passage details and notes are fetched on demand, while filtering and graph calculations run in a Web Worker.
 
 ## Other collections
 

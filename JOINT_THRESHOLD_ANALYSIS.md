@@ -1,5 +1,11 @@
 # What a joint-search similarity cutoff would retain
 
+> **Historical results:** this analysis measures the v2 endpoint rule. The
+> published catalog now uses v3, which keeps qualifying prefixes when a longer
+> continuation falls below the export floor. Counts and threshold comparisons
+> below do not describe the current catalog; see the current figures in
+> [README.md](README.md).
+
 I analyzed **all 360,578** containment-filtered results in the experimental
 WJazzD joint-search database, recomputed each stored alignment's pitch,
 onset, duration, and skip costs, and checked that every recomputed total
