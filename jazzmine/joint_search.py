@@ -17,6 +17,7 @@ from .corpus import SOURCE, Solo
 class Settings:
     seed_intervals: int = 5
     max_postings: int = 80
+    min_similarity: float = 0.8
     total_budget: float = 6.0
     run_budget: float = 2.0
     onset_tolerance: float = 0.125
@@ -144,7 +145,11 @@ def extend(a: Solo, b: Solo, i: int, j: int, settings: Settings = Settings(),
     stack = [start]
     labels: dict[tuple[int, int, int, int], list[_State]] = defaultdict(list)
     labels[(start.i, start.j, start.last_i, start.last_j)].append(start)
-    best: _State | None = start if n >= settings.min_pairs else None
+    def qualifies(s: _State) -> bool:
+        return (s.paired >= settings.min_pairs and
+                1 - s.cost / (s.paired + s.gaps) >= settings.min_similarity - 1e-9)
+
+    best: _State | None = start if qualifies(start) else None
     explored = 0
 
     def end_key(s: _State) -> tuple:
@@ -156,7 +161,7 @@ def extend(a: Solo, b: Solo, i: int, j: int, settings: Settings = Settings(),
         if not s.active:
             continue
         explored += 1
-        if (s.paired >= settings.min_pairs and
+        if (qualifies(s) and
                 (s.step is None or s.step[0] >= 0 and s.step[1] >= 0) and
                 (best is None or end_key(s) > end_key(best))):
             best = s

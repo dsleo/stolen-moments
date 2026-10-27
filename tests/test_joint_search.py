@@ -66,6 +66,26 @@ class JointSearchTests(unittest.TestCase):
         self.assertIsNone(strict)
         self.assertIsNotNone(loose)
 
+    def test_qualifying_prefix_survives_lower_similarity_extension(self):
+        intervals = [2, 1, 3, -2, 4, -5, 2, 2, 1, -3, 4, 1, -2, 3,
+                     2, -4, 1, 3, -2, 1, 4, -3, 2]
+        a = _synthetic_solo(1, intervals)
+        b = _synthetic_solo(2, intervals, 5)
+        # The opening eight notes are exact. Later notes add repeated pitch and
+        # duration errors; the full 24-note alignment scores 75%, below export.
+        for i in range(8, len(b.pitches)):
+            if i % 4:
+                b.pitches[i] += 1
+                b.durations[i] = 1.2
+        b._intervals = None
+
+        result, _ = extend(a, b, 0, 0)
+
+        self.assertIsNotNone(result)
+        self.assertLess(result.paired, len(a.pitches))
+        self.assertGreaterEqual(result.similarity, .8)
+        self.assertGreaterEqual(result.paired, 8)
+
     def test_containment_does_not_remove_crossing_overlaps(self):
         from jazzmine.joint_search import Passage
         def p(a0, a1, b0, b1):

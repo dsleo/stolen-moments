@@ -16,7 +16,7 @@ from pathlib import Path
 
 from . import covers
 from .corpus import ROOT, load_corpus, source_checksum
-from .joint_store import DEFAULT_STORE
+from .joint_store import DEFAULT_STORE, PIPELINE
 
 
 OUTPUT = ROOT / "static" / "catalog"
@@ -99,6 +99,11 @@ def export(store: Path = DEFAULT_STORE, output: Path = OUTPUT,
         meta = dict(db.execute("SELECT key,value FROM meta"))
         if meta.get("complete") != "True" or meta.get("source_sha256") != source_checksum():
             raise ValueError("Build the complete joint WJazzD index before exporting")
+        if meta.get("pipeline") != PIPELINE:
+            raise ValueError("Rebuild the joint WJazzD index with the current pipeline before exporting")
+        settings = json.loads(meta["settings"])
+        if abs(float(settings.get("min_similarity", -1)) - floor) > 1e-9:
+            raise ValueError("The export floor must match the endpoint floor used to build the joint index")
         solos = load_corpus()
         manual, aligned, automatic = media_maps(media_store)
         album_art = json.loads(ALBUM_ART_MAP.read_text()) if ALBUM_ART_MAP.exists() else {}
@@ -186,7 +191,7 @@ def export(store: Path = DEFAULT_STORE, output: Path = OUTPUT,
 
         write_gzip(output / "index.json.gz", {"version": 1, "floor": floor,
                    "shard_size": SHARD_SIZE, "source_sha256": meta["source_sha256"],
-                   "settings": json.loads(meta["settings"]),
+                   "settings": settings,
                    "solos": metadata, "rows": rows})
         report = {"passages": len(rows), "solos": len(used), "floor": floor,
                   "recording_sides": dict(coverage), "cached_covers": covers_copied,
