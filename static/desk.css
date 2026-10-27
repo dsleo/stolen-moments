@@ -40,9 +40,6 @@ body:not(.atlas-open) { overflow: hidden; }
 .landing-copy h1 { font: 400 clamp(45px,5.1vw,82px)/.94 var(--display); letter-spacing: -.068em; margin: 0; color: #f6ecd6; text-shadow: 0 2px 18px #120d08a8; }
 .landing-prompt { display: flex; align-items: center; justify-content: space-between; gap: 56px; min-height: 44px; margin: 24px 0 0; padding: 12px 0; border: 0; border-top: 1px solid #ecd8ad60; background: transparent; text-transform: uppercase; letter-spacing: .16em; font-size: 10px; color: #f4e6c9; }
 .landing-prompt span { color: #e99a69; font-size: 17px; }
-.landing-feature-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 4px; color: #f2e3c5; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-decoration-color: #eab385; text-underline-offset: 4px; text-shadow: 0 1px 10px #160f08; }
-.landing-feature-link span { color: #eab385; font-size: 16px; transition: transform .18s ease; }
-.landing-feature-link:hover span { transform: translateX(3px); }
 .landing-intro { transition: opacity 280ms ease-out, transform 500ms cubic-bezier(.25,1,.5,1); }
 .listening-desk:not([data-phase="closed"]) .landing-intro { opacity: 0; transform: translateY(8px); pointer-events: none; }
 
@@ -74,7 +71,6 @@ body:not(.atlas-open) { overflow: hidden; }
 @media (max-width: 400px) {
   .landing-copy { left: 20px; right: 20px; bottom: 5svh; }
   .landing-copy > p.landing-value { font-size: 15px; }
-  .landing-feature-link { font-size: 10px; }
   .desk-actions { gap: 8px; flex-wrap: wrap; }
   .desk-actions button, .desk-actions a { gap: 8px; min-height: 44px; font-size: 9px; white-space: normal; }
 }

@@ -1,4 +1,4 @@
-const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredTotal:0,sort:'evidence'};
+const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredTotal:0,initialResultsReady:false,sort:'evidence'};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
@@ -8,6 +8,11 @@ const params = () => ({min_notes:Number($('#min_notes').value),min_similarity:.8
   performer:$('#performer').value.trim(),decade:state.decade,instrument:state.instrument,sort:state.sort});
 let toastTimer;
 function toast(message){const el=$('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3600)}
+function bringCrateIntoView(){
+  if(deskPhase!=='open'||!state.initialResultsReady)return;
+  $('#open-shelf').focus({preventScroll:true});
+  $('.crate').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'end'});
+}
 
 function updateOutputs(){
   $('#min_notes_value').textContent=$('#min_notes').value+'+';
@@ -38,7 +43,7 @@ async function load(append=false){
     if(!append&&!items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower the similarity or length minimum to broaden the search.</div>';
     state.nextOffset=state.offset+items.length<total?state.offset+items.length:null;
   }catch(err){if(serial===state.request){if(!append)$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
-  finally{if(serial===state.request){state.loading=false;if(!append){$('#crate-state').hidden=true;$('#crate-strip').removeAttribute('aria-busy')}}}
+  finally{if(serial===state.request){state.loading=false;if(!append){$('#crate-state').hidden=true;$('#crate-strip').removeAttribute('aria-busy');state.initialResultsReady=true;bringCrateIntoView()}}}
 }
 
 const hue = name => [...String(name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7);
@@ -437,7 +442,7 @@ function animateLid(open){
   });
 }
 
-async function openDesk({instant=false}={}){
+async function openDesk({instant=false,scrollToCrate=true}={}){
   if(deskPhase!=='closed')return;
   deskPhase='opening';
   desk.dataset.phase='opening';
@@ -454,6 +459,7 @@ async function openDesk({instant=false}={}){
   $('.archive-content').inert=false;
   $('.desk-actions').inert=false;
   $('#desk-status').textContent='The lid is open.';
+  if(scrollToCrate)bringCrateIntoView();
 }
 
 async function closeDesk(){
@@ -490,7 +496,7 @@ async function init(){
   updateOutputs();
   const requestedPair=new URLSearchParams(location.search).get('pair');
   if(location.hash==='#explore'||requestedPair){
-    await openDesk({instant:!!requestedPair});
+    await openDesk({instant:!!requestedPair,scrollToCrate:false});
     $('#explore').scrollIntoView({behavior:'instant'});
   }
   try{const portraits=await fetch('artist-portraits.json');if(portraits.ok)state.portraits=await portraits.json()}catch{}
