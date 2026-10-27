@@ -95,3 +95,16 @@
 .state-tag { min-height: 28px; padding: 0 10px; border: 1px solid #e8b67d; border-radius: 999px; background: transparent; color: #f3e9d2; font-size: 12px; cursor: pointer; }
 .state-tag:hover { background: #5a4430; }
 .sort-options { left: 64px; }
+
+/* The aligned sequence makes the reason for each displayed pair inspectable. */
+.alignment-panel { margin: 22px 0 8px; padding: 18px clamp(14px,2.5vw,30px); border: 1px solid var(--line); background: var(--paper-light); }
+.alignment-panel h3 { margin: 0 0 4px; font: 600 20px/1.2 var(--display); }
+.alignment-panel > p { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+.alignment-table-scroll { max-height: 260px; overflow: auto; }
+.alignment-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.alignment-table caption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.alignment-table th,.alignment-table td { padding: 7px 10px; border-top: 1px solid var(--line); }
+.alignment-table thead th { position: sticky; top: 0; z-index: 1; background: var(--paper); color: var(--muted); font-size: 10px; letter-spacing: .04em; }
+.alignment-table tbody th { width: 54px; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+.alignment-table .alignment-gap td { background: #f2e5d8; color: #783e2d; }
+@media(max-width:600px) { .alignment-panel { padding: 14px 10px; } .alignment-table { min-width: 490px; } }

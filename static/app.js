@@ -177,15 +177,51 @@ function abcPitch(midi,accidentals){
 
 function scoreAbc(notes){
   const accidentals=new Map();
-  const differences=notes.slice(1).map((n,i)=>Math.max(.125,n.beat-notes[i].beat));
-  const fallback=differences.length?[...differences].sort((a,b)=>a-b)[Math.floor(differences.length/2)]:.5;
+  const rates=notes.slice(1).map((n,i)=>{
+    const seconds=n.onset-notes[i].onset,beats=n.beat-notes[i].beat;
+    return seconds>1e-6&&beats>0?beats/seconds:null;
+  }).filter(rate=>rate!==null);
+  const fallback=rates.length?[...rates].sort((a,b)=>a-b)[Math.floor(rates.length/2)]:2;
+  const units=beats=>Math.max(1,Math.min(32,Math.round(beats*4)));
   const body=notes.map((note,i)=>{
-    const length=Math.max(1,Math.min(32,Math.round((differences[i]??fallback)*4)));
-    return `${abcPitch(note.pitch,accidentals)}${length===1?'':length}`;
+    const next=notes[i+1];
+    const seconds=next?next.onset-note.onset:null,beats=next?next.beat-note.beat:null;
+    const localRate=seconds>1e-6&&beats>0?beats/seconds:fallback;
+    const durationBeats=Math.max(.0625,(note.duration||0)*localRate);
+    const length=units(durationBeats);
+    const duration=`${abcPitch(note.pitch,accidentals)}${length===1?'':length}`;
+    if(!next)return duration;
+    const restBeats=Math.max(0,beats-durationBeats);
+    const restUnits=Math.round(restBeats*4);
+    return restUnits>0?`${duration} z${Math.min(32,restUnits)}`:duration;
   }).join(' ');
   const pitches=notes.map(n=>n.pitch).sort((a,b)=>a-b);
   const clef=pitches[Math.floor(pitches.length/2)]<57?'bass':'treble';
   return `X:1\nM:none\nL:1/16\nK:C clef=${clef}\n${body}`;
+}
+
+const PITCH_NAMES=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+function pitchLabel(midi){return `${PITCH_NAMES[((midi%12)+12)%12]}${Math.floor(midi/12)-1}`}
+
+function alignmentPanel(d){
+  const aByIndex=new Map(d.a_notes.map(note=>[note.index,note]));
+  const bByIndex=new Map(d.b_notes.map(note=>[note.index,note]));
+  const rows=d.alignment.map(([ai,bi],index)=>{
+    const a=ai>=0?aByIndex.get(ai):null,b=bi>=0?bByIndex.get(bi):null;
+    const paired=!!a&&!!b;
+    const aText=a?`${pitchLabel(a.pitch)} · note ${a.index+1}`:'Skipped';
+    const bText=b?`${pitchLabel(b.pitch)} · note ${b.index+1}`:'Skipped';
+    const result=paired?'Paired':a?'No matching note in B':'No matching note in A';
+    return `<tr class="${paired?'':'alignment-gap'}"><th scope="row">${index+1}</th><td>${esc(aText)}</td><td>${esc(bText)}</td><td>${result}</td></tr>`;
+  }).join('');
+  const skipped=d.alignment.filter(([a,b])=>a<0||b<0).length;
+  return `<section class="alignment-panel" aria-labelledby="alignment-title">
+    <h3 id="alignment-title">Note-by-note alignment</h3>
+    <p>Each row shows how notes were paired. ${skipped?`${skipped} extra note${skipped===1?' was':'s were'} skipped.`:'No notes were skipped.'}</p>
+    <div class="alignment-table-scroll" tabindex="0" aria-label="Scrollable note alignment table">
+      <table class="alignment-table"><caption>${d.alignment.length} alignment steps between passages A and B</caption><thead><tr><th scope="col">Step</th><th scope="col">A · ${esc(d.a.performer)}</th><th scope="col">B · ${esc(d.b.performer)}</th><th scope="col">Alignment</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+  </section>`;
 }
 
 let abcLoad;
@@ -234,6 +270,7 @@ function artistPanel(d,side){
 function detailHTML(d){
   return `<div class="pair-card"><header class="pair-card-head"><div><p class="small-caps">A closer listen</p><h2 id="pair-dialog-title">${esc(d.a.performer)} <em>↔</em> ${esc(d.b.performer)}</h2></div><button type="button" class="dialog-close" data-close-pair aria-label="Close pair detail">×</button></header>
     <div class="pair-split">${artistPanel(d,'a')}${artistPanel(d,'b')}</div>
+    ${alignmentPanel(d)}
     <div class="pair-card-score"><div><strong>${d.notes}</strong><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div><div><strong>${d.evidence.toFixed(1)}</strong><span>evidence</span></div></div>
     <footer class="pair-card-foot"><span>WJazzD source note IDs: ${d.a_notes.map(n=>n.eventid).join(', ')} / ${d.b_notes.map(n=>n.eventid).join(', ')}.</span><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
   </div>`;
