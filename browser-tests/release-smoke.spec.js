@@ -40,8 +40,13 @@ test('mobile landing, archive, pair details, deep links, and method assets', asy
   await expect(landing).toHaveAttribute('data-phase', 'open', { timeout: 10_000 });
   await expect(page.locator('.desk-actions')).toBeVisible();
   await expect(page.locator('.archive-content')).toBeVisible();
+  await expect(page.locator('.landing-feature-link')).toHaveCount(0);
   await expect(page.locator('#result-count')).not.toHaveText('—', { timeout: 60_000 });
   await expect(page.locator('.crate-card').first()).toBeVisible({ timeout: 60_000 });
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await expect.poll(() => page.locator('.crate').evaluate(el => el.getBoundingClientRect().bottom)).toBeGreaterThan(800);
+  await expect.poll(() => page.locator('.crate').evaluate(el => el.getBoundingClientRect().bottom)).toBeLessThan(880);
+  await expect(page.locator('#open-shelf')).toBeFocused();
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
