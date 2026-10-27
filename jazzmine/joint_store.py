@@ -14,6 +14,7 @@ from .joint_search import Settings, anchors, extend, wjazzd_beat_durations
 
 
 DEFAULT_STORE = ROOT / "data" / "joint-search.db"
+PIPELINE = "joint-seed-5-right-v3"
 
 
 def overlap(s0: int, s1: int, t0: int, t1: int) -> float:
@@ -125,7 +126,7 @@ def build(path: Path = DEFAULT_STORE, settings: Settings = Settings(),
     consolidate(db)
     with db:
         db.executemany("INSERT OR REPLACE INTO meta VALUES (?,?)", [
-            ("pipeline", "joint-seed-5-right-v2"),
+            ("pipeline", PIPELINE),
             ("source_sha256", report["source_sha256"]),
             ("settings", json.dumps(asdict(settings))),
             ("eligible_anchors_processed", str(count)),
@@ -147,21 +148,24 @@ def main() -> None:
                         help="Merge overlapping windows in an existing store without rebuilding")
     parser.add_argument("--total-budget", type=float, default=6.0)
     parser.add_argument("--run-budget", type=float, default=2.0)
+    parser.add_argument("--minimum-similarity", type=float, default=.8)
     args = parser.parse_args()
     if args.limit is not None and args.limit < 1:
         parser.error("--limit must be positive")
     if args.total_budget <= 0 or args.run_budget <= 0:
         parser.error("budgets must be positive")
+    if not 0 <= args.minimum_similarity <= 1:
+        parser.error("--minimum-similarity must be between 0 and 1")
     if args.consolidate_only:
         db = sqlite3.connect(args.output)
         removed = consolidate(db)
-        db.execute("INSERT OR REPLACE INTO meta VALUES ('pipeline','joint-seed-5-right-v2')")
         db.commit()
         print(json.dumps({"removed": removed, "kept": db.execute("SELECT COUNT(*) FROM candidate").fetchone()[0]}))
         return
     print(json.dumps(build(args.output,
                            Settings(total_budget=args.total_budget,
-                                    run_budget=args.run_budget), args.limit), indent=2))
+                                    run_budget=args.run_budget,
+                                    min_similarity=args.minimum_similarity), args.limit), indent=2))
 
 
 if __name__ == "__main__":

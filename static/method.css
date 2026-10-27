@@ -1,0 +1,80 @@
+.methods-page{background:var(--paper-light);color:var(--ink)}
+.methods-page .skip-link{position:absolute;left:20px;top:-60px;z-index:10;background:var(--ink);color:white;padding:10px 15px}
+.methods-page .skip-link:focus{top:10px}
+.methods-header{display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:74px;padding:0 clamp(22px,5vw,78px);background:var(--paper);border-bottom:1px solid var(--line)}
+.methods-header a{text-decoration:none}
+.methods-brand{font:600 21px/1 var(--display);letter-spacing:-.045em}
+.methods-back{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em}
+.methods-back span{font-size:17px;color:var(--rust);margin-right:7px}
+.methods-header a:hover,.methods-footer a:hover{text-decoration:underline;text-underline-offset:4px}
+.methods-hero{padding:clamp(65px,8vw,120px) clamp(22px,5vw,78px) 50px;max-width:1320px;margin:auto}
+.methods-hero h1{font:400 clamp(54px,7vw,108px)/1 var(--display);letter-spacing:-.07em;margin:17px 0 22px}
+.methods-deck{max-width:760px;font:400 clamp(18px,2.1vw,25px)/1.47 var(--display);letter-spacing:-.02em;margin:0;color:#50584c}
+.methods-facts{display:flex;flex-wrap:wrap;gap:30px clamp(40px,6vw,100px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0;margin-top:65px}
+.methods-facts div{display:grid;gap:2px}
+.methods-facts strong{font:400 clamp(24px,3vw,35px)/1.2 var(--display);font-variant-numeric:tabular-nums}
+.methods-facts span{font-size:11px;color:var(--muted)}
+.methods-layout{max-width:1320px;margin:auto;display:grid;grid-template-columns:200px minmax(0,760px);gap:clamp(45px,6vw,100px);padding:0 clamp(22px,5vw,78px) 90px}
+.methods-nav{align-self:start;position:sticky;top:30px;padding-top:43px;display:grid;gap:12px}
+.methods-nav .small-caps{margin-bottom:13px}
+.methods-nav a{font-size:12px;text-decoration:none;color:#596154}
+.methods-nav a:hover{color:var(--rust);text-decoration:underline;text-underline-offset:4px}
+.methods-section{padding-top:43px;margin-bottom:38px;scroll-margin-top:22px}
+.section-heading{display:grid;grid-template-columns:1fr;gap:7px;margin-bottom:20px}
+.section-heading>span{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--rust);white-space:nowrap}
+.section-heading h2{font:400 clamp(28px,3vw,39px)/1.17 var(--display);letter-spacing:-.04em;margin:0}
+.methods-section p,.method-steps{font-size:14px;line-height:1.8;color:#444b41;max-width:695px;margin:0 0 18px}
+.methods-section a{color:#92452e;text-decoration-thickness:1px;text-underline-offset:3px}
+.methods-section a:hover{color:#5f2c1e}
+.methods-section sup{font-size:10px;line-height:0}
+.methods-section i{font-family:Georgia,serif;font-size:1.08em}
+.method-steps{padding-left:22px}
+.method-steps li{padding-left:6px;margin-bottom:14px}
+.method-steps li::marker{color:var(--rust);font-weight:700}
+.method-steps strong{color:var(--ink)}
+.equation{position:relative;max-width:695px;min-height:96px;display:grid;place-items:center;margin:20px 0 24px;padding:18px 54px;background:#f0eee5;border-left:2px solid #ba8c76;color:#252921}
+.equation math{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;font-size:22px}
+.equation-number{position:absolute;right:18px;bottom:13px;color:#858a7e;font:12px Georgia,serif}
+.references ol{margin:0 0 23px;padding-left:21px;max-width:695px;font-size:13px;line-height:1.7;color:#4b5149}
+.references li{padding-left:5px;margin:0 0 14px}
+.references li::marker{color:var(--rust)}
+.methods-section .methods-provenance{border-top:1px solid var(--line);padding-top:18px;font-size:12px;color:#72786e}
+.worked-example{max-width:695px;margin:32px 0 10px;padding:24px 27px 20px;background:#f0eee5;border-top:2px solid var(--rust)}
+.worked-example h3{font:400 27px/1.2 var(--display);letter-spacing:-.035em;margin:10px 0 20px}
+.example-recordings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:17px 0}
+.example-recordings>div{display:grid;align-content:start;gap:2px}
+.example-recordings>div+div{border-left:1px solid var(--line);padding-left:18px}
+.example-side{color:var(--rust);text-transform:uppercase;letter-spacing:.1em;font-size:10px;font-weight:700;margin-bottom:6px}
+.example-recordings strong{font:600 18px/1.25 var(--display)}
+.example-recordings span:not(.example-side){font-size:12px;color:#555e52}
+.example-recordings a{font-size:12px;font-weight:700;margin-top:11px}
+.methods-section .worked-example>p{font-size:11px;line-height:1.6;color:#656d61;margin:14px 0 0}
+.example-analysis{max-width:695px;margin:26px 0;padding:18px 21px 2px;border-left:2px solid #b58b75;background:#f4f2eb}
+.methods-section .example-kicker{color:var(--rust);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:11px}
+.seed-table{width:100%;border-collapse:collapse;font-size:12px;color:#40483e;margin:0 0 13px}
+.seed-table caption{text-align:left;font-size:11px;color:#697166;margin-bottom:6px}
+.seed-table th,.seed-table td{text-align:left;padding:7px 7px 7px 0;border-bottom:1px solid var(--line)}
+.seed-table thead th{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#72796e}
+.seed-table tbody th{font-weight:700}
+.seed-table td{font-variant-numeric:tabular-nums;white-space:nowrap}
+.interval-run{font-family:"Cambria Math",Georgia,serif;white-space:nowrap}
+.methods-footer{background:var(--paper);align-items:center}
+.methods-footer a{color:var(--ink);text-decoration:none}
+.methods-page .methods-provenance,.methods-page .worked-example>p,.methods-page .seed-table caption,.methods-page .seed-table thead th,.methods-page .equation-number{color:#555b50}
+.methods-page .methods-nav a{min-height:44px;display:inline-flex;align-items:center}
+.methods-page :is(a,button):focus-visible{outline:3px solid #703321;outline-offset:3px;box-shadow:0 0 0 2px var(--paper-light)}
+@media(max-width:400px){
+  .methods-header{padding-inline:16px;gap:10px}
+  .methods-brand{font-size:17px}
+  .methods-back{max-width:120px}
+  .methods-hero,.methods-layout{padding-left:16px;padding-right:16px}
+  .methods-hero h1{font-size:clamp(44px,14vw,58px)}
+  .methods-facts div{min-width:calc(50% - 13px)}
+  .example-recordings{grid-template-columns:1fr}
+  .example-recordings>div+div{border-left:0;border-top:1px solid var(--line);padding:14px 0 0}
+  .worked-example{padding:18px 14px}
+  .seed-table th,.seed-table td{padding-right:4px}
+}
+@media(max-width:760px){.methods-layout{display:block}.methods-nav{position:static;display:flex;flex-wrap:wrap;gap:8px 14px;padding-top:0;border-bottom:1px solid var(--line);padding-bottom:22px}.methods-nav .small-caps{width:100%;margin:0 0 3px}.methods-hero{padding-bottom:38px}.methods-facts{margin-top:42px}.methods-section{padding-top:36px}.section-heading{grid-template-columns:1fr;gap:5px}.methods-section p,.method-steps,.equation,.references ol{margin-left:0}.methods-back{font-size:10px}}
+@media(max-width:500px){.methods-header{min-height:66px}.methods-brand{font-size:18px}.methods-back{max-width:130px;text-align:right;line-height:1.35}.methods-facts{gap:18px 25px}.methods-facts div{min-width:130px}.equation{padding:16px 35px 23px;min-height:88px}.equation math{font-size:19px}.equation-number{right:10px;bottom:7px}.worked-example{padding:20px}.example-recordings{gap:12px}.example-recordings>div+div{padding-left:12px}.seed-table{font-size:11px}.seed-table td{white-space:normal}.methods-footer span,.methods-footer a{display:block}}
+@media print{.methods-page{background:white}.methods-header,.methods-nav,.methods-footer{display:none}.methods-hero{padding:0 0 20px}.methods-layout{display:block;padding:0}.methods-section{break-inside:avoid}.methods-article a{color:inherit}}

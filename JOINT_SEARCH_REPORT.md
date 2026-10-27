@@ -1,5 +1,11 @@
 # Joint pitch-and-rhythm search: experimental comparison
 
+> **Historical results:** this report benchmarks the v2 endpoint rule. The
+> published catalog now uses v3, which keeps qualifying prefixes when a longer
+> continuation falls below the export floor. Counts and threshold comparisons
+> below do not describe the current catalog; see the current figures in
+> [README.md](README.md).
+
 This branch adds an experimental, read-only replacement for the present motif
 miner. It writes `data/joint-search.db` and never changes `data/workbench.db` or
 the app's ranking. The database and benchmarks were built from the 456 WJazzD

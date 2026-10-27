@@ -8,4 +8,7 @@ data/jtd.db
 .DS_Store
 *.log
 .qa/
+node_modules/
+test-results/
+playwright-report/
 data/covers/

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f1e8">
+  <meta name="description" content="Corpus, retrieval method, scoring, and limitations of the Stolen Moments jazz phrase archive.">
+  <link rel="canonical" href="https://dsleo.github.io/stolen-moments/method.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>How it works · Stolen Moments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1;9..144,600,20,1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="styles.css?v=release-9">
+  <link rel="stylesheet" href="method.css?v=release-3">
+</head>
+<body class="methods-page">
+  <a class="skip-link" href="#content">Skip to method</a>
+  <header class="methods-header">
+    <a class="methods-brand" href="index.html#explore">Stolen Moments</a>
+    <a class="methods-back" href="index.html#explore"><span aria-hidden="true">↖</span> Return to the archive</a>
+  </header>
+  <main id="content">
+    <div class="methods-hero">
+      <p class="small-caps">Note / 01</p>
+      <h1>How it works</h1>
+      <p class="methods-deck">A reproducible, score-based search for shared passages across jazz solo transcriptions.</p>
+      <div class="methods-facts" aria-label="Catalog at publication">
+        <div><strong>456</strong><span>transcribed solos</span></div>
+        <div><strong>78</strong><span>musicians</span></div>
+        <div><strong>200,809</strong><span>note events</span></div>
+        <div><strong>215,084</strong><span>indexed passage pairs</span></div>
+      </div>
+    </div>
+
+    <div class="methods-layout">
+      <nav class="methods-nav" aria-label="On this page">
+        <p class="small-caps">Contents</p>
+        <a href="#corpus">01 &nbsp; Corpus</a>
+        <a href="#retrieval">02 &nbsp; Retrieval</a>
+        <a href="#scoring">03 &nbsp; Scoring</a>
+        <a href="#interpretation">04 &nbsp; Interpretation</a>
+        <a href="#references">References</a>
+      </nav>
+      <article class="methods-article">
+        <section id="corpus" class="methods-section">
+          <div class="section-heading"><span>01 / Input</span><h2>Corpus and representation</h2></div>
+          <p>The input is the <a href="https://jazzomat.hfm-weimar.de/dbformat/dboverview.html">Weimar Jazz Database</a> (WJazzD), release 2.1: 456 manually prepared monophonic solo transcriptions, with 200,809 note events in this import. We use each note’s rounded semitone pitch, onset and duration in seconds, and the database beat grid. Metadata supplies performer, instrument, composition, and recording date. Other prepared collections are not included in the published index.<sup><a href="#ref-1">1</a></sup></p>
+          <p>Onsets and note endpoints are interpolated onto the beat grid. For a solo with pitches <i>p</i><sub>i</sub>, the interval sequence is:</p>
+          <div class="equation" role="group" aria-label="Equation 1: pitch interval equals the following pitch minus the current pitch">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><msub><mi>Δ</mi><mi>i</mi></msub><mo>=</mo><msub><mi>p</mi><mrow><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>−</mo><msub><mi>p</mi><mi>i</mi></msub></mrow></math>
+            <span class="equation-number">(1)</span>
+          </div>
+          <p>Interval sequences preserve the shape of an exact phrase under transposition. They do not make the search invariant to octave displacement or changed interval sizes.</p>
+          <aside class="worked-example" id="example" aria-labelledby="example-title">
+            <span class="small-caps">Worked example · catalog passage 214</span>
+            <h3 id="example-title">One passage, two solos</h3>
+            <div class="example-recordings">
+              <div><span class="example-side">A · 1947</span><strong>Charlie Parker</strong><span>“Embraceable You”</span><a href="https://www.youtube.com/watch?v=_GAMeCJR478&amp;t=93s" target="_blank" rel="noopener noreferrer">Listen at 1:33 ↗</a></div>
+              <div><span class="example-side">B · 1956</span><strong>John Coltrane</strong><span>“Soultrane”</span><a href="https://www.youtube.com/watch?v=t251Toh5obw&amp;t=156s" target="_blank" rel="noopener noreferrer">Listen at 2:36 ↗</a></div>
+            </div>
+            <p>Source transcriptions: <a href="https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo56.html">Parker</a> and <a href="https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo232.html">Coltrane</a>. These are different compositions and recordings. The listening links use the catalog’s JazzTube alignments, so their timestamps are approximate.<sup><a href="#ref-3">3</a></sup></p>
+          </aside>
+        </section>
+
+        <section id="retrieval" class="methods-section">
+          <div class="section-heading"><span>02 / Search</span><h2>Candidate retrieval and alignment</h2></div>
+          <ol class="method-steps">
+            <li><strong>Seed.</strong> Index every five consecutive pitch intervals, spanning six notes. Occurrences of the same seed in different solos form candidate anchors. Seeds with more than 80 occurrences are omitted to limit very common patterns.</li>
+            <li><strong>Extend.</strong> From each anchor, search rightward. A step may pair the next notes or skip one note on either side. The seed sets a fixed transposition; subsequent paired notes pay a pitch and rhythm cost, while each skip costs 1.</li>
+            <li><strong>Select.</strong> Keep the longest reachable endpoint meeting the constraints below, with at least eight paired notes. Then remove contained windows. Within one ordered solo pair, windows overlapping by at least 50% of the shorter range <em>on both solos</em> are consolidated, keeping the higher-evidence result.</li>
+          </ol>
+          <div class="example-analysis">
+            <p class="example-kicker">In the Parker–Coltrane example</p>
+            <table class="seed-table">
+              <caption>First six paired notes in the transcriptions</caption>
+              <thead><tr><th scope="col">Solo</th><th scope="col">MIDI pitches</th></tr></thead>
+              <tbody><tr><th scope="row">Parker</th><td>78 · 77 · 76 · 75 · 74 · 75</td></tr><tr><th scope="row">Coltrane</th><td>73 · 72 · 71 · 70 · 69 · 70</td></tr></tbody>
+            </table>
+            <p>Both yield the interval seed <span class="interval-run">−1, −1, −1, −1, +1</span>; Coltrane’s pitches are five semitones lower. This seed occurs 54 times in the corpus, below the 80-occurrence cutoff, so it enters the alignment search.</p>
+          </div>
+          <p>This is an exhaustive search over eligible interval seeds with a bounded rightward alignment. It is a heuristic devised for this archive, not an implementation or validation of the pattern-search systems described in related Jazzomat work.<sup><a href="#ref-2">2</a></sup></p>
+        </section>
+
+        <section id="scoring" class="methods-section">
+          <div class="section-heading"><span>03 / Decision rule</span><h2>Cost, similarity, and rank</h2></div>
+          <p>For each paired note, let <i>P</i> be transposition-adjusted pitch difference capped at 1 after division by two semitones. Let <i>O</i> and <i>D</i> be differences in inter-onset spacing and duration, both in beats: each has a one-eighth-beat tolerance, then rises to 1 over a further half beat. The paired-note cost is:</p>
+          <div class="equation" role="group" aria-label="Equation 2: paired-note cost is one half pitch cost plus one quarter onset cost plus one quarter duration cost">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>c</mi><mo>=</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>P</mi><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mi>O</mi><mo>+</mo><mfrac><mn>1</mn><mn>4</mn></mfrac><mi>D</mi></mrow></math>
+            <span class="equation-number">(2)</span>
+          </div>
+          <p>The total cost <i>C</i> includes these paired-note costs and one unit per skipped note. Search stops a path when <i>C</i> exceeds 6, or cost accumulated since the last zero-cost pair exceeds 2. A qualifying passage has:</p>
+          <div class="equation" role="group" aria-label="Equation 3: similarity equals one minus total cost divided by paired plus skipped notes; at least 0.8">
+            <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>S</mi><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mi>C</mi><mrow><mi>N</mi><mo>+</mo><mi>G</mi></mrow></mfrac><mo>≥</mo><mn>0.80</mn></mrow></math>
+            <span class="equation-number">(3)</span>
+          </div>
+          <p>Here <i>N</i> is the number of paired notes and <i>G</i> the number of skips. The default “Best matches” order uses evidence <i>N − C</i>; it is a ranking heuristic, not a probability of quotation. All search and consolidation run before publication; the site reads the resulting static catalog.</p>
+          <div class="example-analysis">
+            <p class="example-kicker">The same passage, scored</p>
+            <p>The alignment pairs 19 notes with no skips. Its total cost is 3.6222: 2.7500 from pitch differences after the exact seed, 0.6076 from onset spacing, and 0.2646 from note duration (rounded). Thus <i>S</i> = 1 − 3.6222 / 19 = 0.8094, or 80.9% similarity. Its evidence rank value is 19 − 3.6222 = 15.3778.</p>
+          </div>
+        </section>
+
+        <section id="interpretation" class="methods-section">
+          <div class="section-heading"><span>04 / Scope</span><h2>Interpretation and limits</h2></div>
+          <p>A match establishes similarity between two symbolic passages in this corpus. It does not by itself establish borrowing, influence, or priority. Shared repertoire, idiom, transcription choices, and chance are alternative explanations. Recording dates come from corpus metadata. Linked recordings, when available, use separate video alignment data and may have imprecise timestamps.<sup><a href="#ref-3">3</a></sup></p>
+          <p>In the example, the shared core is a mostly chromatic descent. The two recording dates place Parker’s solo earlier, but the algorithm cannot determine whether Coltrane drew on that performance or on common jazz vocabulary.</p>
+          <p>The exact five-interval seed excludes short or heavily transformed motifs; the frequency cap omits some common material. Rightward extension can begin after a musically meaningful start. Pitch and rhythm weights, the 0.80 floor, and the 50% consolidation threshold were chosen heuristically and have not been calibrated against expert relevance judgements. The result set is therefore a discovery aid, not a recall-complete or statistically validated detector.</p>
+        </section>
+
+        <section id="references" class="methods-section references">
+          <div class="section-heading"><span>Sources</span><h2>References</h2></div>
+          <ol>
+            <li id="ref-1">Pfleiderer, M., Frieler, K., Abeßer, J., Zaddach, W.-G., &amp; Burkhart, B. (eds.). 2017. <em>Inside the Jazzomat: New Perspectives for Jazz Research.</em> Schott Campus. <a href="https://jazzomat.hfm-weimar.de/dbformat/dboverview.html">WJazzD documentation ↗</a></li>
+            <li id="ref-2">Frieler, K., Höger, F., Pfleiderer, M., &amp; Dixon, S. 2018. “Two Web Applications for Exploring Melodic Patterns in Jazz Solos.” <em>Proceedings of ISMIR 2018</em>, 777–783. <a href="https://ismir2018.ircam.fr/doc/pdfs/177_Paper.pdf">Paper ↗</a></li>
+            <li id="ref-3">Balke, S., Dittmar, C., Abeßer, J., Frieler, K., Pfleiderer, M., &amp; Müller, M. 2018. “Bridging the Gap: Enriching YouTube Videos with Jazz Music Annotations.” <em>Frontiers in Digital Humanities</em> 5:1. <a href="https://doi.org/10.3389/fdigh.2018.00001">DOI ↗</a></li>
+          </ol>
+          <p class="methods-provenance">Implementation: <a href="https://github.com/dsleo/stolen-moments/blob/main/jazzmine/joint_search.py">search and scoring</a> · <a href="https://github.com/dsleo/stolen-moments/blob/main/jazzmine/joint_store.py">consolidation</a> · <a href="https://jazzomat.hfm-weimar.de/download/download.html">source database</a>. Catalog figures refer to the published 27 October 2026 export.</p>
+        </section>
+      </article>
+    </div>
+  </main>
+  <footer class="methods-footer"><span>Stolen Moments · a research instrument</span><a href="index.html#explore">Return to the archive ↗</a></footer>
+</body>
+</html>
