@@ -7,7 +7,7 @@
     const bytes=new Uint8Array(await res.arrayBuffer());
     // A host that sends Content-Encoding: gzip lets the browser unpack the file already.
     if(bytes[0]!==0x1f||bytes[1]!==0x8b)return JSON.parse(new TextDecoder().decode(bytes));
-    if(!('DecompressionStream' in window))throw new Error('This browser needs gzip decompression support');
+    if(!('DecompressionStream' in window))throw new Error('This browser cannot unpack the archive data. Try a current version of Safari, Chrome, Firefox, or Edge.');
     return JSON.parse(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
   }
   class Catalog{
@@ -16,6 +16,30 @@
       this.shards=new Map();this.notes=new Map();
       this.performers=[...new Set(Object.values(this.solos).map(s=>s.performer))].sort();
       this.visibleTotal=this.rows.reduce((n,r)=>n+(this.solos[r[R.A]].composition_id!==this.solos[r[R.B]].composition_id),0);
+      this.searchWorker=null;this.searchSerial=0;this.searchPending=new Map();
+      if('Worker' in window){
+        try{
+          this.searchWorker=new Worker('search-worker.js?v=worker-1');
+          this.searchWorker.addEventListener('message',event=>{
+            const pending=this.searchPending.get(event.data.id);if(!pending)return;
+            this.searchPending.delete(event.data.id);
+            event.data.error?pending.reject(new Error(event.data.error)):pending.resolve(event.data.value);
+          });
+          this.searchWorker.addEventListener('error',()=>{
+            for(const pending of this.searchPending.values())pending.reject(new Error('Background search stopped'));
+            this.searchPending.clear();this.searchWorker?.terminate();this.searchWorker=null;
+          });
+          this.searchWorker.postMessage({type:'init',solos:this.solos,rows:this.rows});
+        }catch{this.searchWorker=null}
+      }
+    }
+    async query(type,parameters){
+      if(!this.searchWorker)return this[`${type}OnMainThread`](parameters);
+      const id=++this.searchSerial;
+      return new Promise((resolve,reject)=>{
+        this.searchPending.set(id,{resolve,reject});
+        this.searchWorker.postMessage({id,type,parameters});
+      });
     }
     solo(row,side){return this.solos[row[side==='a'?R.A:R.B]]}
     link(s,second){
@@ -45,7 +69,8 @@
       return [!p.decade||Math.floor(a.year/10)*10===Number(p.decade)||Math.floor(b.year/10)*10===Number(p.decade),
         !p.instrument||a.instrument.toLowerCase()===p.instrument.toLowerCase()||b.instrument.toLowerCase()===p.instrument.toLowerCase()];
     }
-    filtered(p){
+    filtered(p){return this.query('filtered',p)}
+    filteredOnMainThread(p){
       const ids=[];
       for(let id=0;id<this.rows.length;id++){
         const row=this.rows[id];if(this.base(row,p)&&this.flags(row,p).every(Boolean))ids.push(id);
@@ -55,7 +80,8 @@
       // Otherwise evidence order is already stored in the index.
       return ids;
     }
-    facets(p){
+    facets(p){return this.query('facets',p)}
+    facetsOnMainThread(p){
       const counts={decade:new Map(),instrument:new Map(),performer:new Map()};
       const add=(map,values)=>{for(const v of values)if(v!==null&&v!==undefined&&v!=='')map.set(v,(map.get(v)||0)+1)};
       for(const row of this.rows){
@@ -69,7 +95,8 @@
         instrument:[...counts.instrument].sort((a,b)=>b[1]-a[1]),
         performer:[...counts.performer].sort((a,b)=>b[1]-a[1])};
     }
-    influence(p){
+    influence(p){return this.query('influence',p)}
+    influenceOnMainThread(p){
       const byName=new Map();for(const s of Object.values(this.solos)){
         if(!byName.has(s.performer))byName.set(s.performer,[]);byName.get(s.performer).push(s);
       }

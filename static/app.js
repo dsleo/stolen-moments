@@ -23,7 +23,7 @@ async function load(append=false){
   if(!append)state.nextOffset=null;
   try{
     if(!state.catalog)throw new Error('Catalog unavailable');
-    if(!append){state.filteredIds=state.catalog.filtered(params());refreshFacets(serial)}
+    if(!append){state.filteredIds=await state.catalog.filtered(params());refreshFacets(serial)}
     const total=state.filteredIds.length;
     const ids=state.filteredIds.slice(state.offset,state.offset+50);
     const items=ids.map(id=>state.catalog.item(id));
@@ -104,7 +104,7 @@ async function loadEchoes(){
   const serial=state.echoSerial=(state.echoSerial||0)+1;
   try{
     if(!state.catalog)return;
-    const d=state.catalog.influence(params());if(serial!==state.echoSerial)return;
+    const d=await state.catalog.influence(params());if(serial!==state.echoSerial)return;
     state.echoes=d;
     state.echoOrder=d.musicians.map((_,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
     if(state.echoSel!=null&&state.echoSel>=d.musicians.length)state.echoSel=null;
@@ -126,7 +126,7 @@ const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sa
 const FACETS={decade:{label:'Decade',name:v=>`${v}s`},instrument:{label:'Instrument',name:v=>INSTRUMENTS[v]||v.toUpperCase()},performer:{label:'Musician',name:v=>v}};
 const facetValue = kind => kind==='performer'?$('#performer').value:state[kind];
 async function refreshFacets(serial){
-  try{const data=state.catalog.facets(params());if(serial===state.request){state.facetData=data;renderShelf()}}catch{}
+  try{const data=await state.catalog.facets(params());if(serial===state.request){state.facetData=data;renderShelf()}}catch{}
 }
 function renderShelf(){
   const data=state.facetData;if(!data)return;

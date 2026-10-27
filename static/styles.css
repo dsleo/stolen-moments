@@ -60,6 +60,13 @@ main{min-width:0}
 footer{padding:23px clamp(24px,4vw,72px);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;color:#8c9287;font-size:10px;letter-spacing:.05em}
 .toast{position:fixed;right:22px;bottom:22px;background:var(--rail);color:#f7f3e8;box-shadow:0 10px 30px #1a211628;padding:12px 17px;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:10;font-size:12px}
 .toast.show{opacity:1;transform:translateY(0)}
+.dialog-close{min-width:44px;min-height:44px}
+.score-play{width:44px;height:44px}
+.shelf-tools .shelf-toggle{width:44px;height:44px;flex-basis:44px}
+#crate-state .state-tag{min-height:44px}
+#sort-options button{min-height:44px}
+#pair-dialog .score-play{width:44px;height:44px}
+.noscript-message{margin:0;padding:16px 24px;background:#252921;color:#f7f3e8;text-align:center}
 @media(max-width:1050px){.app-shell{grid-template-columns:74px minmax(0,1fr)}
 .workspace{grid-template-columns:255px minmax(0,1fr)}
 .controls{padding:33px 19px}

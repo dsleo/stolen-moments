@@ -47,7 +47,7 @@ body:not(.atlas-open) { overflow: hidden; }
 .desk-deck-button:focus-visible::after { content: ""; position: absolute; inset: 12%; border: 2px solid #e8c58a; transform: rotate(14deg); }
 .desk-deck-button:disabled { cursor: default; }
 
-.listening-desk[data-phase="open"] .listening-desk[data-phase="open"] .desk-actions { position: absolute; bottom: 24px; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); display: flex; justify-content: space-between; gap: 24px; opacity: 0; visibility: hidden; transition: opacity 400ms ease-out; }
+.listening-desk[data-phase="open"] .desk-actions { position: absolute; bottom: 24px; left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); display: flex; justify-content: space-between; gap: 24px; opacity: 0; visibility: hidden; transition: opacity 400ms ease-out; }
 .desk-actions button, .desk-actions a { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; border: 0; padding: 0; background: transparent; color: #f2e3c5; text-decoration: none; font-size: 10px; text-transform: uppercase; letter-spacing: .13em; text-shadow: 0 1px 10px #160f08; }
 .desk-actions span { color: #eab385; font-size: 16px; }
 .desk-actions :is(a,button):hover { color: #fff5df; }
