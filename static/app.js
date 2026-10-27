@@ -60,8 +60,7 @@ function pullPair(id){
   stage.innerHTML=`<button type="button" class="stage-open" data-match="${id}" aria-haspopup="dialog" aria-label="Open ${esc(item.a.performer)} and ${esc(item.b.performer)}">${sleeve(item.a,'a')}<span class="stage-x" aria-hidden="true">↔</span>${sleeve(item.b,'b')}</button>
     <h3>${esc(item.a.performer)} <em>↔</em> ${esc(item.b.performer)}</h3>
     <p>${esc(item.a.title)} · ${sec(item.a_track_time)} &nbsp;/&nbsp; ${esc(item.b.title)} · ${sec(item.b_track_time)}</p>
-    <p>${item.notes} paired notes · ${pct(item.similarity)} similarity${item.gaps?` · ${item.gaps} extra note${item.gaps===1?'':'s'}`:''}</p>
-    <button type="button" class="drawer-done" data-match="${id}" aria-haspopup="dialog">Hear this pair ↗</button>`;
+    <button type="button" class="stage-cta" data-match="${id}" aria-haspopup="dialog"><span>Hear this pair</span><span class="stage-cta-arrow" aria-hidden="true">↗</span></button>`;
 }
 const SPACING=64,NODE_H=84,TOP_N=70;
 function layoutEcho(d){

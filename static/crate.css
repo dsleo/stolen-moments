@@ -11,6 +11,12 @@
 @keyframes stage-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .stage h3 { margin: 0; font: 400 clamp(22px,5vw,32px)/1.1 var(--display); color: var(--ink); }
 .stage p { margin: 0; font-size: 14px; }
+.stage-cta { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-width: 194px; min-height: 48px; margin-top: 3px; padding: 0 18px 0 22px; border: 1px solid #803a28; border-radius: 999px; background: var(--rust); color: #fff8e8; font: 700 13px/1 var(--ui); letter-spacing: .025em; box-shadow: 0 3px 0 #713321; transition: transform .18s ease-out,background-color .18s ease-out,box-shadow .18s ease-out; }
+.stage-cta:hover { transform: translateY(-2px); background: #873c28; box-shadow: 0 5px 0 #713321; }
+.stage-cta:active { transform: translateY(1px); box-shadow: 0 1px 0 #713321; }
+.stage-cta:focus-visible { outline: 2px solid var(--rust); outline-offset: 4px; }
+.stage-cta-arrow { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid #fff8e87a; border-radius: 50%; font-size: 15px; transition: transform .18s ease-out; }
+.stage-cta:hover .stage-cta-arrow { transform: translate(1px,-1px); }
 .stage-open { display: flex; align-items: center; justify-content: center; gap: clamp(6px,2vw,20px); padding: 0; border: 0; background: transparent; width: 100%; }
 .stage-open .sleeve { width: min(34vw, 230px); }
 .stage-open .sleeve.a { transform: rotate(-2deg); }
@@ -40,7 +46,7 @@
 .crate::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(#5a4430, #46341f); border-top: 2px solid #7a5c3c; pointer-events: none; }
 .crate-strip { padding-bottom: 34px; }
 @media (min-width: 900px) { .crate { margin: 48px 0 0; } .crate-card-item { flex-basis: 200px; } }
-@media (prefers-reduced-motion: reduce) { .stage.has-pair { animation: none; } .sleeve, .crate-card { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .stage.has-pair { animation: none; } .sleeve, .crate-card, .stage-cta,.stage-cta-arrow { transition: none; } }
 
 /* Facet shelf: dividers that re-file the crate by decade, instrument or musician. */
 .shelf { margin: 0 0 4px; }
