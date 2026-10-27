@@ -27,7 +27,8 @@
 
 .crate { position: relative; margin: 40px -16px 0; padding: 10px 0 0; background: #3a2c1f; border-radius: 6px 6px 0 0; }
 .crate-strip { display: flex; gap: 10px; overflow-x: auto; padding: 26px 16px 18px; scroll-snap-type: x mandatory; scroll-padding: 0 16px; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
-.crate-card { flex: 0 0 clamp(150px,44vw,190px); scroll-snap-align: start; display: grid; gap: 6px; padding: 0 0 8px; border: 0; background: transparent; color: #f3e9d2; text-align: left; transition: transform .3s cubic-bezier(.25,1,.5,1); }
+.crate-card-item { flex: 0 0 clamp(150px,44vw,190px); scroll-snap-align: start; list-style: none; }
+.crate-card { display: grid; width: 100%; gap: 6px; padding: 0 0 8px; border: 0; background: transparent; color: #f3e9d2; text-align: left; transition: transform .3s cubic-bezier(.25,1,.5,1); }
 .crate-card .sleeves { position: relative; display: block; aspect-ratio: 1; }
 .crate-card .sleeve.b { position: absolute; right: 0; bottom: 0; width: 80%; transform: rotate(3deg); }
 .crate-card .sleeve.a { width: 80%; }
@@ -38,7 +39,7 @@
 .crate-score { color: #e8b67d; font-size: 12px; }
 .crate::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: linear-gradient(#5a4430, #46341f); border-top: 2px solid #7a5c3c; pointer-events: none; }
 .crate-strip { padding-bottom: 34px; }
-@media (min-width: 900px) { .crate { margin: 48px 0 0; } .crate-card { flex-basis: 200px; } }
+@media (min-width: 900px) { .crate { margin: 48px 0 0; } .crate-card-item { flex-basis: 200px; } }
 @media (prefers-reduced-motion: reduce) { .stage.has-pair { animation: none; } .sleeve, .crate-card { transition: none; } }
 
 /* Facet shelf: dividers that re-file the crate by decade, instrument or musician. */
