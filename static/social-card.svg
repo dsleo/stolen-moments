@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Stolen Moments · jazz phrase discovery</title>
+  <desc id="desc">Two melodic lines sit side by side on warm paper, inviting listeners to compare jazz phrases.</desc>
+  <rect width="1200" height="630" fill="#f4f1e8"/>
+  <path d="M72 68H1128M72 562H1128" stroke="#d7d1c2" stroke-width="2"/>
+  <text x="78" y="116" fill="#a94329" font-family="Arial,sans-serif" font-size="19" font-weight="700" letter-spacing="4">A LISTENING ARCHIVE</text>
+  <text x="72" y="226" fill="#252921" font-family="Georgia,serif" font-size="88" font-weight="700">Stolen Moments</text>
+  <text x="75" y="285" fill="#62695e" font-family="Arial,sans-serif" font-size="29">Find a phrase shared by two jazz solos.</text>
+  <g fill="none" stroke="#858a7d" stroke-width="2">
+    <path d="M96 374H1104M96 392H1104M96 410H1104M96 428H1104M96 446H1104"/>
+    <path d="M96 476H1104M96 494H1104M96 512H1104M96 530H1104M96 548H1104"/>
+  </g>
+  <g fill="#252921" stroke="#252921" stroke-width="4" stroke-linecap="round">
+    <ellipse cx="162" cy="427" rx="9" ry="6" transform="rotate(-22 162 427)"/><path d="M170 426V370"/>
+    <ellipse cx="242" cy="409" rx="9" ry="6" transform="rotate(-22 242 409)"/><path d="M250 408V353"/>
+    <ellipse cx="322" cy="418" rx="9" ry="6" transform="rotate(-22 322 418)"/><path d="M330 417V362"/>
+    <ellipse cx="402" cy="391" rx="9" ry="6" transform="rotate(-22 402 391)"/><path d="M410 390V335"/>
+    <ellipse cx="482" cy="400" rx="9" ry="6" transform="rotate(-22 482 400)"/><path d="M490 399V344"/>
+    <ellipse cx="562" cy="382" rx="9" ry="6" transform="rotate(-22 562 382)"/><path d="M570 381V326"/>
+    <ellipse cx="642" cy="418" rx="9" ry="6" transform="rotate(-22 642 418)"/><path d="M650 417V362"/>
+    <ellipse cx="722" cy="427" rx="9" ry="6" transform="rotate(-22 722 427)"/><path d="M730 426V371"/>
+    <ellipse cx="802" cy="400" rx="9" ry="6" transform="rotate(-22 802 400)"/><path d="M810 399V344"/>
+    <ellipse cx="882" cy="391" rx="9" ry="6" transform="rotate(-22 882 391)"/><path d="M890 390V335"/>
+    <ellipse cx="962" cy="409" rx="9" ry="6" transform="rotate(-22 962 409)"/><path d="M970 408V353"/>
+    <ellipse cx="1042" cy="382" rx="9" ry="6" transform="rotate(-22 1042 382)"/><path d="M1050 381V326"/>
+    <ellipse cx="162" cy="512" rx="9" ry="6" transform="rotate(-22 162 512)"/><path d="M170 511V456"/>
+    <ellipse cx="242" cy="485" rx="9" ry="6" transform="rotate(-22 242 485)"/><path d="M250 484V429"/>
+    <ellipse cx="322" cy="494" rx="9" ry="6" transform="rotate(-22 322 494)"/><path d="M330 493V438"/>
+    <ellipse cx="402" cy="476" rx="9" ry="6" transform="rotate(-22 402 476)"/><path d="M410 475V420"/>
+    <ellipse cx="482" cy="512" rx="9" ry="6" transform="rotate(-22 482 512)"/><path d="M490 511V456"/>
+    <ellipse cx="562" cy="485" rx="9" ry="6" transform="rotate(-22 562 485)"/><path d="M570 484V429"/>
+    <ellipse cx="642" cy="494" rx="9" ry="6" transform="rotate(-22 642 494)"/><path d="M650 493V438"/>
+    <ellipse cx="722" cy="476" rx="9" ry="6" transform="rotate(-22 722 476)"/><path d="M730 475V420"/>
+    <ellipse cx="802" cy="512" rx="9" ry="6" transform="rotate(-22 802 512)"/><path d="M810 511V456"/>
+    <ellipse cx="882" cy="485" rx="9" ry="6" transform="rotate(-22 882 485)"/><path d="M890 484V429"/>
+    <ellipse cx="962" cy="494" rx="9" ry="6" transform="rotate(-22 962 494)"/><path d="M970 493V438"/>
+    <ellipse cx="1042" cy="476" rx="9" ry="6" transform="rotate(-22 1042 476)"/><path d="M1050 475V420"/>
+  </g>
+  <circle cx="600" cy="467" r="28" fill="#a94329"/><path d="M588 467h24m-8-9 9 9-9 9" fill="none" stroke="#f4f1e8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="75" y="598" fill="#62695e" font-family="Arial,sans-serif" font-size="17" letter-spacing="2">LISTEN · COMPARE · DECIDE</text>
+  <text x="1125" y="598" text-anchor="end" fill="#62695e" font-family="Arial,sans-serif" font-size="17">DSLEO.GITHUB.IO/STOLEN-MOMENTS</text>
+</svg>

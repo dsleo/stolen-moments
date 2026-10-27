@@ -20,6 +20,7 @@ Open [http://127.0.0.1:8766](http://127.0.0.1:8766). It cannot be opened as `fil
 
 - **Crate:** one sleeve per passage pair, with album art, the two musicians, similarity and note count. The filter button narrows by decade, instrument or musician (searchable) and by minimum paired notes. The sort button offers *Best matches*, *Longest passages* and *Most similar*. Active filters show as removable tags.
 - **Passage view:** two score excerpts, a synthesized rendering of each (the database notes, not the original audio), and links into the source recordings.
+- **Pair links:** opening a passage gives it a shareable `?pair=` URL in the address bar, based on source solo IDs and starting note positions. A ranking reorder does not change these links; a pair removed by a future catalog rebuild cannot be reopened.
 - **Echoes:** a timeline of musicians and the strongest connections between them. Select a musician to trace who echoes whom.
 
 Scores are heuristics for listening, not evidence of quotation or influence.

@@ -1,4 +1,4 @@
-const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredIds:[],sort:'evidence'};
+const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredTotal:0,sort:'evidence'};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
@@ -19,28 +19,33 @@ function updateOutputs(){
 
 async function load(append=false){
   const serial=++state.request;
+  const perf=()=>new URLSearchParams(location.search).has('perf');
+  if(!append&&perf())performance.mark('sm:first-query-start');
   state.loading=true;
+  if(!append){$('#crate-state').hidden=false;$('#crate-state').textContent='Loading passages…';$('#crate-strip').setAttribute('aria-busy','true')}
   if(!append)state.nextOffset=null;
   try{
     if(!state.catalog)throw new Error('Catalog unavailable');
-    if(!append){state.filteredIds=await state.catalog.filtered(params());refreshFacets(serial)}
-    const total=state.filteredIds.length;
-    const ids=state.filteredIds.slice(state.offset,state.offset+50);
-    const items=ids.map(id=>state.catalog.item(id));
+    const page=await state.catalog.filtered(params(),state.offset,50);
+    if(!append){state.filteredTotal=page.total;refreshFacets(serial)}
+    const total=state.filteredTotal;
+    if(!append&&perf()){performance.mark('sm:first-query-ready');try{performance.measure('sm:first-filter','sm:first-query-start','sm:first-query-ready')}catch{}}
+    const items=page.items;
     if(serial!==state.request)return;
     $('#result-count').textContent=total.toLocaleString();
     if(!append)state.items=[];state.items.push(...items);renderCrate(items,append);
+    if(!append&&perf()){performance.mark('sm:first-results-rendered');try{performance.measure('sm:first-results','sm:first-query-start','sm:first-results-rendered')}catch{}}
     if(!append&&!items.length)$('#crate-strip').innerHTML='<div class="empty"><strong>No passages at this setting.</strong>Lower the similarity or length minimum to broaden the search.</div>';
     state.nextOffset=state.offset+items.length<total?state.offset+items.length:null;
   }catch(err){if(serial===state.request){if(!append)$('#crate-strip').innerHTML=`<div class="empty"><strong>Search unavailable.</strong>${esc(err.message)}</div>`;toast(err.message)}}
-  finally{if(serial===state.request)state.loading=false}
+  finally{if(serial===state.request){state.loading=false;if(!append){$('#crate-state').hidden=true;$('#crate-strip').removeAttribute('aria-busy')}}}
 }
 
 const hue = name => [...String(name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7);
 const coverPhoto = s => s.cover?{url:s.cover,kind:'cover'}:
   state.portraits[s.performer]?.image?{url:state.portraits[s.performer].image,kind:'portrait'}:null;
 // Typographic sleeve underneath; the real cover (if the archive finds one) covers it.
-const sleeve = (s,side) => {const photo=coverPhoto(s);return `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span>${photo?`<img loading="lazy" decoding="async" alt="" src="${esc(photo.url)}">`:''}${photo?.kind==='portrait'?'<span class="portrait-tag">Artist photo</span>':''}</span>`};
+const sleeve = (s,side) => {const photo=coverPhoto(s);return `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span>${photo?`<img loading="lazy" decoding="async" alt="" src="${esc(photo.url)}">`:''}</span>`};
 const crateCard = item => `<div class="crate-card-item" role="listitem"><button type="button" class="crate-card" data-pull="${item.id}" aria-pressed="false" aria-label="Open ${esc(item.a.performer)}, ${esc(item.a.title)}, and ${esc(item.b.performer)}, ${esc(item.b.title)}; ${item.notes} paired notes; ${pct(item.similarity)} similar"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${pct(item.similarity)} similar · ${item.notes} notes</span></button></div>`;
 function renderCrate(items,append){
   const strip=$('#crate-strip');
@@ -62,52 +67,85 @@ function pullPair(id){
     <p>${esc(item.a.title)} · ${sec(item.a_track_time)} &nbsp;/&nbsp; ${esc(item.b.title)} · ${sec(item.b_track_time)}</p>
     <button type="button" class="stage-cta" data-match="${id}" aria-haspopup="dialog"><span>Hear this pair</span><span class="stage-cta-arrow" aria-hidden="true">↗</span></button>`;
 }
-const SPACING=64,NODE_H=84,TOP_N=70;
-function layoutEcho(d){
-  const order=d.musicians.map((m,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
-  const x=[];order.forEach((mi,pos)=>{x[mi]=SPACING/2+pos*SPACING});
-  return {x,width:order.length*SPACING};
+const ECHO_TOP_N=70;
+const echoTopLinks=d=>[...d.links].sort((a,b)=>b.strength-a.strength).slice(0,ECHO_TOP_N);
+const echoDecade=year=>year?Math.floor(year/10)*10:null;
+const echoDegree=(links,count)=>{const degree=Array(count).fill(0);for(const l of links){degree[l.from]++;degree[l.to]++}return degree};
+function echoVisibleOrder(shown){
+  const linked=new Set(shown.flatMap(l=>[l.from,l.to]));
+  if(state.echoSel!=null)linked.add(state.echoSel);
+  return state.echoOrder.filter(i=>linked.has(i));
+}
+function echoNode(p,i,size,extra='',position=''){
+  return `<button type="button" class="echo-node ${extra}" style="--echo-portrait-size:${size}px;${position}" data-echo="${i}" aria-pressed="${state.echoSel===i}" aria-label="${esc(p.name)}. Show connections" title="${esc(p.name)}">${portrait(p.name)}<span>${esc(p.name)}</span></button>`;
+}
+function renderEchoTimeline(d){
+  const box=$('#echoes-scroll'),m=d.musicians,sel=state.echoSel;
+  const shown=sel!=null?[...d.links].filter(l=>l.from===sel||l.to===sel).sort((a,b)=>b.strength-a.strength).slice(0,40):echoTopLinks(d);
+  const order=echoVisibleOrder(shown),degree=echoDegree(shown,m.length);
+  if(!order.length){box.innerHTML='<div class="empty"><strong>No connections at these settings.</strong></div>';return}
+  const spacing=Math.round(86*(state.echoZoom||1)),x=[];
+  order.forEach((mi,pos)=>{x[mi]=spacing/2+pos*spacing});
+  const width=Math.max(box.clientWidth,order.length*spacing),arcH=Math.max(135,Math.floor((box.clientHeight-115)*(sel==null ? .68 : .48)));
+  const y0=arcH+24,height=Math.max(box.clientHeight,y0+115),max=Math.max(...shown.map(l=>l.strength),1e-9);
+  const arcs=shown.map(l=>{
+    if(x[l.from]==null||x[l.to]==null)return '';
+    const x1=Math.min(x[l.from],x[l.to]),x2=Math.max(x[l.from],x[l.to]),rx=Math.max(1,(x2-x1)/2),ry=Math.max(20,(arcH-20)*Math.pow(rx/(width/2),.45));
+    const down=sel!=null&&l.from===sel,ty=down?y0+66:y0-6;
+    return `<path class="echo-arc ${down?'down':'up'}${sel!=null?' sel':''}" d="M${x1},${ty} A${rx},${ry} 0 0 ${down?0:1} ${x2},${ty}" stroke-width="${(1.5+4.5*l.strength/max).toFixed(1)}" data-match="${l.top_id}" tabindex="0" role="button" aria-label="${esc(m[l.from].name)} to ${esc(m[l.to].name)}, ${l.pairs} solo pairs"><title>${esc(m[l.from].name)} → ${esc(m[l.to].name)} · ${l.pairs} solo pair${l.pairs===1?'':'s'}</title></path>`;
+  }).join('');
+  let lastDecade=null;
+  const years=order.map(mi=>{const dec=echoDecade(m[mi].year),label=dec&&dec!==lastDecade?`<text class="echo-year" x="${Math.max(6,x[mi]-28)}" y="21">${dec}s</text><line class="echo-decade-line" x1="${x[mi]}" x2="${x[mi]}" y1="30" y2="${height}"/>`:'';if(dec)lastDecade=dec;return label}).join('');
+  const nodes=order.map(i=>{const size=degree[i]>=10?58:degree[i]>=4?49:40;return echoNode(m[i],i,size,degree[i]?'':'unlinked',`left:${x[i]}px;top:${y0}px`)}).join('');
+  const left=box.scrollLeft;
+  box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${height}px"><svg width="${width}" height="${height}" aria-label="Arcs from earlier to later musicians">${years}${arcs}</svg>${nodes}</div>`;
+  box.scrollLeft=left;
+  if(box.clientWidth&&box.clientHeight&&(state.echoCenterIndex!=null||!state.echoInitialCentered)){
+    const target=state.echoCenterIndex??degree.indexOf(Math.max(...degree));
+    state.echoCenterIndex=null;state.echoInitialCentered=true;
+    requestAnimationFrame(()=>{if(x[target]!=null)box.scrollLeft=Math.max(0,x[target]-box.clientWidth/2)});
+  }
 }
 function renderEchoes(){
   const d=state.echoes;if(!d)return;
-  const ARC_H=Math.max(110,Math.floor(($('#echoes-scroll').clientHeight-NODE_H-12)/2));
-  const {x,width}=layoutEcho(d),sel=state.echoSel,m=d.musicians;
-  const links=d.links.filter(l=>sel==null?false:l.from===sel||l.to===sel);
-  const shown=sel==null?[...d.links].sort((a,b)=>b.strength-a.strength).slice(0,TOP_N):links;
-  const max=Math.max(...shown.map(l=>l.strength),1e-9),y0=ARC_H+4;
-  const linked=new Set(shown.flatMap(l=>[l.from,l.to]));
-  const arcs=shown.map(l=>{
-    const x1=Math.min(x[l.from],x[l.to]),x2=Math.max(x[l.from],x[l.to]),rx=(x2-x1)/2,ry=Math.max(14,(ARC_H-6)*Math.pow(rx/(width/2),.6));
-    const down=sel!=null&&l.from===sel,ty=down?y0+NODE_H:y0-4;
-    return `<path class="echo-arc ${down?'down':'up'}${sel!=null?' sel':''}" d="M${x1},${ty} A${rx},${ry} 0 0 ${down?0:1} ${x2},${ty}" stroke-width="${(1.5+4.5*l.strength/max).toFixed(1)}" data-match="${l.top_id}" tabindex="0" role="button" aria-label="${esc(m[l.from].name)} to ${esc(m[l.to].name)}, ${l.pairs} solo pairs"><title>${esc(m[l.from].name)} → ${esc(m[l.to].name)} · ${l.pairs} solo pair${l.pairs===1?'':'s'}</title></path>`;
-  }).join('');
-  let lastDecade='';
-  const years=state.echoOrder.map(mi=>{const dec=m[mi].year?Math.floor(m[mi].year/10)*10:'';const t=dec&&dec!==lastDecade?`<text class="echo-year" x="${x[mi]-24}" y="14">${dec}s</text>`:'';if(dec)lastDecade=dec;return t}).join('');
-  const nodes=m.map((p,i)=>`<button type="button" class="echo-node${sel!=null&&sel!==i&&!linked.has(i)?' dim':''}" style="left:${x[i]}px;top:${y0}px" data-echo="${i}" aria-pressed="${sel===i}" aria-label="${esc(p.name)}. Select, then double click for details" title="${esc(p.name)} · double click for details">${portrait(p.name)}<span>${esc(p.name)}</span></button>`).join('');
-  const H=y0+NODE_H+ARC_H+8,box=$('#echoes-scroll'),left=box.scrollLeft;
-  box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${H}px"><svg width="${width}" height="${H}" aria-label="Arcs from earlier to later musicians">${years}${arcs}</svg>${nodes}</div>`;
-  box.scrollLeft=left;
-  $('#echoes-note').textContent=sel==null?`Strongest ${shown.length} connections. Select a musician to trace their echoes; double click to open details.`:`${m[sel].name} · double click for details`;
+  $('#echo-overview').hidden=state.echoSel==null;
+  renderEchoTimeline(d);
   renderEchoPanel(state.echoPanel);
+}
+function echoLinkYears(l){
+  return l.from_year&&l.to_year?`${l.from_year} → ${l.to_year}`:'';
 }
 function renderEchoPanel(sel){
   const d=state.echoes,m=d.musicians,panel=$('#echoes-panel');
   if(sel==null){panel.innerHTML='';return}
-  const list=(ls,other)=>ls.length?`<ol>${[...ls].sort((a,b)=>b.strength-a.strength).slice(0,10).map(l=>`<li><button type="button" data-match="${l.top_id}"><span>${esc(m[l[other]].name)}</span><small>${l.pairs} pair${l.pairs===1?'':'s'}</small></button></li>`).join('')}</ol>`:'<p>None at these settings.</p>';
+  const list=(ls,other)=>ls.length?`<ol>${[...ls].sort((a,b)=>b.strength-a.strength).slice(0,10).map(l=>`<li><button type="button" data-match="${l.top_id}"><span>${esc(m[l[other]].name)}<small>${echoLinkYears(l)}</small></span><small>${l.pairs} pair${l.pairs===1?'':'s'}</small></button></li>`).join('')}</ol>`:'<p>None at these settings.</p>';
   const source=state.portraits[m[sel].name]?.page;
   panel.innerHTML=`<h3>${esc(m[sel].name)}</h3><p>${m[sel].solos} solos · c. ${m[sel].year??'?'}</p>${source?`<a class="portrait-source" href="${esc(source)}" target="_blank" rel="noopener noreferrer">Portrait source ↗</a>`:''}<h4>Echoes</h4>${list(d.links.filter(l=>l.to===sel),'from')}<h4>Echoed by</h4>${list(d.links.filter(l=>l.from===sel),'to')}`;
 }
-let echoHeight=0;
-new ResizeObserver(()=>{const h=$('#echoes-scroll').clientHeight;if(h&&h!==echoHeight){echoHeight=h;renderEchoes()}}).observe($('#echoes-scroll'));
+let echoWidth=0,echoHeight=0;
+new ResizeObserver(()=>{
+  const box=$('#echoes-scroll'),width=box.clientWidth,height=box.clientHeight;
+  if(!height||(width===echoWidth&&height===echoHeight))return;
+  if(width!==echoWidth){if(state.echoSel!=null)state.echoCenterIndex=state.echoSel;else state.echoInitialCentered=false}
+  echoWidth=width;echoHeight=height;renderEchoes();
+}).observe($('#echoes-scroll'));
+function selectEcho(i){
+  state.echoSel=i;state.echoPanel=i;state.echoCenterIndex=i;
+  renderEchoes();
+}
 async function loadEchoes(){
   const serial=state.echoSerial=(state.echoSerial||0)+1;
   try{
     if(!state.catalog)return;
     const d=await state.catalog.influence(params());if(serial!==state.echoSerial)return;
+    const oldName=state.echoes?.musicians[state.echoSel]?.name;
     state.echoes=d;
     state.echoOrder=d.musicians.map((_,i)=>i).sort((a,b)=>(d.musicians[a].year??9999)-(d.musicians[b].year??9999)||d.musicians[a].name.localeCompare(d.musicians[b].name));
-    if(state.echoSel!=null&&state.echoSel>=d.musicians.length)state.echoSel=null;
-    if(state.echoPanel!=null&&state.echoPanel>=d.musicians.length)state.echoPanel=null;
+    state.echoSel=oldName?d.musicians.findIndex(m=>m.name===oldName):null;
+    if(state.echoSel===-1)state.echoSel=null;
+    state.echoPanel=state.echoSel;
+    if(state.echoSel==null)state.echoInitialCentered=false;
+    $('#echo-musicians').innerHTML=d.musicians.map(m=>`<option value="${esc(m.name)}"></option>`).join('');
     renderEchoes();
   }catch(err){$('#echoes-scroll').innerHTML=`<div class="empty"><strong>Echoes unavailable.</strong>${esc(err.message)}</div>`}
 }
@@ -158,7 +196,7 @@ function scorePanel(notes,side,id,solo){
   if(!notes.length)return '';
   return `<section class="score-panel ${side}" aria-label="Score excerpt ${side.toUpperCase()}">
     <div class="score-heading"><div><span class="score-letter">${side.toUpperCase()}</span><strong>${esc(solo.performer)} · ${esc(solo.title)}</strong></div><span>${notes.length} notes</span></div>
-    <div class="score-body"><div class="score-scroll"><div class="score-paper" id="score-${id}-${side}" role="img" aria-label="Staff notation for ${esc(solo.performer)} playing ${esc(solo.title)}"></div></div></div>
+    <div class="score-body"><div class="score-scroll" role="region" tabindex="0" aria-label="Scrollable score for ${esc(solo.performer)} playing ${esc(solo.title)}"><div class="score-paper" id="score-${id}-${side}" role="img" aria-label="Staff notation for ${esc(solo.performer)} playing ${esc(solo.title)}"></div></div></div>
     <div class="score-footer"><span>${sec(notes[0].track_time)}–${sec(notes[notes.length-1].track_time)} in source track</span><button type="button" class="score-play" data-play="${side}" data-detail="${id}" aria-label="Play MIDI transcription for ${esc(solo.performer)} — ${esc(solo.title)}" title="Play MIDI transcription"><span aria-hidden="true">▶</span></button></div>
   </section>`;
 }
@@ -208,25 +246,19 @@ function alignmentPanel(d){
   const rows=d.alignment.map(([ai,bi],index)=>{
     const a=ai>=0?aByIndex.get(ai):null,b=bi>=0?bByIndex.get(bi):null;
     const paired=!!a&&!!b;
-    const aText=a?`${pitchLabel(a.pitch)} · note ${a.index+1}`:'Skipped';
-    const bText=b?`${pitchLabel(b.pitch)} · note ${b.index+1}`:'Skipped';
+    const aText=a?pitchLabel(a.pitch):'Skipped';
+    const bText=b?pitchLabel(b.pitch):'Skipped';
     const result=paired?'Paired':a?'No matching note in B':'No matching note in A';
     return `<tr class="${paired?'':'alignment-gap'}"><th scope="row">${index+1}</th><td>${esc(aText)}</td><td>${esc(bText)}</td><td>${result}</td></tr>`;
   }).join('');
   const skipped=d.alignment.filter(([a,b])=>a<0||b<0).length;
-  return `<details class="alignment-disclosure">
-    <summary aria-label="Show note-by-note alignment" title="Show note-by-note alignment">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 10l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      <span>Compare notes</span>
-    </summary>
-    <section class="alignment-panel" aria-labelledby="alignment-title">
+  return `<section class="alignment-panel" aria-labelledby="alignment-title">
       <h3 id="alignment-title">Note-by-note alignment</h3>
       <p>Each row shows how notes were paired. ${skipped?`${skipped} extra note${skipped===1?' was':'s were'} skipped.`:'No notes were skipped.'}</p>
       <div class="alignment-table-scroll" tabindex="0" aria-label="Scrollable note alignment table">
         <table class="alignment-table"><caption>${d.alignment.length} alignment steps between passages A and B</caption><thead><tr><th scope="col">Step</th><th scope="col">A · ${esc(d.a.performer)}</th><th scope="col">B · ${esc(d.b.performer)}</th><th scope="col">Alignment</th></tr></thead><tbody>${rows}</tbody></table>
       </div>
-    </section>
-  </details>`;
+    </section>`;
 }
 
 let abcLoad;
@@ -256,7 +288,7 @@ function mediaSection(d,side){
 
 function albumVisual(s,side){
   const photo=coverPhoto(s),portrait=photo?.kind==='portrait';
-  return `<div class="album-visual" data-side="${side}"><div class="album-placeholder" aria-hidden="true"></div>${photo?`<img class="album-art" src="${esc(photo.url)}" alt="${portrait?`Photo of ${esc(s.performer)}; album cover unavailable`:`Album cover for ${esc(s.album||s.title)}`}" onerror="this.hidden=true">`:''}${portrait?'<span class="album-kind">Artist photo · recording cover unavailable</span>':''}</div>`;
+  return `<div class="album-visual" data-side="${side}"><div class="album-placeholder" aria-hidden="true"></div>${photo?`<img class="album-art" src="${esc(photo.url)}" alt="${portrait?`Photo of ${esc(s.performer)}; album cover unavailable`:`Album cover for ${esc(s.album||s.title)}`}" onerror="this.hidden=true">`:''}</div>`;
 }
 
 function artistPanel(d,side){
@@ -265,7 +297,7 @@ function artistPanel(d,side){
   const trackName=recordingUrl?`<a class="track-link" href="${recordingUrl}" target="_blank" rel="noopener noreferrer">${esc(s.title)} <span aria-hidden="true">↗</span></a>`:esc(s.title);
   return `<article class="artist-panel ${side}">
     <div class="artist-visual">${albumVisual(s,side)}</div>
-    <div class="artist-info"><header class="artist-heading"><div class="side-tag">${side.toUpperCase()}</div><div><h3>${esc(s.performer)}</h3><p class="artist-meta">${esc(s.instrument||'Jazz soloist')} · ${esc(s.recording_date||s.year||'Date unknown')}</p></div></header>
+    <div class="artist-info"><header class="artist-heading"><div class="side-tag">${side.toUpperCase()}</div><div><h3>${esc(s.performer)}</h3><p class="artist-meta">${esc(s.recording_date||s.year||'Date unknown')}</p></div></header>
       <div class="track-heading"><div><h4>${trackName}</h4>${s.album?`<p>${esc(s.album)}</p>`:''}</div></div>
       ${scorePanel(d[`${side}_notes`],side,d.id,s)}
       ${mediaSection(d,side)}</div>
@@ -275,14 +307,31 @@ function artistPanel(d,side){
 function detailHTML(d){
   return `<div class="pair-card"><header class="pair-card-head"><div><p class="small-caps">A closer listen</p><h2 id="pair-dialog-title">${esc(d.a.performer)} <em>↔</em> ${esc(d.b.performer)}</h2></div><button type="button" class="dialog-close" data-close-pair aria-label="Close pair detail">×</button></header>
     <div class="pair-split">${artistPanel(d,'a')}${artistPanel(d,'b')}</div>
-    <div class="pair-card-score"><div><strong>${d.notes}</strong><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div><div class="alignment-score-cell">${alignmentPanel(d)}</div></div>
+    <div class="pair-card-score"><div class="paired-stat"><div class="paired-stat-top"><strong>${d.notes}</strong><button type="button" class="alignment-toggle" data-toggle-alignment aria-expanded="false" aria-controls="alignment-panel-${d.id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 10l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>Compare notes</button></div><span>paired notes</span></div><div><strong>${pct(d.similarity)}</strong><span>similarity</span></div><div><strong>${d.gaps}</strong><span>extra notes</span></div></div>
+    <div class="alignment-score-cell" id="alignment-panel-${d.id}" hidden>${alignmentPanel(d)}</div>
     <footer class="pair-card-foot"><span>${esc(d.a.recording_date||'unknown')} · ${esc(d.b.recording_date||'unknown')}</span></footer>
   </div>`;
 }
 
-async function toggleDetail(button){
-  const id=Number(button.dataset.match),dialog=$('#pair-dialog');
-  state.lastTrigger=button;
+async function pairURL(id){
+  const key=await state.catalog?.pairKey(id);
+  if(!key)return null;
+  const url=new URL(location.href);
+  url.searchParams.set('pair',key);
+  url.hash='';
+  return url;
+}
+function clearPairURL(){
+  const url=new URL(location.href);
+  if(!url.searchParams.has('pair'))return;
+  url.searchParams.delete('pair');
+  history.replaceState(null,'',url);
+}
+async function toggleDetail(buttonOrId){
+  const id=typeof buttonOrId==='number'?buttonOrId:Number(buttonOrId.dataset.match),dialog=$('#pair-dialog');
+  state.lastTrigger=typeof buttonOrId==='number'?null:buttonOrId;
+  const url=await pairURL(id);
+  if(url)history.replaceState(null,'',url);
   state.openId=id;dialog.innerHTML='<div class="pair-loading">Reading both passages…</div>';
   if(!dialog.open)dialog.showModal();
   try{const detail=await state.catalog.detail(id);state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
@@ -318,17 +367,25 @@ document.addEventListener('click',event=>{
   const sorting=event.target.closest('[data-sort]');if(sorting){state.sort=sorting.dataset.sort;document.querySelectorAll('[data-sort]').forEach(b=>b.setAttribute('aria-pressed',String(b===sorting)));$('#sort-options').hidden=true;$('#open-sort').setAttribute('aria-expanded','false');resetSearch()}
   if(event.target.closest('#clear-crate-filters')){state.decade='';state.instrument='';$('#performer').value='';$('#min_notes').value=8;updateOutputs();resetSearch()}
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
-  const echo=event.target.closest('[data-echo]');if(echo){const i=Number(echo.dataset.echo),now=performance.now();const secondClick=state.lastEchoClick?.index===i&&now-state.lastEchoClick.time<450;state.echoSel=i;state.echoPanel=secondClick?i:null;state.lastEchoClick={index:i,time:now};renderEchoes()}
+  if(event.target.closest('#echo-search-toggle'))setEchoSearchOpen($('#echo-search-field').hidden);
+  else if(!event.target.closest('#echo-search-field'))setEchoSearchOpen(false);
+  if(event.target.closest('#echo-overview')){state.echoSel=null;state.echoPanel=null;state.echoCenterIndex=null;state.echoInitialCentered=false;$('#echo-search').value='';renderEchoes()}
+  const echoZoom=event.target.closest('[data-echo-zoom]');if(echoZoom){state.echoZoom=Math.max(.8,Math.min(1.4,(state.echoZoom||1)+(echoZoom.dataset.echoZoom==='in'?.2:-.2)));renderEchoes()}
+  const echo=event.target.closest('[data-echo]');if(echo)selectEcho(Number(echo.dataset.echo));
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
+  const alignmentToggle=event.target.closest('[data-toggle-alignment]');if(alignmentToggle){const panel=document.getElementById(alignmentToggle.getAttribute('aria-controls'));const open=panel.hidden;panel.hidden=!open;alignmentToggle.setAttribute('aria-expanded',String(open))}
   const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
   if(event.target.closest('[data-close-pair]'))$('#pair-dialog').close();
 });
-document.addEventListener('dblclick',event=>{const echo=event.target.closest('[data-echo]');if(echo){state.echoSel=Number(echo.dataset.echo);state.echoPanel=state.echoSel;renderEchoes()}});
-document.addEventListener('keydown',event=>{const echo=event.target.closest('[data-echo]');if(echo&&event.key==='Enter'&&state.echoSel===Number(echo.dataset.echo)){event.preventDefault();state.echoPanel=state.echoSel;renderEchoes()}});
+document.addEventListener('keydown',event=>{const match=event.target.closest('[data-match]');if(match&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleDetail(match)}});
 let debounce;
 $('#facet-search').addEventListener('input',renderShelf);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')for(const [panel,btn] of [['#crate-options','#open-shelf'],['#sort-options','#open-sort']]){$(panel).hidden=true;$(btn).setAttribute('aria-expanded','false')}});
+function setEchoSearchOpen(open){$('#echo-search-field').hidden=!open;$('#echo-search-toggle').setAttribute('aria-expanded',String(open));if(open)$('#echo-search').focus()}
+function findEchoMusician(){const value=$('#echo-search').value.trim().toLowerCase(),d=state.echoes;if(!value||!d)return;let i=d.musicians.findIndex(m=>m.name.toLowerCase()===value);if(i<0)i=d.musicians.findIndex(m=>m.name.toLowerCase().startsWith(value));if(i>=0){selectEcho(i);setEchoSearchOpen(false)}}
+$('#echo-search').addEventListener('change',findEchoMusician);
+$('#echo-search').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();findEchoMusician()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){setEchoSearchOpen(false);for(const [panel,btn] of [['#crate-options','#open-shelf'],['#sort-options','#open-sort']]){$(panel).hidden=true;$(btn).setAttribute('aria-expanded','false')}}});
 $('#min_notes').addEventListener('input',()=>{updateOutputs();clearTimeout(debounce);debounce=setTimeout(resetSearch,150)});
 // One photograph and one hinged cover persist through both views. The lid's
 // projected corners rotate around the rear hinges; the record never changes.
@@ -380,14 +437,14 @@ function animateLid(open){
   });
 }
 
-async function openDesk(){
+async function openDesk({instant=false}={}){
   if(deskPhase!=='closed')return;
   deskPhase='opening';
   desk.dataset.phase='opening';
   $('#enter-atlas').disabled=true;
   $('[data-lift-lid]').disabled=true;
   $('.landing-intro').inert=true;
-  await animateLid(true);
+  if(instant)renderLid(1);else await animateLid(true);
   deskPhase='open';
   desk.dataset.phase='open';
   document.body.classList.add('atlas-open');
@@ -425,16 +482,28 @@ $('#enter-atlas').addEventListener('click',openDesk);
 $('[data-lift-lid]').addEventListener('click',openDesk);
 $('#close-deck').addEventListener('click',closeDesk);
 $('#pair-dialog').addEventListener('click',event=>{if(event.target===$('#pair-dialog'))$('#pair-dialog').close()});
-$('#pair-dialog').addEventListener('close',()=>{state.openId=null;if(state.lastTrigger?.isConnected)state.lastTrigger.focus()});
+$('#pair-dialog').addEventListener('close',()=>{state.openId=null;clearPairURL();if(state.lastTrigger?.isConnected)state.lastTrigger.focus();else $('#crate-strip .crate-card')?.focus()});
 
 async function init(){
+  const perf=()=>new URLSearchParams(location.search).has('perf');
+  if(perf())performance.mark('sm:app-start');
   updateOutputs();
+  const requestedPair=new URLSearchParams(location.search).get('pair');
+  if(location.hash==='#explore'||requestedPair){
+    await openDesk({instant:!!requestedPair});
+    $('#explore').scrollIntoView({behavior:'instant'});
+  }
   try{const portraits=await fetch('artist-portraits.json');if(portraits.ok)state.portraits=await portraits.json()}catch{}
   try{setView(localStorage.getItem('atlas-view')==='echoes'?'echoes':'crate')}catch{}
   try{
     state.catalog=await loadCatalog();
+    if(perf())performance.mark('sm:catalog-ready');
     await load();
     if($('.results-area').dataset.view==='echoes')loadEchoes();
+    if(requestedPair){
+      const id=await state.catalog.findPairKey(requestedPair);
+      if(id===null){clearPairURL();toast('This pair link is no longer available. Browse the archive.')}else toggleDetail(id);
+    }
   }catch(err){const message=location.protocol==='file:'?'Open this site over HTTP, for example with `python3 -m http.server 8766 -d static`.':err.message;$('#crate-strip').innerHTML=`<div class="empty"><strong>Could not open the atlas.</strong>${esc(message)}</div>`}
 }
 init();

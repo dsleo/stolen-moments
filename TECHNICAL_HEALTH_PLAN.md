@@ -2,6 +2,8 @@
 
 **Baseline:** 13/20 in [the 27 October audit](PRELAUNCH_AUDIT.md). That score was recorded before the local mobile landing and pair-link fixes; it has not been formally recalculated. **Release target:** at least **18/20**, no open P1 technical findings, and a repeatable browser check on the exact revision to be deployed.
 
+**Implementation status:** Phase 1 is implemented locally: pinned Playwright browser smoke, first-party syntax checks, and existing Python/catalog checks are required before deployment. Phases 2–3 now include darker text tokens, focusable score scrollers, reduced-motion handling, 44 px controls, direct featured-pair entry, and overflow/axe checks at 320, 390, 768, and 1280 px. Automated checks pass, but a manual screen-reader/keyboard review and true 200% browser text-zoom review remain before assigning a new score. As an additional main-thread improvement, catalog decompression, JSON parsing, and full-index ownership now run in the search worker; the UI receives only the visible page of 50 results. Local desktop timings are documented in [the audit](PRELAUNCH_AUDIT.md); they do not replace a cold mobile-device/network test.
+
 | Dimension | Baseline | Target | Evidence required for the target |
 | --- | ---: | ---: | --- |
 | Accessibility | 2 | 4 | WCAG AA contrast and operation across the main journeys; manual keyboard and screen-reader review. |

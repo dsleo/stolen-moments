@@ -4,7 +4,7 @@
 
 **One-line description:** Stolen Moments is an interactive listening archive that finds similar passages in 456 transcribed jazz solos and lets you hear and inspect the match.
 
-**Audience:** jazz listeners and musicians. **Voice:** curious, editorial, precise about what the data can show. **Configured publication URL:** <https://dsleo.github.io/stolen-moments/>. The featured-pair link should be added after the app supports stable pair URLs.
+**Audience:** jazz listeners and musicians. **Voice:** curious, editorial, precise about what the data can show. **Configured publication URL:** <https://dsleo.github.io/stolen-moments/>. **Featured pair URL after the next deployment:** <https://dsleo.github.io/stolen-moments/?pair=87.562.200.283>.
 
 ## The story to lead with
 
@@ -12,7 +12,7 @@ In 1954, Clifford Brown played “A Night in Tunisia.” In a 1991 recording, Jo
 
 This is the suggested lead for a 30-second demo or feature pitch. Before releasing it, manually confirm the two linked uploads and timestamps, listen to the passages with at least one musician who did not build the algorithm, and check all visuals used in the edit.
 
-Source transcription pages: [Brown, solo 87](https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo87.html) and [Henderson, solo 200](https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo200.html). Catalog result at export: row 2, source note windows 562–599 and 283–321. Row numbers may change on rebuild; a stable share link is needed before distribution.
+Source transcription pages: [Brown, solo 87](https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo87.html) and [Henderson, solo 200](https://jazzomat.hfm-weimar.de/dbformat/synopsis/solo200.html). Catalog result at export: row 2, source note windows 562–599 and 283–321. The pair URL uses solo IDs and starting note positions, so a ranking reorder does not change it. If a future catalog removes the match, the app offers the archive instead.
 
 ## Copy ready to adapt
 
@@ -26,11 +26,11 @@ What if the history of jazz could be explored one phrase at a time? Stolen Momen
 
 ### Short social post
 
-Two solos. Thirty-seven years apart. A phrase worth hearing twice. Stolen Moments lets you compare matched passages from the Weimar Jazz Database note by note, then listen for yourself. [Add stable feature link after release.]
+Two solos. Thirty-seven years apart. A phrase worth hearing twice. Stolen Moments lets you compare matched passages from the Weimar Jazz Database note by note, then listen for yourself. [Open the pair](https://dsleo.github.io/stolen-moments/?pair=87.562.200.283).
 
 ### Alternative social post for musicians
 
-Is it a shared lick, a common shape, or a coincidence? Put two jazz transcriptions side by side and listen. Stolen Moments shows the aligned notes, skipped notes, and the source context so your ears can make the next call. [Add stable link.]
+Is it a shared lick, a common shape, or a coincidence? Put two jazz transcriptions side by side and listen. Stolen Moments shows the aligned notes, skipped notes, and the source context so your ears can make the next call. [Hear an example](https://dsleo.github.io/stolen-moments/?pair=87.562.200.283).
 
 ## A 30-second launch clip
 
@@ -64,13 +64,15 @@ Do not say “proved quotation,” “copied,” “plagiarized,” “influence
 
 ## Assets and credits
 
-- **Hero art:** [jazz-desk-base.webp](static/assets/jazz-desk-base.webp) (1672 × 941; generated for this project). This is the safest first visual for a text-led social card.
+- **Social card:** [social-card.png](static/social-card.png) (1200 × 630; project-authored artwork, no cover or portrait imagery), with an editable [SVG source](static/social-card.svg). The site Open Graph metadata points to this PNG and includes image alt text.
+- **Hero art:** [jazz-desk-base.webp](static/assets/jazz-desk-base.webp) (1672 × 941; generated for this project). This is another project-art option for a text-led social post.
 - **Icon:** [favicon.svg](static/favicon.svg). Use “Stolen Moments” as live text beside it rather than stretching the icon into a wordmark.
-- **Product screenshots:** capture the landing, a pair view with both score excerpts, and the Echoes view after final UI and rights review. A press screenshot showing a third-party cover or portrait needs an explicit asset decision.
+- **Product screenshots:** capture the landing, a pair view with both score excerpts, and the Echoes view after final UI and rights review. A press screenshot showing a third-party cover or portrait needs an explicit asset decision. The [campaign asset register](static/ASSET_RIGHTS.md) records known sources and clearance gaps.
 - **Data credit:** “Based on the Weimar Jazz Database v2.1 by the Jazzomat Research Project (HfM Weimar); data licensed under ODbL 1.0.” See [data attribution and licence](static/DATA_LICENSE.txt) and the [Jazzomat download page](https://jazzomat.hfm-weimar.de/download/download.html).
 - **Method:** link the public `method.html` page after its current local files are committed and deployed.
+- **Feedback:** a “Send feedback” route now opens a GitHub issue form. This provides a direct feedback path without adding tracking scripts or collecting visitor analytics.
 - **Press contact:** add a named contact and working email before sending this kit externally.
 
 ## Distribution checklist
 
-Choose and verify three featured pairs; create stable URLs; commission or compose a 1200 × 630 social image with a readable headline and `og:image:alt`; make the 30-second captioned clip; confirm the visual and audio rights for each deliverable; send this kit first to a small group of jazz players, educators, and music writers. Use their reactions to sharpen the public story before paying for reach.
+Choose and verify three featured pairs; confirm their URLs and social preview in the deployed build; make the 30-second captioned clip; confirm the visual and audio rights for each deliverable using the asset register; add a named press contact before sending the kit externally; send it first to a small group of jazz players, educators, and music writers. Use their reactions to sharpen the public story before paying for reach.
