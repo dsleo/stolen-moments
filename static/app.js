@@ -360,6 +360,8 @@ async function playTranscript(notes){
     state.sources.push(oscillator);
   }
 }
+function stopTranscript(){for(const source of state.sources){try{source.stop()}catch{}}state.sources=[]}
+window.StolenMoments={playTranscript,stopPlayback:stopTranscript};
 
 document.addEventListener('click',event=>{
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}

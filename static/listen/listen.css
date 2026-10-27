@@ -1,0 +1,52 @@
+.listen-entry{border:1px solid #a54d32!important;border-radius:999px;background:#a54d32!important;color:#fff!important;padding:.55rem 1rem!important;font:600 .83rem 'DM Sans',sans-serif;letter-spacing:.02em;cursor:pointer}
+.listen-entry:hover,.listen-entry:focus-visible{background:#853f2a!important}
+.listen-dialog{width:min(760px,calc(100vw - 24px));max-height:min(92dvh,900px);padding:0;border:1px solid #797d6d;border-radius:16px;background:#f4f0e6;color:#262b22;box-shadow:0 24px 90px #12181080}
+.listen-dialog::backdrop{background:#101711af;backdrop-filter:blur(3px)}
+.listen-shell{padding:clamp(18px,4vw,38px);overflow:auto;max-height:92dvh}
+.listen-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;border-bottom:1px solid #c9c5b7;padding-bottom:1.1rem}
+.listen-header h2{font:400 clamp(2rem,5vw,3.5rem)/1.05 Fraunces,Georgia,serif;margin:.15rem 0 0}
+.listen-header h2 em{color:#a54d32;font-weight:400}
+.listen-header>button{border:1px solid #b5b8aa;background:transparent;border-radius:50%;width:44px;height:44px;font-size:1.75rem;line-height:1;cursor:pointer;flex:none}
+.listen-intro{max-width:50ch;margin:1rem 0 1.5rem;font-size:1rem;line-height:1.5}
+.listen-actions,.listen-controls{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem}
+.listen-actions button,.listen-upload,.listen-controls button,.listen-results button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #4f5847;background:transparent;color:#293126;border-radius:8px;min-height:44px;padding:.6rem .9rem;font:600 .85rem 'DM Sans',sans-serif;cursor:pointer;text-decoration:none}
+.listen-actions .listen-primary,.listen-controls #listen-stop{background:#303d2e;color:#fff;border-color:#303d2e}
+.listen-actions button:hover,.listen-upload:hover,.listen-controls button:hover,.listen-results button:hover{border-color:#a54d32;box-shadow:inset 0 0 0 1px #a54d32}
+.listen-upload input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%)}
+.listen-example-label{display:inline-flex;align-items:center;gap:.45rem;font:600 .78rem 'DM Sans',sans-serif;color:#596052}
+.listen-example-label select{min-height:44px;border:1px solid #4f5847;border-radius:8px;background:#f4f0e6;color:#293126;padding:.45rem;font:500 .83rem 'DM Sans',sans-serif}
+.listen-upload:focus-within{outline:2px solid #a54d32;outline-offset:2px}
+.listen-activity{display:flex;align-items:center;gap:.6rem;margin-top:1.4rem;font-size:.9rem;min-height:1.5rem}
+#listen-led{width:10px;height:10px;border-radius:50%;background:#8a9382;flex:none}
+.listen-dialog[data-mode=recording] #listen-led,.listen-dialog[data-mode=live] #listen-led{background:#a54d32;box-shadow:0 0 0 4px #a54d3230}
+#listen-time{font-variant-numeric:tabular-nums;margin-left:auto;color:#5f6759}
+.listen-meter{height:5px;background:#d2d2c7;border-radius:10px;margin:.65rem 0 1rem;overflow:hidden}
+.listen-meter span{display:block;height:100%;width:0;background:#a54d32;transition:width .12s ease-out}
+.listen-controls{min-height:44px}
+.listen-note-preview{margin:1rem 0;padding:.75rem 1rem;background:#e8e7db;border-left:3px solid #a54d32;font-size:.85rem;line-height:1.5}
+.listen-downloads{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0}
+.listen-downloads[hidden]{display:none}
+.listen-downloads button{border:0;background:none;padding:.2rem;color:#85402c;text-decoration:underline;text-underline-offset:3px;font:600 .78rem 'DM Sans',sans-serif;cursor:pointer}
+.listen-results{margin-top:1.45rem;border-top:1px solid #c9c5b7}
+.listen-results-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+.listen-results h3{font:400 1.5rem Fraunces,Georgia,serif;margin:1rem 0}
+#listen-result-count{font-size:.78rem;color:#5f6759}
+.listen-empty{color:#5f6759;line-height:1.5;margin:.8rem 0 1.5rem}
+.listen-result{padding:1rem 0;border-top:1px solid #d6d3c8}
+.listen-result:first-child{border-top:0}
+.listen-result-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem}
+.listen-result h4{font:500 1.13rem Fraunces,Georgia,serif;margin:0}
+.listen-result-meta{font-size:.83rem;color:#596052;margin:.32rem 0 .75rem}
+.listen-result-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.listen-result a{color:#85402c;font-size:.84rem;font-weight:600;text-underline-offset:3px;margin-left:.2rem}
+.listen-compare{margin-top:.7rem;background:#e8e7db;padding:.8rem;overflow:auto;font-size:.8rem;line-height:1.7}
+.listen-compare table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.listen-compare caption{text-align:left;padding-bottom:.4rem;color:#596052}
+.listen-compare th,.listen-compare td{text-align:left;padding:.2rem .5rem;border-bottom:1px solid #d1d1c5}
+.listen-help{border-top:1px solid #c9c5b7;margin-top:1.5rem;padding-top:.8rem;font-size:.83rem;color:#596052}
+.listen-help summary{cursor:pointer;font-weight:600}
+.listen-help p{line-height:1.5}
+.listen-help pre{overflow:auto;max-height:200px;padding:.6rem;background:#e8e7db;color:#293126;font-size:.7rem}
+.listen-dialog :focus-visible{outline:2px solid #a54d32;outline-offset:2px}
+@media(max-width:550px){.listen-shell{padding:18px}.listen-result-head{display:block}.listen-result-actions button,.listen-result-actions a{margin-top:.25rem}}
+@media(prefers-reduced-motion:reduce){.listen-meter span{transition:none}}

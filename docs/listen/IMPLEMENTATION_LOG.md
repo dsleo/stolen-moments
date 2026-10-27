@@ -1,0 +1,66 @@
+# Listen & Find implementation record
+
+27 October 2026, branch `codex/live-solo-search`. Base commit `058aa70`.
+This document records measured evidence and remaining verification, not user
+acceptance. The user checklist is in `BROWSER_CHECKLIST.md`.
+
+## Delivered
+
+- Complete deterministic static corpus of 456 WJazzD solos and 200,809 notes,
+  including solos absent from precomputed pair rows. Eight compressed shards total
+  about 3.8 MB. Source SHA-256:
+  `af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12`.
+- Static corpus and model-asset validators, with checksums and recording-link
+  provenance/timing. Model/runtime assets are local and version pinned.
+- Browser microphone/file recording, Basic Pitch transcription, conversion to
+  note arrays, search against every source solo, ranked passage inspection,
+  synthesis, recording links, JSON/MIDI download and cancellation.
+- A separate lightweight monophonic pitch tracker supplies continuous results
+  in short overlapping chunks; note events are searched in a rolling 15-second
+  phrase. Capture is limited to five minutes and does not upload audio.
+- Clear, transposed/slower and silence WAV examples generated deterministically
+  from WJazzD notes. No source recording audio is redistributed.
+- Dedicated branch/PR CI checks; deployment remains on `main` only.
+
+## Checks run locally
+
+| Check | Result |
+| --- | --- |
+| `python -m jazzmine.listen_validate` | 456 solos, 200,809 notes, 8 shards; passed |
+| `npm run verify:listen` | 5 local model/runtime assets; passed |
+| `npm run build:listen` then corpus validation | Passed; asset hashes consistent |
+| `python -m pytest -q` | 35 passed |
+| `npm run test:listen:unit` | 17 passed |
+| `npm run test:browser` | 13 passed, 1 macOS fake-microphone skip; includes actual model, upload, live tracker, subpath, keyboard/a11y and old archive smoke |
+| Focused debug-panel browser test | 1 passed |
+| Browser real-model examples | Clear and +7 semitone/1.25× slower both found Paul Desmond, “Alianca” |
+| Browser live tracker + corpus | Known synthetic phrase recovered |
+| Browser upload and `/stolen-moments/` subpath | Passed in a later focused run |
+| Symbolic pilot, `npm run benchmark:listen -- --count=12` | 60/60 positive variant cases, 0/12 random negative matches; search p95 933 ms on darwin/arm64 |
+
+The symbolic pilot report and case-level data are in `benchmark.md` and
+`benchmark.json`. These test queries use known corpus notes; they do not estimate
+accuracy on instrument recordings. The built-in WAV examples use a synthesizer
+and exercise the actual Basic Pitch model in a browser.
+
+## Measured limitations and unfinished evidence
+
+- Basic Pitch runs on the TF.js CPU backend in a browser Worker. On this Mac,
+  one warmed 10-second synthetic clip took about 17 seconds and a 15-second clip
+  about 32 seconds. The plan's 5-second transcription target is not met. The
+  faster continuous tracker is used for live mode; its real-instrument quality
+  remains unmeasured. See `MODEL_SPIKE.md`.
+- No 40-clip, permission-cleared saxophone/trumpet set was available, so the
+  plan's held-out real-audio recall and false-positive gates remain unverified.
+- The physical Chrome/Safari microphone and five-minute memory checks remain
+  for a human device run. A headless macOS fake microphone stalled during
+  AudioWorklet initialization; capture now times out with a recovery message.
+  A fake-microphone browser test is included for non-macOS CI, but has not yet
+  passed on that host.
+- Firefox and WebKit real-model inference, cross-device p95 latency, and PR CI
+  on the remote host have not yet been observed.
+
+Do not present those missing measurements as passes. The browser checklist makes
+them directly checkable from the local preview. If instrument accuracy is poor,
+collect consented audio with reference notes and tune transcription/search
+settings on validation clips before claiming release readiness.

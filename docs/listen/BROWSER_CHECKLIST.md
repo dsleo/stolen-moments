@@ -1,0 +1,43 @@
+# Listen & Find browser check
+
+This checklist is for the `codex/live-solo-search` branch. The feature runs from
+committed static files. Start a local preview from the repository root:
+
+```sh
+rtk python -m http.server 8766 --bind 127.0.0.1 --directory static
+```
+
+Open http://127.0.0.1:8766/ in Chrome, Firefox or Safari. If port 8766 is busy,
+use another port and open that URL. Allow the microphone only when you try the
+recording steps. A built-in example can be used without a microphone.
+
+Mark each row yourself. The expected reference for the clear and transposed
+examples is **Paul Desmond, “Alianca”**. These examples synthesize a phrase from
+the archive; they are integration checks, not evidence about saxophone accuracy.
+
+| Check | Action | Expected result | Your result |
+| --- | --- | --- | --- |
+| Archive | Lift the lid; browse Crate, Echoes, filters and a pair | Existing archive responds as before | ☐ |
+| Open | Select Listen & Find | Dialog opens and explains that audio stays in browser | ☐ |
+| Clear example | Select Clear melody, then Try example | Detected notes and Paul Desmond passage in top five | ☐ |
+| Changed key/tempo | Select Higher and slower, then Try example | Same passage appears; shift is shown | ☐ |
+| Quiet example | Select Quiet recording, then Try example | Clear no-sound message, no confident match | ☐ |
+| Comparison | Play your notes, play passage, Compare notes | Audible and visually aligned phrase; only one playback at a time | ☐ |
+| Microphone | Record a supplied/known 8–16 note phrase, then Stop | Level moves, mic indicator ends, results reflect new notes | ☐ |
+| Permission | Deny microphone, then choose a short WAV | Recovery message; file still works | ☐ |
+| Continuous | Start continuous listening; play one reference phrase twice | Suggestions update while recording and stabilize | ☐ |
+| Change phrase | Play a different known phrase | Old suggestion expires, new suggestion appears | ☐ |
+| Stop | Stop or close during processing | Mic indicator turns off, no stale result appears later | ☐ |
+| Reset | Clear and start again | Fresh session; earlier audio is gone | ☐ |
+| Accessibility | Use keyboard only, then narrow browser to mobile width | Controls remain reachable, focus visible, no sideways scroll | ☐ |
+| Source | Open a source recording when offered | Recording link/provenance shown; timestamp only when known | ☐ |
+| Long run | Let continuous mode reach five minutes | Session stops, no accumulating delay, restart works | ☐ |
+
+An arbitrary improvised melody may have no close counterpart in this finite
+collection. Use the supplied example or a known archive phrase for a positive
+check. Please note browser/device versions and any failed step when reporting
+feedback.
+
+Implementation agents should record their own measured results separately in
+`docs/listen/IMPLEMENTATION_LOG.md`; these boxes represent the user's check, not
+an automated pass.

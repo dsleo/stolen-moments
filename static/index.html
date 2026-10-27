@@ -28,8 +28,10 @@
   <link rel="stylesheet" href="desk.css?v=release-9">
   <link rel="stylesheet" href="crate.css?v=release-13">
   <link rel="stylesheet" href="echoes.css?v=release-14">
+  <link rel="stylesheet" href="listen/listen.css?v=1">
   <script src="catalog.js?v=release-8" defer></script>
   <script src="app.js?v=release-22" defer></script>
+  <script type="module" src="listen/listen.js?v=1"></script>
 </head>
 <body>
   <noscript><p class="noscript-message">Stolen Moments needs JavaScript to search the phrase archive and play transcriptions.</p></noscript>
@@ -73,6 +75,7 @@
         <div class="desk-actions" inert>
           <button id="close-deck" type="button" aria-label="Close the lid and return home"><span aria-hidden="true">↙</span> Close the lid</button>
           <a href="#explore">Explore passages <span aria-hidden="true">↓</span></a>
+          <button id="open-listen" class="listen-entry" type="button" aria-haspopup="dialog">Listen &amp; Find <span aria-hidden="true">↗</span></button>
         </div>
         <p id="desk-status" class="sr-only" role="status"></p>
       </section>
@@ -106,6 +109,27 @@
   </div>
   <input id="performer" type="hidden">
   <dialog id="pair-dialog" class="pair-dialog" aria-labelledby="pair-dialog-title"></dialog>
+  <dialog id="listen-dialog" class="listen-dialog" aria-labelledby="listen-title">
+    <div class="listen-shell">
+      <header class="listen-header"><div><p class="small-caps">A phrase from where you are</p><h2 id="listen-title">Listen <em>&amp; Find</em></h2></div><button id="listen-close" type="button" aria-label="Close Listen and Find">×</button></header>
+      <p class="listen-intro">Play one instrument for a few seconds. Your audio stays in this browser.</p>
+      <div class="listen-actions">
+        <button id="listen-record" class="listen-primary" type="button">Record a phrase</button>
+        <button id="listen-live" type="button">Listen continuously</button>
+        <label class="listen-example-label">Example <select id="listen-example-kind"><option value="clear">Clear melody</option><option value="transposed">Higher and slower</option><option value="silence">Quiet recording</option></select></label>
+        <button id="listen-example" type="button">Try example</button>
+        <label class="listen-upload">Choose an audio file<input id="listen-file" type="file" accept="audio/wav,audio/mpeg,audio/ogg,audio/flac,audio/*"></label>
+      </div>
+      <div class="listen-activity"><span id="listen-led" aria-hidden="true"></span><span id="listen-status" role="status" aria-live="polite">Ready when you are.</span><time id="listen-time">00:00</time></div>
+      <div class="listen-meter" role="meter" aria-label="Microphone level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="listen-level"></span></div>
+      <div class="listen-controls"><button id="listen-stop" type="button" hidden>Stop</button><button id="listen-cancel" type="button" hidden>Cancel</button><button id="listen-clear" type="button" hidden>Clear</button></div>
+      <div id="listen-note-preview" class="listen-note-preview" hidden></div>
+      <div id="listen-downloads" class="listen-downloads" hidden><button id="listen-export-json" type="button">Download detected notes · JSON</button><button id="listen-export-midi" type="button">Download detected notes · MIDI</button></div>
+      <section class="listen-results" aria-labelledby="listen-results-title"><div class="listen-results-head"><h3 id="listen-results-title">Closest passages</h3><span id="listen-result-count"></span></div><div id="listen-result-list"><p class="listen-empty">Play a phrase to search every solo in the collection.</p></div></section>
+      <details id="listen-debug" class="listen-help" hidden><summary>Technical details</summary><pre id="listen-debug-text"></pre></details>
+      <details class="listen-help"><summary>What works best?</summary><p>Use a clear, single-note instrument close to the microphone. A quiet room helps. The matches are suggestions for listening, not proof of a quotation.</p></details>
+    </div>
+  </dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
