@@ -191,7 +191,7 @@ footer span{display:block;margin-bottom:5px}}
 .pair-card-head h2{font-size:36px}
 .pair-card-score{grid-template-columns:repeat(2,1fr);gap:16px}
 .artist-panel{padding:24px 4px 28px}
-.artist-heading h3{font-size:26px}
+.artist-heading h3{font-size:26px}}
 @media(prefers-reduced-motion:reduce){.record{animation:none}}
 .record{z-index:1}
 /* Signal Cut — the home page is a working jazz instrument{position:relative;isolation:isolate;min-height:calc(100vh - 60px);padding:clamp(52px,8vw,118px) clamp(24px,7vw,116px) clamp(54px,7vw,104px);grid-template-columns:minmax(300px,.9fr) minmax(460px,1.12fr);gap:clamp(24px,5vw,86px);background:linear-gradient(112deg,#f4f0e5 0 48%,#e8ddc7 100%)}

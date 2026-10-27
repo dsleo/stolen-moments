@@ -215,13 +215,19 @@ function alignmentPanel(d){
     return `<tr class="${paired?'':'alignment-gap'}"><th scope="row">${index+1}</th><td>${esc(aText)}</td><td>${esc(bText)}</td><td>${result}</td></tr>`;
   }).join('');
   const skipped=d.alignment.filter(([a,b])=>a<0||b<0).length;
-  return `<section class="alignment-panel" aria-labelledby="alignment-title">
-    <h3 id="alignment-title">Note-by-note alignment</h3>
-    <p>Each row shows how notes were paired. ${skipped?`${skipped} extra note${skipped===1?' was':'s were'} skipped.`:'No notes were skipped.'}</p>
-    <div class="alignment-table-scroll" tabindex="0" aria-label="Scrollable note alignment table">
-      <table class="alignment-table"><caption>${d.alignment.length} alignment steps between passages A and B</caption><thead><tr><th scope="col">Step</th><th scope="col">A · ${esc(d.a.performer)}</th><th scope="col">B · ${esc(d.b.performer)}</th><th scope="col">Alignment</th></tr></thead><tbody>${rows}</tbody></table>
-    </div>
-  </section>`;
+  return `<details class="alignment-disclosure">
+    <summary aria-label="Show note-by-note alignment" title="Show note-by-note alignment">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 10l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span>Compare notes</span>
+    </summary>
+    <section class="alignment-panel" aria-labelledby="alignment-title">
+      <h3 id="alignment-title">Note-by-note alignment</h3>
+      <p>Each row shows how notes were paired. ${skipped?`${skipped} extra note${skipped===1?' was':'s were'} skipped.`:'No notes were skipped.'}</p>
+      <div class="alignment-table-scroll" tabindex="0" aria-label="Scrollable note alignment table">
+        <table class="alignment-table"><caption>${d.alignment.length} alignment steps between passages A and B</caption><thead><tr><th scope="col">Step</th><th scope="col">A · ${esc(d.a.performer)}</th><th scope="col">B · ${esc(d.b.performer)}</th><th scope="col">Alignment</th></tr></thead><tbody>${rows}</tbody></table>
+      </div>
+    </section>
+  </details>`;
 }
 
 let abcLoad;
