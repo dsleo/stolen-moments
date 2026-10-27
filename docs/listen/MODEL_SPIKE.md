@@ -13,8 +13,9 @@
   explicitly identified as CPU in returned diagnostics.
 - The worker takes mono Float32 PCM at its true sample rate. Its windowed-sinc
   resampler converts to Basic Pitch's required 22,050 Hz before inference.
-- WAV/recording capture lifecycle uses an AudioWorklet. Audio is not sent to a
-  server; the asset fetches are GETs for locally hosted model files.
+- Microphone capture uses an AudioWorklet when available and falls back to
+  ScriptProcessor when worklet startup fails. Audio is not sent to a server;
+  the asset fetches are GETs for locally hosted model files.
 
 Model weight SHA-256: `b142a95737a52e1e412d5f92e73d8bb80dfe8d04941acc0702f11f4524fb377c`.
 Model JSON SHA-256: `1ed1aaee3409ec1dc098c8b01f430c0911f6fe9412e7af8086750f9e8f302f68`.

@@ -31,7 +31,7 @@ acceptance. The user checklist is in `BROWSER_CHECKLIST.md`.
 | `npm run build:listen` then corpus validation | Passed; asset hashes consistent |
 | `python -m pytest -q` | 35 passed |
 | `npm run test:listen:unit` | 17 passed |
-| `npm run test:browser` | 13 passed, 1 macOS fake-microphone skip; includes actual model, upload, live tracker, subpath, keyboard/a11y and old archive smoke |
+| `npm run test:browser` | 15 passed, including actual model, upload, fake microphone, live tracker, subpath, keyboard/a11y and old archive smoke |
 | Focused debug-panel browser test | 1 passed |
 | Browser real-model examples | Clear and +7 semitone/1.25× slower both found Paul Desmond, “Alianca” |
 | Browser live tracker + corpus | Known synthetic phrase recovered |
@@ -53,10 +53,10 @@ and exercise the actual Basic Pitch model in a browser.
 - No 40-clip, permission-cleared saxophone/trumpet set was available, so the
   plan's held-out real-audio recall and false-positive gates remain unverified.
 - The physical Chrome/Safari microphone and five-minute memory checks remain
-  for a human device run. A headless macOS fake microphone stalled during
-  AudioWorklet initialization; capture now times out with a recovery message.
-  A fake-microphone browser test is included for non-macOS CI, but has not yet
-  passed on that host.
+  for a human device run. Headless Chromium on macOS stalled during
+  AudioWorklet initialization, so capture now falls back to ScriptProcessor.
+  The fake-microphone browser test records and identifies the built-in phrase
+  locally on macOS. The Linux CI rerun is pending.
 - Firefox and WebKit real-model inference, cross-device p95 latency, and PR CI
   on the remote host have not yet been observed.
 

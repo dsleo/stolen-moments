@@ -20,7 +20,8 @@ export class CaptureSession {
 
   async start() {
     if (this.active) throw new Error('Microphone is already recording.');
-    if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext || !window.AudioWorkletNode) {
+    if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext ||
+        (!window.AudioWorkletNode && !window.AudioContext.prototype.createScriptProcessor)) {
       throw new Error('This browser cannot record microphone audio here. Try a current browser over HTTPS or localhost.');
     }
     const epoch = ++this.epoch;
@@ -43,14 +44,36 @@ export class CaptureSession {
         throw new Error('Recording was cancelled.');
       }
       context = new AudioContext({latencyHint: 'interactive'});
-      await withTimeout(context.audioWorklet.addModule(new URL('./pcm-worklet.js', import.meta.url)),
-        10000, 'Microphone audio processing could not start. Please try another browser.');
       if (epoch !== this.epoch) throw new Error('Recording was cancelled.');
       const source = context.createMediaStreamSource(stream);
-      const node = new AudioWorkletNode(context, 'listen-pcm', {
-        numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1],
-      });
-      node.port.onmessage = event => this.handleMessage(event.data, epoch);
+      let node;
+      if (window.AudioWorkletNode && context.audioWorklet) {
+        try {
+          await withTimeout(context.audioWorklet.addModule(new URL('./pcm-worklet.js', import.meta.url)),
+            3000, 'AudioWorklet did not start.');
+          if (epoch !== this.epoch) throw new Error('Recording was cancelled.');
+          node = new AudioWorkletNode(context, 'listen-pcm', {
+            numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1],
+          });
+          node.port.onmessage = event => this.handleMessage(event.data, epoch);
+        } catch (error) {
+          if (epoch !== this.epoch || !context.createScriptProcessor) throw error;
+        }
+      }
+      if (!node) {
+        node = context.createScriptProcessor(2048, 1, 1);
+        node.onaudioprocess = event => {
+          const input = event.inputBuffer;
+          const chunk = new Float32Array(input.length);
+          for (let channel = 0; channel < input.numberOfChannels; channel++) {
+            const samples = input.getChannelData(channel);
+            for (let i = 0; i < chunk.length; i++) chunk[i] += samples[i] / input.numberOfChannels;
+          }
+          event.outputBuffer.getChannelData(0).fill(0);
+          this.handleMessage({type: 'pcm', chunk}, epoch);
+        };
+      }
+      this.sampleRate = context.sampleRate;
       source.connect(node);
       node.connect(context.destination);
       await withTimeout(context.resume(), 10000,
@@ -60,7 +83,6 @@ export class CaptureSession {
       this.context = context;
       this.source = source;
       this.node = node;
-      this.sampleRate = context.sampleRate;
       this.active = true;
       return {sampleRate: this.sampleRate};
     } catch (error) {
@@ -100,12 +122,14 @@ export class CaptureSession {
   async stop() {
     if (!this.active) return {pcm: new Float32Array(), sampleRate: this.sampleRate || 0,
       durationSeconds: 0};
-    const token = ++this.flushToken || (this.flushToken = 1);
-    await new Promise(resolve => {
-      this.flushResolve = resolve;
-      this.node.port.postMessage({type: 'flush', token});
-      setTimeout(resolve, 250);
-    });
+    if (this.node.port) {
+      const token = ++this.flushToken || (this.flushToken = 1);
+      await new Promise(resolve => {
+        this.flushResolve = resolve;
+        this.node.port.postMessage({type: 'flush', token});
+        setTimeout(resolve, 250);
+      });
+    }
     const pcm = new Float32Array(this.samples);
     let offset = 0;
     for (const chunk of this.chunks) { pcm.set(chunk, offset); offset += chunk.length; }
@@ -136,9 +160,10 @@ export class CaptureSession {
     this.flushResolve?.();
     this.flushResolve = null;
     this.stream?.getTracks().forEach(track => track.stop());
+    if (this.node && 'onaudioprocess' in this.node) this.node.onaudioprocess = null;
     this.node?.disconnect();
     this.source?.disconnect();
-    this.node?.port.close();
+    this.node?.port?.close();
     if (this.context && this.context.state !== 'closed') await withTimeout(this.context.close(),
       2000, 'Audio cleanup timed out.').catch(() => {});
     this.stream = this.node = this.source = this.context = null;

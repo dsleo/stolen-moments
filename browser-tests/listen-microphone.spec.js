@@ -11,8 +11,7 @@ test.use({
   ]},
 });
 
-test('real AudioWorklet microphone route records, stops and searches',async({page})=>{
-  test.skip(process.platform==='darwin','Headless macOS fake media stalls in AudioWorklet; use physical browser checklist.');
+test('microphone route records, stops and searches',async({page})=>{
   test.setTimeout(120000);
   await page.goto('/');
   await page.locator('#landing-prompt').click();
