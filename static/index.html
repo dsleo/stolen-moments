@@ -28,10 +28,10 @@
   <link rel="stylesheet" href="desk.css?v=release-9">
   <link rel="stylesheet" href="crate.css?v=release-13">
   <link rel="stylesheet" href="echoes.css?v=release-14">
-  <link rel="stylesheet" href="listen/listen.css?v=2">
+  <link rel="stylesheet" href="listen/listen.css?v=3">
   <script src="catalog.js?v=release-8" defer></script>
-  <script src="app.js?v=release-22" defer></script>
-  <script type="module" src="listen/listen.js?v=2"></script>
+  <script src="app.js?v=release-23" defer></script>
+  <script type="module" src="listen/listen.js?v=3"></script>
 </head>
 <body>
   <noscript><p class="noscript-message">Stolen Moments needs JavaScript to search the phrase archive and play transcriptions.</p></noscript>
@@ -112,20 +112,21 @@
   <dialog id="listen-dialog" class="listen-dialog" aria-labelledby="listen-title">
     <div class="listen-shell">
       <header class="listen-header"><div><p class="small-caps">A phrase from where you are</p><h2 id="listen-title">Listen <em>&amp; Find</em></h2></div><button id="listen-close" type="button" aria-label="Close Listen and Find">×</button></header>
-      <p class="listen-intro">Play one instrument for a few seconds. Your audio stays in this browser.</p>
+      <p class="listen-intro">Play one instrument for 2–20 seconds, with at least eight notes. Your audio stays in this browser.</p>
       <div class="listen-actions">
-        <button id="listen-record" class="listen-primary listen-icon-action" type="button" aria-label="Record a phrase" title="Record a phrase"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></button>
+        <div class="listen-icon-control"><button id="listen-record" class="listen-primary listen-icon-action" type="button" aria-label="Record a phrase" title="Record a phrase"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5.5 10.5a6.5 6.5 0 0 0 13 0M12 17v4m-4 0h8"/></svg></button><span aria-hidden="true">Record</span></div>
         <label class="listen-example-label">Example <select id="listen-example-kind"><option value="clear">Clear melody</option><option value="transposed">Higher and slower</option><option value="silence">Quiet recording</option></select></label>
         <button id="listen-example" type="button">Try example</button>
-        <label class="listen-upload listen-icon-action" aria-label="Choose an audio file" title="Choose an audio file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7.5 7.5M12 3l4.5 4.5M4 16.5v2A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5v-2"/></svg><input id="listen-file" type="file" aria-label="Choose an audio file" accept="audio/wav,audio/mpeg,audio/ogg,audio/flac,audio/*"></label>
+        <div class="listen-icon-control"><label class="listen-upload listen-icon-action" aria-label="Choose an audio file" title="Choose an audio file"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m0 0L7.5 7.5M12 3l4.5 4.5M4 16.5v2A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5v-2"/></svg><input id="listen-file" type="file" aria-label="Choose an audio file" accept="audio/wav,audio/mpeg,audio/ogg,audio/flac,audio/*"></label><span aria-hidden="true">Upload</span></div>
       </div>
-      <details class="listen-help listen-help-near-actions"><summary>What works best?</summary><p>Use a clear, single-note instrument close to the microphone. A quiet room helps. The matches are suggestions for listening, not proof of a quotation.</p></details>
+      <details class="listen-help listen-help-near-actions"><summary>What works best?</summary><p>Use a clear, single-note instrument close to the microphone in a quiet room. Uploads should be under 20 MB. The match is a listening suggestion, not proof of a quotation.</p></details>
       <div class="listen-activity"><span id="listen-led" aria-hidden="true"></span><span id="listen-status" role="status" aria-live="polite">Ready when you are.</span><time id="listen-time">00:00</time></div>
+      <div id="listen-progress" class="listen-progress" hidden><div class="listen-progress-label"><span id="listen-progress-step">Preparing audio…</span><span id="listen-progress-percent"></span></div><div id="listen-progress-track" class="listen-progress-track" role="progressbar" aria-label="Phrase analysis progress" aria-valuemin="0" aria-valuemax="100"><span id="listen-progress-fill"></span></div><p>Transcription runs on your device. Longer phrases can take a little while.</p></div>
       <div class="listen-meter" role="meter" aria-label="Microphone level" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="listen-level"></span></div>
       <div class="listen-controls"><button id="listen-stop" type="button" hidden>Stop</button><button id="listen-cancel" type="button" hidden>Cancel</button><button id="listen-clear" type="button" hidden>Clear</button></div>
-      <section id="listen-note-preview" class="listen-note-preview" aria-labelledby="listen-your-title" hidden><div class="listen-your-head"><div><span class="score-letter">A</span><h3 id="listen-your-title">Your phrase</h3></div><button id="listen-play-detected" type="button" aria-label="Play detected MIDI notes" title="Play detected MIDI notes"><span aria-hidden="true">▶</span> Play detected notes</button></div><p id="listen-note-summary"></p><div class="listen-score-scroll" role="region" tabindex="0" aria-label="Scrollable score of your detected phrase"><div id="listen-your-score" class="listen-score-paper"></div></div></section>
+      <section id="listen-note-preview" class="listen-note-preview" aria-labelledby="listen-your-title" hidden><div class="listen-your-head"><div><span class="score-letter">A</span><h3 id="listen-your-title">Your phrase</h3></div><button id="listen-play-detected" type="button" data-play-text="Play detected notes" data-pause-text="Pause detected notes" data-resume-text="Resume detected notes" aria-label="Play detected notes as MIDI" title="Play detected notes as MIDI"><span data-play-icon aria-hidden="true">▶</span> <span data-play-text>Play detected notes</span></button></div><p id="listen-note-summary"></p><details id="listen-preview-details" class="listen-preview-details" open><summary>Detected score <span class="listen-scroll-hint">Scroll to see more notes →</span></summary><p id="listen-note-names"></p><div class="listen-score-scroll" role="region" tabindex="0" aria-label="Scrollable score of your detected phrase"><div id="listen-your-score" class="listen-score-paper"></div></div><p class="listen-score-note">The score rounds the rhythm. Playback follows detected timing; MIDI omits bends and dynamics.</p><details class="listen-note-timings"><summary>Note timings</summary><ol id="listen-note-timings-list"></ol></details></details></section>
       <div id="listen-downloads" class="listen-downloads" hidden><button id="listen-export-json" type="button">Download detected notes · JSON</button><button id="listen-export-midi" type="button">Download detected notes · MIDI</button></div>
-      <section class="listen-results" aria-labelledby="listen-results-title"><div class="listen-results-head"><h3 id="listen-results-title">Closest passages</h3><span id="listen-result-count"></span></div><div id="listen-result-list"><p class="listen-empty">Play a phrase to search every solo in the collection.</p></div></section>
+      <section class="listen-results" aria-labelledby="listen-results-title"><div class="listen-results-head"><h3 id="listen-results-title">Closest passages</h3><span id="listen-result-count"></span></div><p id="listen-result-explainer" class="listen-result-explainer" hidden>Pattern similarity ranks note and timing matches. It is not the chance that one solo quotes another.</p><div id="listen-result-list"><p class="listen-empty">Play a phrase to search every solo in the collection.</p></div></section>
       <details id="listen-debug" class="listen-help" hidden><summary>Technical details</summary><pre id="listen-debug-text"></pre></details>
     </div>
   </dialog>

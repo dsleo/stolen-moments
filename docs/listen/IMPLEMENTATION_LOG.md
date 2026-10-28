@@ -44,6 +44,26 @@ The symbolic pilot report and case-level data are in `benchmark.md` and
 accuracy on instrument recordings. The built-in WAV examples use a synthesizer
 and exercise the actual Basic Pitch model in a browser.
 
+## Follow-up design audit, 28 October 2026
+
+- Cleared the previous phrase, score, ranked results and downloads as soon as a
+  new recording, upload or example begins. A cancelled first score render cannot
+  repopulate the next phrase.
+- Exposed model loading, transcription percentage and archive search in the
+  dialog. The model remains CPU-bound; the progress display does not claim a
+  shorter processing time.
+- Kept a compact detected-phrase player above the results, with an expandable
+  score, pitch names and note timings. Explained rhythmic rounding and MIDI
+  omissions. Relabeled rankings as pattern similarity and expanded instrument
+  abbreviations.
+- Added visible Record and Upload captions, scroll cues, larger touch targets,
+  and dialog-scoped color tokens.
+- Made every note player in Listen and the catalog pair view change to Pause
+  while playing and Resume while paused. Switching players or closing a dialog
+  stops the previous rendition.
+- Local follow-up verification: 15/15 browser tests, 17/17 Listen unit tests,
+  model asset verification and a visual check at desktop and 390-pixel width.
+
 ## Measured limitations and unfinished evidence
 
 - Basic Pitch runs on the TF.js CPU backend in a browser Worker. On this Mac,

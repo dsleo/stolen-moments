@@ -22,15 +22,17 @@ the archive; they are integration checks, not evidence about saxophone accuracy.
 | Clear example | Select Clear melody, then Try example | Detected notes and Paul Desmond passage in top five | ☐ |
 | Changed key/tempo | Select Higher and slower, then Try example | Same passage appears; shift is shown | ☐ |
 | Quiet example | Select Quiet recording, then Try example | Clear no-sound message, no confident match | ☐ |
-| Comparison | Play your notes, play passage, Compare notes | Audible and visually aligned phrase; only one playback at a time | ☐ |
+| Comparison | Play your notes, pause and resume, then play the passage | The active button changes to Pause, then Resume; switching passages stops the earlier playback | ☐ |
 | Microphone | Record a supplied/known 8–16 note phrase, then Stop | Level moves, mic indicator ends, results reflect new notes | ☐ |
 | Permission | Deny microphone, then choose a short WAV | Recovery message; file still works | ☐ |
 | Stop | Stop or close during processing | Mic indicator turns off, no stale result appears later | ☐ |
-| Reset | Clear and start again | Fresh session; earlier audio is gone | ☐ |
+| Reset | Find the clear example, then try Quiet recording | Earlier results, score and downloads disappear immediately; no-sound message replaces them | ☐ |
 | Accessibility | Use keyboard only, then narrow browser to mobile width | Controls remain reachable, focus visible, no sideways scroll | ☐ |
 | Source | Open a source recording when offered | Recording link/provenance shown; timestamp only when known | ☐ |
-| Detected phrase | After recording, play the detected notes above the matches | The MIDI rendition plays and its score remains visible | ☐ |
+| Detected phrase | After recording, play the detected notes above the matches, then open Detected score | The MIDI rendition plays; the score, note names and timings are available above the matches | ☐ |
 | Pair view | Open a result's comparison | Your phrase and the archive passage appear as two scores with separate play controls | ☐ |
+| Progress | Run the clear example | Preparation, model loading, transcription percentage and archive search appear during processing | ☐ |
+| Score labels | Read the score and match notes | Rounded rhythm and MIDI limitations are explained; the ranking says pattern similarity | ☐ |
 
 An arbitrary improvised melody may have no close counterpart in this finite
 collection. Use the supplied example or a known archive phrase for a positive
