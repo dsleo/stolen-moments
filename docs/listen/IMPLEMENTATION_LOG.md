@@ -14,7 +14,7 @@ acceptance. The user checklist is in `BROWSER_CHECKLIST.md`.
   provenance/timing. Model/runtime assets are local and version pinned.
 - Browser microphone/file recording, Basic Pitch transcription, conversion to
   note arrays, search against every source solo, ranked passage inspection,
-  synthesis, recording links, JSON/MIDI download and cancellation.
+  MIDI-style note playback, recording links and cancellation.
 - A separate lightweight monophonic pitch tracker was built and tested during
   the pilot. The continuous listening control was removed from the interface
   after user review; phrase recording is the available microphone flow. Audio
@@ -68,6 +68,20 @@ and exercise the actual Basic Pitch model in a browser.
 - Limited branch CI to the pull request event. Running both push and PR checks
   for the same feature commit caused the shared Pages concurrency group to
   cancel one run and display a misleading failed check.
+
+## User-directed simplification, 28 October 2026
+
+- Matched the catalog pair's score layout and circular MIDI control in Listen.
+  The detected phrase and every result pair now use icon-only Play, Pause and
+  Resume buttons with accessible names.
+- Removed the pair toggle, alignment table, scroll prompts, score caveat, note
+  timings, similarity explainer, JSON/MIDI downloads, icon captions and Clear
+  button. A new recording, upload or example replaces the earlier phrase.
+- Shortened the introduction and kept the recording constraints in the nearby
+  help. During analysis, one progress line replaces the duplicate status line.
+- Verified the result at 626px and 390px widths. All 15 browser tests and 17
+  Listen unit tests passed; the focused browser test also checks the catalog's
+  circular button shape.
 
 ## Measured limitations and unfinished evidence
 

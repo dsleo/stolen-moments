@@ -14,7 +14,6 @@
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.55.1",
-    "@tonejs/midi": "^2.0.28",
     "esbuild": "0.25.12"
   },
   "dependencies": {

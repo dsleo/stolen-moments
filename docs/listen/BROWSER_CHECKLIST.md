@@ -26,13 +26,13 @@ the archive; they are integration checks, not evidence about saxophone accuracy.
 | Microphone | Record a supplied/known 8–16 note phrase, then Stop | Level moves, mic indicator ends, results reflect new notes | ☐ |
 | Permission | Deny microphone, then choose a short WAV | Recovery message; file still works | ☐ |
 | Stop | Stop or close during processing | Mic indicator turns off, no stale result appears later | ☐ |
-| Reset | Find the clear example, then try Quiet recording | Earlier results, score and downloads disappear immediately; no-sound message replaces them | ☐ |
+| Reset | Find the clear example, then try Quiet recording | Earlier results and score disappear immediately; no-sound message replaces them | ☐ |
 | Accessibility | Use keyboard only, then narrow browser to mobile width | Controls remain reachable, focus visible, no sideways scroll | ☐ |
 | Source | Open a source recording when offered | Recording link/provenance shown; timestamp only when known | ☐ |
-| Detected phrase | After recording, play the detected notes above the matches, then open Detected score | The MIDI rendition plays; the score, note names and timings are available above the matches | ☐ |
-| Pair view | Open a result's comparison | Your phrase and the archive passage appear as two scores with separate play controls | ☐ |
-| Progress | Run the clear example | Preparation, model loading, transcription percentage and archive search appear during processing | ☐ |
-| Score labels | Read the score and match notes | Rounded rhythm and MIDI limitations are explained; the ranking says pattern similarity | ☐ |
+| Detected phrase | After recording, play the detected notes above the matches, then open Detected score | The icon toggles Play/Pause/Resume; the score and note names are available above the matches | ☐ |
+| Pair view | Read a result | Your phrase and the archive passage are always shown as two scores with the catalog's circular play controls | ☐ |
+| Progress | Run the clear example | One analysis stage and transcription percentage appear during processing, without a duplicate status line | ☐ |
+| Score labels | Read a match | The ranking says pattern similarity | ☐ |
 
 An arbitrary improvised melody may have no close counterpart in this finite
 collection. Use the supplied example or a known archive phrase for a positive
