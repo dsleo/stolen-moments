@@ -21,6 +21,9 @@ test('mobile landing, archive, pair details, deep links, and method assets', asy
 
   await page.goto('/');
   const landing = page.locator('#landing');
+  await expect(landing.locator('.landing-meta,.landing-value')).toHaveCount(0);
+  await expect(landing.locator('#landing-title')).toBeVisible();
+  await expect(landing.locator('#landing-prompt')).toBeVisible();
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await expect(landing).toHaveAttribute('data-phase', 'closed');

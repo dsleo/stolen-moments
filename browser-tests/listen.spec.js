@@ -33,9 +33,15 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   await expect(dialog.locator('.listen-result').first()).toContainText('Paul Desmond');
   await expect(dialog.locator('.listen-result').first()).toContainText('pattern similarity');
   await expect(dialog.locator('.listen-result').first()).toContainText('Alto sax');
+  const recordingLink=dialog.locator('.listen-result').first().locator('h4 .listen-recording-link');
+  await expect(recordingLink).toHaveAttribute('aria-label',/Open recording of Paul Desmond/);
+  await expect(recordingLink).toHaveAttribute('target','_blank');
+  await expect(recordingLink.locator('span')).toHaveText('↗');
+  await expect(dialog.locator('.listen-result-actions')).toHaveCount(0);
   await expect(dialog.locator('#listen-result-explainer')).toHaveCount(0);
   await expect(dialog.locator('#listen-progress')).toBeHidden();
   await expect(dialog.locator('#listen-preview-details')).not.toHaveAttribute('open');
+  await expect(dialog.locator('#listen-note-preview .score-letter')).toHaveCount(0);
   await dialog.locator('#listen-preview-details > summary').click();
   await expect(dialog.locator('#listen-your-score svg')).toBeVisible();
   await expect(dialog.locator('#listen-play-detected')).toBeEnabled();

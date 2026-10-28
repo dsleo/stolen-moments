@@ -82,6 +82,9 @@ and exercise the actual Basic Pitch model in a browser.
 - Verified the result at 626px and 390px widths. All 15 browser tests and 17
   Listen unit tests passed; the focused browser test also checks the catalog's
   circular button shape.
+- Removed the landing image's small top labels and introductory paragraph after
+  user review. Moved the source recording action to an accessible icon beside
+  each match title and removed the letter badge from the detected phrase.
 
 ## Measured limitations and unfinished evidence
 

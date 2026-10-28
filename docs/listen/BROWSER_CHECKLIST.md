@@ -28,7 +28,7 @@ the archive; they are integration checks, not evidence about saxophone accuracy.
 | Stop | Stop or close during processing | Mic indicator turns off, no stale result appears later | ☐ |
 | Reset | Find the clear example, then try Quiet recording | Earlier results and score disappear immediately; no-sound message replaces them | ☐ |
 | Accessibility | Use keyboard only, then narrow browser to mobile width | Controls remain reachable, focus visible, no sideways scroll | ☐ |
-| Source | Open a source recording when offered | Recording link/provenance shown; timestamp only when known | ☐ |
+| Source | Select the arrow beside a match title when offered | Source recording opens; provenance and a timestamp appear only when known | ☐ |
 | Detected phrase | After recording, play the detected notes above the matches, then open Detected score | The icon toggles Play/Pause/Resume; the score and note names are available above the matches | ☐ |
 | Pair view | Read a result | Your phrase and the archive passage are always shown as two scores with the catalog's circular play controls | ☐ |
 | Progress | Run the clear example | One analysis stage and transcription percentage appear during processing, without a duplicate status line | ☐ |

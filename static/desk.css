@@ -32,11 +32,8 @@ body:not(.atlas-open) { overflow: hidden; }
 .desk-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg,#19140dc4,transparent 54%),linear-gradient(0deg,#19140d9c,transparent 32%); opacity: 1; transition: opacity 650ms cubic-bezier(.25,1,.5,1); }
 .listening-desk:not([data-phase="closed"]) .desk-shade { opacity: 0; }
 
-.landing-meta { position: absolute; top: clamp(24px,3vw,44px); left: clamp(24px,4vw,64px); right: clamp(24px,4vw,64px); display: flex; justify-content: space-between; gap: 24px; color: #ead8b2; text-transform: uppercase; letter-spacing: .16em; font-size: 9px; }
-.landing-meta span:last-child { color: #d9c9a8b8; }
 .landing-copy { position: absolute; left: clamp(24px,6vw,96px); bottom: clamp(40px,7vw,96px); max-width: 430px; }
 .landing-copy > p { margin: 0 0 16px; color: #d59a61; text-transform: uppercase; letter-spacing: .16em; font-size: 10px; }
-.landing-copy > p.landing-value { max-width: 360px; margin: 18px 0 0; color: #f1e6d2; font: 400 clamp(15px,1.35vw,18px)/1.5 var(--display); letter-spacing: 0; text-transform: none; text-shadow: 0 1px 10px #160f08; }
 .landing-copy h1 { font: 400 clamp(45px,5.1vw,82px)/.94 var(--display); letter-spacing: -.068em; margin: 0; color: #f6ecd6; text-shadow: 0 2px 18px #120d08a8; }
 .landing-prompt { display: flex; align-items: center; justify-content: space-between; gap: 56px; min-height: 44px; margin: 24px 0 0; padding: 12px 0; border: 0; border-top: 1px solid #ecd8ad60; background: transparent; text-transform: uppercase; letter-spacing: .16em; font-size: 10px; color: #f4e6c9; }
 .landing-prompt span { color: #e99a69; font-size: 17px; }
@@ -61,16 +58,13 @@ body:not(.atlas-open) { overflow: hidden; }
   .desk-photograph { mask-image: linear-gradient(transparent, #000 9%, #000 89%, transparent); }
   .desk-shade { background: linear-gradient(0deg,#211a12 3%,#211a1299 25%,transparent 55%); }
   .landing-copy { bottom: 7svh; right: 24px; }
-  .landing-copy > p.landing-value { max-width: 330px; }
   .landing-copy h1 { font-size: clamp(42px,10vw,64px); }
   .landing-copy > p { margin-bottom: 12px; }
   .landing-prompt { margin-top: 16px; }
-  .landing-meta { font-size: 8px; }
     .desk-actions { bottom: 24px; }
 }
 @media (max-width: 400px) {
   .landing-copy { left: 20px; right: 20px; bottom: 5svh; }
-  .landing-copy > p.landing-value { font-size: 15px; }
   .desk-actions { gap: 8px; flex-wrap: wrap; }
   .desk-actions button, .desk-actions a { gap: 8px; min-height: 44px; font-size: 9px; white-space: normal; }
 }
@@ -78,7 +72,6 @@ body:not(.atlas-open) { overflow: hidden; }
   .listening-desk { min-height: 100svh; }
   .landing-copy { bottom: 24px; }
   .landing-copy h1 { font-size: 42px; }
-  .landing-meta { top: 20px; }
   .desk-actions { bottom: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
