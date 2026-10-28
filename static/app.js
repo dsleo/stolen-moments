@@ -1,4 +1,4 @@
-const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredTotal:0,initialResultsReady:false,sort:'evidence'};
+const state = {offset:0,nextOffset:null,openId:null,lastTrigger:null,loading:false,request:0,details:{},audio:null,sources:[],playback:null,playbackRevision:0,items:[],decade:'',instrument:'',facetKind:'decade',facetData:null,portraits:{},echoPanel:null,catalog:null,filteredTotal:0,initialResultsReady:false,sort:'evidence'};
 const $ = s => document.querySelector(s);
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const pct = n => `${Math.round(n*100)}%`;
@@ -342,14 +342,18 @@ async function toggleDetail(buttonOrId){
   try{const detail=await state.catalog.detail(id);state.details[id]=detail;if(state.openId===id){dialog.innerHTML=detailHTML(detail);renderScores(detail)}}catch(err){dialog.innerHTML=`<div class="pair-loading"><strong>Could not open this pair.</strong><p>${esc(err.message)}</p><button type="button" class="drawer-done" data-close-pair>Close</button></div>`}
 }
 
-async function playTranscript(notes){
+async function playTranscript(notes,{owner=null,onStateChange=()=>{}}={}){
+  if(!notes?.length)return false;
   const Context=window.AudioContext||window.webkitAudioContext;
-  if(!Context){toast('Audio playback is unavailable in this browser');return}
+  if(!Context){toast('Audio playback is unavailable in this browser');return false}
+  stopTranscript();
   if(!state.audio)state.audio=new Context();
+  const revision=state.playbackRevision;
   await state.audio.resume();
-  for(const source of state.sources){try{source.stop()}catch{}}
-  state.sources=[];
+  if(revision!==state.playbackRevision)return false;
+  state.playback={owner,onStateChange,mode:'playing'};
   const start=state.audio.currentTime+.08,first=notes[0].onset;
+  let finalSource=null,finalTime=-Infinity;
   for(const note of notes){
     const oscillator=state.audio.createOscillator(),gain=state.audio.createGain();
     const at=start+Math.max(0,note.onset-first),duration=Math.max(.07,Math.min(note.duration,.8));
@@ -358,8 +362,17 @@ async function playTranscript(notes){
     gain.gain.exponentialRampToValueAtTime(.0001,at+duration);
     oscillator.connect(gain).connect(state.audio.destination);oscillator.start(at);oscillator.stop(at+duration+.02);
     state.sources.push(oscillator);
+    if(at+duration>finalTime){finalTime=at+duration;finalSource=oscillator}
   }
+  if(finalSource)finalSource.onended=()=>{if(revision===state.playbackRevision)stopTranscript()};
+  onStateChange('playing');
+  return true;
 }
+function stopTranscript(){state.playbackRevision++;for(const source of state.sources){try{source.stop()}catch{}}state.sources=[];const playback=state.playback;state.playback=null;playback?.onStateChange('stopped')}
+async function pauseTranscript(){const playback=state.playback;if(playback?.mode!=='playing')return;await state.audio.suspend();if(state.playback===playback){playback.mode='paused';playback.onStateChange('paused')}}
+async function resumeTranscript(){const playback=state.playback;if(playback?.mode!=='paused')return;await state.audio.resume();if(state.playback===playback){playback.mode='playing';playback.onStateChange('playing')}}
+function setCatalogPlayButton(button,mode){if(!button.isConnected)return;button.dataset.playLabel??=button.getAttribute('aria-label');button.dataset.playing=String(mode==='playing');button.setAttribute('aria-label',mode==='playing'?button.dataset.playLabel.replace(/^Play /,'Pause '):mode==='paused'?button.dataset.playLabel.replace(/^Play /,'Resume '):button.dataset.playLabel);button.title=mode==='playing'?'Pause MIDI transcription':mode==='paused'?'Resume MIDI transcription':'Play MIDI transcription';button.querySelector('span').textContent=mode==='playing'?'❚❚':'▶'}
+window.StolenMoments={playTranscript,pausePlayback:pauseTranscript,resumePlayback:resumeTranscript,stopPlayback:stopTranscript,getPlaybackState:owner=>state.playback?.owner===owner?state.playback.mode:'stopped'};
 
 document.addEventListener('click',event=>{
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
@@ -380,7 +393,7 @@ document.addEventListener('click',event=>{
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
   const match=event.target.closest('[data-match]');if(match){event.preventDefault();toggleDetail(match)}
   const alignmentToggle=event.target.closest('[data-toggle-alignment]');if(alignmentToggle){const panel=document.getElementById(alignmentToggle.getAttribute('aria-controls'));const open=panel.hidden;panel.hidden=!open;alignmentToggle.setAttribute('aria-expanded',String(open))}
-  const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d)playTranscript(d[`${play.dataset.play}_notes`])}
+  const play=event.target.closest('[data-play]');if(play){const d=state.details[Number(play.dataset.detail)];if(d){const mode=window.StolenMoments.getPlaybackState(play);if(mode==='playing')pauseTranscript();else if(mode==='paused')resumeTranscript();else playTranscript(d[`${play.dataset.play}_notes`],{owner:play,onStateChange:next=>setCatalogPlayButton(play,next)})}}
   if(event.target.closest('[data-close-pair]'))$('#pair-dialog').close();
 });
 document.addEventListener('keydown',event=>{const match=event.target.closest('[data-match]');if(match&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleDetail(match)}});
@@ -488,7 +501,7 @@ $('#enter-atlas').addEventListener('click',openDesk);
 $('[data-lift-lid]').addEventListener('click',openDesk);
 $('#close-deck').addEventListener('click',closeDesk);
 $('#pair-dialog').addEventListener('click',event=>{if(event.target===$('#pair-dialog'))$('#pair-dialog').close()});
-$('#pair-dialog').addEventListener('close',()=>{state.openId=null;clearPairURL();if(state.lastTrigger?.isConnected)state.lastTrigger.focus();else $('#crate-strip .crate-card')?.focus()});
+$('#pair-dialog').addEventListener('close',()=>{stopTranscript();state.openId=null;clearPairURL();if(state.lastTrigger?.isConnected)state.lastTrigger.focus();else $('#crate-strip .crate-card')?.focus()});
 
 async function init(){
   const perf=()=>new URLSearchParams(location.search).has('perf');

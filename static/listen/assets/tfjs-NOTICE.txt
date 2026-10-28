@@ -1,0 +1,3 @@
+@tensorflow/tfjs 3.21.0 - Apache License 2.0.
+Source: https://github.com/tensorflow/tfjs
+License: https://www.apache.org/licenses/LICENSE-2.0

@@ -1,0 +1,851 @@
+{
+  "summary": {
+    "kind": "symbolic-pilot",
+    "sourceSha256": "af6a0d9debf042c3581565bd75baad591d32e166cd2ec7298519883de614bf12",
+    "algorithmVersion": "listen-v1",
+    "node": "v25.9.0",
+    "platform": "darwin/arm64",
+    "count": 72,
+    "byVariant": {
+      "clean": {
+        "count": 12,
+        "hits": 12,
+        "candidateHits": 12,
+        "falsePositives": 0
+      },
+      "transposed+7": {
+        "count": 12,
+        "hits": 12,
+        "candidateHits": 12,
+        "falsePositives": 0
+      },
+      "tempo×1.25": {
+        "count": 12,
+        "hits": 12,
+        "candidateHits": 12,
+        "falsePositives": 0
+      },
+      "one-deleted": {
+        "count": 12,
+        "hits": 12,
+        "candidateHits": 12,
+        "falsePositives": 0
+      },
+      "one-pitch-error": {
+        "count": 12,
+        "hits": 12,
+        "candidateHits": 12,
+        "falsePositives": 0
+      },
+      "random-negative": {
+        "count": 12,
+        "hits": 0,
+        "candidateHits": 0,
+        "falsePositives": 0
+      }
+    },
+    "timingMs": {
+      "median": 674,
+      "p95": 933,
+      "max": 1221
+    },
+    "limitations": [
+      "Synthetic symbolic queries only; not held-out instrument recordings.",
+      "This pilot does not satisfy real-audio accuracy or physical microphone gates."
+    ]
+  },
+  "results": [
+    {
+      "soloId": 1,
+      "start": 166,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 933
+    },
+    {
+      "soloId": 1,
+      "start": 166,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 694
+    },
+    {
+      "soloId": 1,
+      "start": 166,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 648
+    },
+    {
+      "soloId": 1,
+      "start": 166,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9575012321069186,
+      "milliseconds": 608
+    },
+    {
+      "soloId": 1,
+      "start": 166,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.98375,
+      "milliseconds": 647
+    },
+    {
+      "soloId": 8,
+      "start": 132,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 717
+    },
+    {
+      "soloId": 8,
+      "start": 132,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 697
+    },
+    {
+      "soloId": 8,
+      "start": 132,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 693
+    },
+    {
+      "soloId": 8,
+      "start": 132,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9421942089123323,
+      "milliseconds": 648
+    },
+    {
+      "soloId": 8,
+      "start": 132,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.98375,
+      "milliseconds": 690
+    },
+    {
+      "soloId": 15,
+      "start": 18,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349159,
+      "milliseconds": 657
+    },
+    {
+      "soloId": 15,
+      "start": 18,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349159,
+      "milliseconds": 657
+    },
+    {
+      "soloId": 15,
+      "start": 18,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349159,
+      "milliseconds": 667
+    },
+    {
+      "soloId": 15,
+      "start": 18,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9443817098095386,
+      "milliseconds": 622
+    },
+    {
+      "soloId": 15,
+      "start": 18,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9746486214349159,
+      "milliseconds": 707
+    },
+    {
+      "soloId": 22,
+      "start": 132,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977422,
+      "milliseconds": 789
+    },
+    {
+      "soloId": 22,
+      "start": 132,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977422,
+      "milliseconds": 690
+    },
+    {
+      "soloId": 22,
+      "start": 132,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977422,
+      "milliseconds": 653
+    },
+    {
+      "soloId": 22,
+      "start": 132,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9544111345780414,
+      "milliseconds": 630
+    },
+    {
+      "soloId": 22,
+      "start": 132,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9610989588977422,
+      "milliseconds": 699
+    },
+    {
+      "soloId": 29,
+      "start": 15,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 690
+    },
+    {
+      "soloId": 29,
+      "start": 15,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 1,
+      "milliseconds": 662
+    },
+    {
+      "soloId": 29,
+      "start": 15,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9999999999999998,
+      "milliseconds": 662
+    },
+    {
+      "soloId": 29,
+      "start": 15,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9578947368421052,
+      "milliseconds": 612
+    },
+    {
+      "soloId": 29,
+      "start": 15,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.98375,
+      "milliseconds": 656
+    },
+    {
+      "soloId": 36,
+      "start": 125,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9920083386915384,
+      "milliseconds": 671
+    },
+    {
+      "soloId": 36,
+      "start": 125,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9920083386915384,
+      "milliseconds": 674
+    },
+    {
+      "soloId": 36,
+      "start": 125,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9920083386915385,
+      "milliseconds": 688
+    },
+    {
+      "soloId": 36,
+      "start": 125,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9476636129537563,
+      "milliseconds": 627
+    },
+    {
+      "soloId": 36,
+      "start": 125,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9757583386915384,
+      "milliseconds": 661
+    },
+    {
+      "soloId": 43,
+      "start": 359,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977309,
+      "milliseconds": 667
+    },
+    {
+      "soloId": 43,
+      "start": 359,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977309,
+      "milliseconds": 667
+    },
+    {
+      "soloId": 43,
+      "start": 359,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9773489588977309,
+      "milliseconds": 670
+    },
+    {
+      "soloId": 43,
+      "start": 359,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9366389190403472,
+      "milliseconds": 618
+    },
+    {
+      "soloId": 43,
+      "start": 359,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9610989588977309,
+      "milliseconds": 669
+    },
+    {
+      "soloId": 50,
+      "start": 264,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9746688605665605,
+      "milliseconds": 701
+    },
+    {
+      "soloId": 50,
+      "start": 264,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9746688605665605,
+      "milliseconds": 695
+    },
+    {
+      "soloId": 50,
+      "start": 264,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9746688605665605,
+      "milliseconds": 695
+    },
+    {
+      "soloId": 50,
+      "start": 264,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9411330668506845,
+      "milliseconds": 668
+    },
+    {
+      "soloId": 50,
+      "start": 264,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9584188605665606,
+      "milliseconds": 812
+    },
+    {
+      "soloId": 57,
+      "start": 115,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9779549184376708,
+      "milliseconds": 1045
+    },
+    {
+      "soloId": 57,
+      "start": 115,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9779549184376708,
+      "milliseconds": 830
+    },
+    {
+      "soloId": 57,
+      "start": 115,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9779549184376708,
+      "milliseconds": 1221
+    },
+    {
+      "soloId": 57,
+      "start": 115,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9465966487384534,
+      "milliseconds": 1000
+    },
+    {
+      "soloId": 57,
+      "start": 115,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9617049184376708,
+      "milliseconds": 813
+    },
+    {
+      "soloId": 64,
+      "start": 107,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9918092075174331,
+      "milliseconds": 782
+    },
+    {
+      "soloId": 64,
+      "start": 107,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9918092075174331,
+      "milliseconds": 692
+    },
+    {
+      "soloId": 64,
+      "start": 107,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9918092075174331,
+      "milliseconds": 685
+    },
+    {
+      "soloId": 64,
+      "start": 107,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9458476956291377,
+      "milliseconds": 679
+    },
+    {
+      "soloId": 64,
+      "start": 107,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9755592075174331,
+      "milliseconds": 684
+    },
+    {
+      "soloId": 71,
+      "start": 55,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349074,
+      "milliseconds": 703
+    },
+    {
+      "soloId": 71,
+      "start": 55,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349074,
+      "milliseconds": 706
+    },
+    {
+      "soloId": 71,
+      "start": 55,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9908986214349074,
+      "milliseconds": 687
+    },
+    {
+      "soloId": 71,
+      "start": 55,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9418125136227153,
+      "milliseconds": 629
+    },
+    {
+      "soloId": 71,
+      "start": 55,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9746486214349074,
+      "milliseconds": 693
+    },
+    {
+      "soloId": 78,
+      "start": 218,
+      "variant": "clean",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9733133447904775,
+      "milliseconds": 641
+    },
+    {
+      "soloId": 78,
+      "start": 218,
+      "variant": "transposed+7",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9733133447904775,
+      "milliseconds": 651
+    },
+    {
+      "soloId": 78,
+      "start": 218,
+      "variant": "tempo×1.25",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9733133447904775,
+      "milliseconds": 790
+    },
+    {
+      "soloId": 78,
+      "start": 218,
+      "variant": "one-deleted",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9118682204940873,
+      "milliseconds": 599
+    },
+    {
+      "soloId": 78,
+      "start": 218,
+      "variant": "one-pitch-error",
+      "expected": true,
+      "candidateHit": true,
+      "hit": true,
+      "returned": 1,
+      "topScore": 0.9570633447904775,
+      "milliseconds": 644
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 739
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 671
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 668
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 703
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 622
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 688
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 645
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 713
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 612
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 611
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 640
+    },
+    {
+      "soloId": null,
+      "start": null,
+      "variant": "random-negative",
+      "expected": false,
+      "candidateHit": false,
+      "hit": false,
+      "returned": 0,
+      "topScore": null,
+      "milliseconds": 651
+    }
+  ]
+}

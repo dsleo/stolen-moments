@@ -1,0 +1,31 @@
+{
+  "source": "WJazzD v2.1 note data; synthesized locally, no source audio",
+  "sourceLicense": "See static/DATA_LICENSE.txt",
+  "examples": [
+    {
+      "name": "clear",
+      "file": "clear.wav",
+      "soloId": 346,
+      "startNote": 133,
+      "noteCount": 16,
+      "pitchShift": 0,
+      "timeScale": 1,
+      "durationSeconds": 6.437
+    },
+    {
+      "name": "transposed",
+      "file": "transposed.wav",
+      "soloId": 346,
+      "startNote": 133,
+      "noteCount": 16,
+      "pitchShift": 7,
+      "timeScale": 1.25,
+      "durationSeconds": 7.796
+    },
+    {
+      "name": "silence",
+      "file": "silence.wav",
+      "expected": "no clear sound"
+    }
+  ]
+}

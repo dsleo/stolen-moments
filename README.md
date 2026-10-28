@@ -22,6 +22,7 @@ Open [http://127.0.0.1:8766](http://127.0.0.1:8766). It cannot be opened as `fil
 - **Passage view:** two score excerpts, a synthesized rendering of each (the database notes, not the original audio), and links into the source recordings.
 - **Pair links:** opening a passage gives it a shareable `?pair=` URL in the address bar, based on source solo IDs and starting note positions. A ranking reorder does not change these links; a pair removed by a future catalog rebuild cannot be reopened.
 - **Echoes:** a timeline of musicians and the strongest connections between them. Select a musician to trace who echoes whom.
+- **Listen & Find (feature branch):** record a single melodic instrument, upload a short audio file, or try a built-in example to search every WJazzD solo for similar note passages. A separate continuous mode updates suggestions as notes arrive. Audio is processed in the browser. See [the browser checklist](docs/listen/BROWSER_CHECKLIST.md) and [the model spike](docs/listen/MODEL_SPIKE.md) for tested behavior and limits.
 
 Scores are heuristics for listening, not evidence of quotation or influence.
 
@@ -36,6 +37,8 @@ python3 -m jazzmine download                 # WJazzD SQLite source -> data/wjaz
 python3 -m jazzmine sync-jazztube            # YouTube links with solo alignments
 python3 -m jazzmine.joint_store              # joint search -> data/joint-search.db (about 1 minute)
 python3 -m jazzmine.static_export            # -> static/catalog/
+npm ci && npm run build:listen                # -> static/listen/assets/ (local model)
+python3 -m jazzmine.listen_export            # -> static/catalog/listen/ (complete note corpus)
 ```
 
 The databases in `data/` stay on your computer and are excluded from Git; `static/catalog/` is the generated output that the site serves. Rebuild and re-export whenever the source, search settings or recording links change.

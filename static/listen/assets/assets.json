@@ -1,0 +1,22 @@
+{
+  "transcription-worker.bundle.js": {
+    "bytes": 1068514,
+    "sha256": "7494f8d694e50ca7917028afb195928ef38a19a2f2c36470458b12f0b7353db5"
+  },
+  "model.json": {
+    "bytes": 174537,
+    "sha256": "1ed1aaee3409ec1dc098c8b01f430c0911f6fe9412e7af8086750f9e8f302f68"
+  },
+  "group1-shard1of1.bin": {
+    "bytes": 742392,
+    "sha256": "b142a95737a52e1e412d5f92e73d8bb80dfe8d04941acc0702f11f4524fb377c"
+  },
+  "basic-pitch-LICENSE.txt": {
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  "tfjs-NOTICE.txt": {
+    "bytes": 142,
+    "sha256": "e362e3f9a580bc66ded6c93014b478188f9c51ece207e890951f73da0cc0d534"
+  }
+}

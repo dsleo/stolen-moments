@@ -21,6 +21,9 @@ test('mobile landing, archive, pair details, deep links, and method assets', asy
 
   await page.goto('/');
   const landing = page.locator('#landing');
+  await expect(landing.locator('.landing-meta,.landing-value')).toHaveCount(0);
+  await expect(landing.locator('#landing-title')).toBeVisible();
+  await expect(landing.locator('#landing-prompt')).toBeVisible();
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await expect(landing).toHaveAttribute('data-phase', 'closed');
@@ -66,6 +69,17 @@ test('mobile landing, archive, pair details, deep links, and method assets', asy
   await expect(dialog).toHaveAttribute('open', '');
   await expect(dialog.locator('.score-panel.a')).toBeVisible({ timeout: 60_000 });
   await expect(dialog.locator('.score-panel.b')).toBeVisible();
+  const playA=dialog.locator('.score-panel.a .score-play');
+  const playB=dialog.locator('.score-panel.b .score-play');
+  await playA.click();
+  await expect(playA).toHaveAttribute('aria-label',/^Pause MIDI transcription/);
+  await playA.click();
+  await expect(playA).toHaveAttribute('aria-label',/^Resume MIDI transcription/);
+  await playA.click();
+  await expect(playA).toHaveAttribute('aria-label',/^Pause MIDI transcription/);
+  await playB.click();
+  await expect(playA).toHaveAttribute('aria-label',/^Play MIDI transcription/);
+  await expect(playB).toHaveAttribute('aria-label',/^Pause MIDI transcription/);
   await expect(dialog.locator('.album-kind, .portrait-tag')).toHaveCount(0);
   await expect(dialog.locator('.alignment-panel')).toBeHidden();
   await dialog.getByRole('button', { name: /Compare notes/ }).click();

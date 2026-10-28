@@ -2,10 +2,21 @@
   "name": "stolen-moments-browser-gate",
   "private": true,
   "scripts": {
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "build:listen": "node scripts/build-listen.mjs",
+    "verify:listen": "node scripts/verify-listen.mjs",
+    "benchmark:listen": "node scripts/benchmark-listen.mjs",
+    "test:listen:unit": "node --test tests-js/listen/*.test.mjs",
+    "test:listen:browser": "playwright test browser-tests/listen*.spec.js",
+    "test:listen:model": "playwright test browser-tests/listen.spec.js browser-tests/listen-subpath.spec.js --grep 'example|uploaded WAV|subpath'",
+    "test:listen:live": "playwright test browser-tests/listen-live-worker.spec.js browser-tests/listen-microphone.spec.js"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
-    "@playwright/test": "1.55.1"
+    "@playwright/test": "1.55.1",
+    "esbuild": "0.25.12"
+  },
+  "dependencies": {
+    "@spotify/basic-pitch": "1.0.1"
   }
 }
