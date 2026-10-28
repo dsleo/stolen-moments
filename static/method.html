@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1;9..144,600,20,1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="styles.css?v=release-9">
-  <link rel="stylesheet" href="method.css?v=release-3">
+  <link rel="stylesheet" href="method.css?v=release-4">
 </head>
 <body class="methods-page">
   <a class="skip-link" href="#content">Skip to method</a>
@@ -37,6 +37,7 @@
     <div class="methods-layout">
       <nav class="methods-nav" aria-label="On this page">
         <p class="small-caps">Contents</p>
+        <a href="#listen-find">Listen &amp; Find</a>
         <a href="#corpus">01 &nbsp; Corpus</a>
         <a href="#retrieval">02 &nbsp; Retrieval</a>
         <a href="#scoring">03 &nbsp; Scoring</a>
@@ -44,6 +45,10 @@
         <a href="#references">References</a>
       </nav>
       <article class="methods-article">
+        <section id="listen-find" class="methods-section listen-method-section">
+          <div class="section-heading"><span>From sound to score</span><h2>Listen &amp; Find</h2></div>
+          <p>Record a short solo or upload audio. A <a href="https://github.com/spotify/basic-pitch-ts" target="_blank" rel="noopener noreferrer">local Basic Pitch</a> model transcribes it into notes, then the archive ranks similar passages from WJazzD. Play both scores to compare them. A clear, single-note line works best.</p>
+        </section>
         <section id="corpus" class="methods-section">
           <div class="section-heading"><span>01 / Input</span><h2>Corpus and representation</h2></div>
           <p>The input is the <a href="https://jazzomat.hfm-weimar.de/dbformat/dboverview.html">Weimar Jazz Database</a> (WJazzD), release 2.1: 456 manually prepared monophonic solo transcriptions, with 200,809 note events in this import. We use each note’s rounded semitone pitch, onset and duration in seconds, and the database beat grid. Metadata supplies performer, instrument, composition, and recording date. Other prepared collections are not included in the published index.<sup><a href="#ref-1">1</a></sup></p>
