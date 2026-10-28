@@ -25,13 +25,12 @@ the archive; they are integration checks, not evidence about saxophone accuracy.
 | Comparison | Play your notes, play passage, Compare notes | Audible and visually aligned phrase; only one playback at a time | ☐ |
 | Microphone | Record a supplied/known 8–16 note phrase, then Stop | Level moves, mic indicator ends, results reflect new notes | ☐ |
 | Permission | Deny microphone, then choose a short WAV | Recovery message; file still works | ☐ |
-| Continuous | Start continuous listening; play one reference phrase twice | Suggestions update while recording and stabilize | ☐ |
-| Change phrase | Play a different known phrase | Old suggestion expires, new suggestion appears | ☐ |
 | Stop | Stop or close during processing | Mic indicator turns off, no stale result appears later | ☐ |
 | Reset | Clear and start again | Fresh session; earlier audio is gone | ☐ |
 | Accessibility | Use keyboard only, then narrow browser to mobile width | Controls remain reachable, focus visible, no sideways scroll | ☐ |
 | Source | Open a source recording when offered | Recording link/provenance shown; timestamp only when known | ☐ |
-| Long run | Let continuous mode reach five minutes | Session stops, no accumulating delay, restart works | ☐ |
+| Detected phrase | After recording, play the detected notes above the matches | The MIDI rendition plays and its score remains visible | ☐ |
+| Pair view | Open a result's comparison | Your phrase and the archive passage appear as two scores with separate play controls | ☐ |
 
 An arbitrary improvised melody may have no close counterpart in this finite
 collection. Use the supplied example or a known archive phrase for a positive

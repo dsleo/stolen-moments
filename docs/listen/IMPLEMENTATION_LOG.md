@@ -15,9 +15,10 @@ acceptance. The user checklist is in `BROWSER_CHECKLIST.md`.
 - Browser microphone/file recording, Basic Pitch transcription, conversion to
   note arrays, search against every source solo, ranked passage inspection,
   synthesis, recording links, JSON/MIDI download and cancellation.
-- A separate lightweight monophonic pitch tracker supplies continuous results
-  in short overlapping chunks; note events are searched in a rolling 15-second
-  phrase. Capture is limited to five minutes and does not upload audio.
+- A separate lightweight monophonic pitch tracker was built and tested during
+  the pilot. The continuous listening control was removed from the interface
+  after user review; phrase recording is the available microphone flow. Audio
+  is not uploaded.
 - Clear, transposed/slower and silence WAV examples generated deterministically
   from WJazzD notes. No source recording audio is redistributed.
 - Dedicated branch/PR CI checks; deployment remains on `main` only.
@@ -52,8 +53,8 @@ and exercise the actual Basic Pitch model in a browser.
   remains unmeasured. See `MODEL_SPIKE.md`.
 - No 40-clip, permission-cleared saxophone/trumpet set was available, so the
   plan's held-out real-audio recall and false-positive gates remain unverified.
-- The physical Chrome/Safari microphone and five-minute memory checks remain
-  for a human device run. Headless Chromium on macOS stalled during
+- Physical Chrome/Safari microphone checks remain for a human device run.
+  Headless Chromium on macOS stalled during
   AudioWorklet initialization, so capture now falls back to ScriptProcessor.
   The fake-microphone browser test records and identifies the built-in phrase
   locally on macOS. The Linux CI rerun is pending.

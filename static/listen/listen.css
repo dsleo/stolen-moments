@@ -10,6 +10,10 @@
 .listen-intro{max-width:50ch;margin:1rem 0 1.5rem;font-size:1rem;line-height:1.5}
 .listen-actions,.listen-controls{display:flex;align-items:center;flex-wrap:wrap;gap:.6rem}
 .listen-actions button,.listen-upload,.listen-controls button,.listen-results button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #4f5847;background:transparent;color:#293126;border-radius:8px;min-height:44px;padding:.6rem .9rem;font:600 .85rem 'DM Sans',sans-serif;cursor:pointer;text-decoration:none}
+.listen-actions .listen-icon-action{width:46px;height:46px;padding:0;flex:none}
+.listen-icon-action svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.listen-upload{position:relative}
+.listen-actions .listen-primary:disabled,.listen-upload:has(input:disabled){opacity:.5;cursor:not-allowed}
 .listen-controls[hidden]{display:none}
 .listen-actions .listen-primary,.listen-controls #listen-stop{background:#303d2e;color:#fff;border-color:#303d2e}
 .listen-actions button:hover,.listen-upload:hover,.listen-controls button:hover,.listen-results button:hover{border-color:#a54d32;box-shadow:inset 0 0 0 1px #a54d32}
@@ -17,6 +21,8 @@
 .listen-example-label{display:inline-flex;align-items:center;gap:.45rem;font:600 .78rem 'DM Sans',sans-serif;color:#596052}
 .listen-example-label select{min-height:44px;border:1px solid #4f5847;border-radius:8px;background:#f4f0e6;color:#293126;padding:.45rem;font:500 .83rem 'DM Sans',sans-serif}
 .listen-upload:focus-within{outline:2px solid #a54d32;outline-offset:2px}
+.listen-help-near-actions{margin:.85rem 0 0;padding:.65rem 0;border-top:0;border-bottom:1px solid #c9c5b7}
+.listen-help-near-actions p{margin:.5rem 0 .25rem}
 .listen-activity{display:flex;align-items:center;gap:.6rem;margin-top:1.4rem;font-size:.9rem;min-height:1.5rem}
 #listen-led{width:10px;height:10px;border-radius:50%;background:#8a9382;flex:none}
 .listen-dialog[data-mode=recording] #listen-led,.listen-dialog[data-mode=live] #listen-led{background:#a54d32;box-shadow:0 0 0 4px #a54d3230}
@@ -24,7 +30,18 @@
 .listen-meter{height:5px;background:#d2d2c7;border-radius:10px;margin:.65rem 0 1rem;overflow:hidden}
 .listen-meter span{display:block;height:100%;width:0;background:#a54d32;transition:width .12s ease-out}
 .listen-controls{min-height:44px}
-.listen-note-preview{margin:1rem 0;padding:.75rem 1rem;background:#e8e7db;border-left:3px solid #a54d32;font-size:.85rem;line-height:1.5}
+.listen-note-preview{margin:1.2rem 0;padding:1rem;background:#e8e7db;font-size:.85rem;line-height:1.5}
+.listen-your-head,.listen-your-head>div,.listen-pair-side-head{display:flex;align-items:center;gap:.65rem}
+.listen-your-head{justify-content:space-between;flex-wrap:wrap}
+.listen-your-head h3{font:400 1.35rem Fraunces,Georgia,serif;margin:0}
+.listen-your-head button,.listen-pair-side button{border:1px solid #4f5847;border-radius:8px;background:#303d2e;color:#f4f0e6;padding:.55rem .75rem;min-height:40px;font:600 .8rem 'DM Sans',sans-serif;cursor:pointer}
+.listen-your-head button:disabled{opacity:.5;cursor:not-allowed}
+.listen-your-head button:hover,.listen-pair-side button:hover{background:#a54d32;border-color:#a54d32}
+.listen-note-preview p{margin:.65rem 0;color:#505b4c}
+.listen-score-scroll{overflow:auto;max-width:100%;background:#faf9f3;border:1px solid #d6d5ca;padding:.4rem .6rem}
+.listen-score-paper{min-height:95px;width:max-content}
+.listen-score-paper svg{display:block;max-height:125px}
+.listen-note-preview .score-letter,.listen-pair-side .score-letter{display:inline-grid;place-items:center;flex:none;width:25px;height:25px;border-radius:50%;background:#52684b;color:#fff;font:700 .72rem 'DM Sans',sans-serif}
 .listen-downloads{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0}
 .listen-downloads[hidden]{display:none}
 .listen-downloads button{border:0;background:none;padding:.2rem;color:#85402c;text-decoration:underline;text-underline-offset:3px;font:600 .78rem 'DM Sans',sans-serif;cursor:pointer}
@@ -40,7 +57,19 @@
 .listen-result-meta{font-size:.83rem;color:#596052;margin:.32rem 0 .75rem}
 .listen-result-actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
 .listen-result a{color:#85402c;font-size:.84rem;font-weight:600;text-underline-offset:3px;margin-left:.2rem}
-.listen-compare{margin-top:.7rem;background:#e8e7db;padding:.8rem;overflow:auto;font-size:.8rem;line-height:1.7}
+.listen-compare{margin-top:.8rem;background:#e8e7db;font-size:.8rem;line-height:1.7}
+.listen-compare[hidden]{display:none}
+.listen-pair-split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.listen-pair-side{min-width:0;padding:1rem}
+.listen-pair-side.b{background:#eee7da;border-left:1px solid #d2c9bd}
+.listen-pair-side-head{min-width:0;margin-bottom:.65rem}
+.listen-pair-side-head strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.82rem}
+.listen-pair-side-head small{margin-left:auto;white-space:nowrap;color:#596052}
+.listen-pair-side.b .score-letter{background:#a76349}
+.listen-pair-side button{margin-top:.7rem;background:transparent;color:#293126}
+.listen-alignment{padding:.7rem 1rem;border-top:1px solid #c9c5b7}
+.listen-alignment summary{cursor:pointer;font-weight:600}
+.listen-alignment-scroll{overflow:auto;max-height:260px}
 .listen-compare table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .listen-compare caption{text-align:left;padding-bottom:.4rem;color:#596052}
 .listen-compare th,.listen-compare td{text-align:left;padding:.2rem .5rem;border-bottom:1px solid #d1d1c5}
@@ -49,5 +78,5 @@
 .listen-help p{line-height:1.5}
 .listen-help pre{overflow:auto;max-height:200px;padding:.6rem;background:#e8e7db;color:#293126;font-size:.7rem}
 .listen-dialog :focus-visible{outline:2px solid #a54d32;outline-offset:2px}
-@media(max-width:550px){.listen-shell{padding:18px}.listen-result-head{display:block}.listen-result-actions button,.listen-result-actions a{margin-top:.25rem}}
+@media(max-width:550px){.listen-shell{padding:18px}.listen-result-head{display:block}.listen-result-actions button,.listen-result-actions a{margin-top:.25rem}.listen-pair-split{grid-template-columns:1fr}.listen-pair-side.b{border-left:0;border-top:1px solid #d2c9bd}.listen-pair-side{padding:.8rem}}
 @media(prefers-reduced-motion:reduce){.listen-meter span{transition:none}}

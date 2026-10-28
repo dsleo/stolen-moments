@@ -13,6 +13,10 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   const dialog=page.locator('#listen-dialog');
   await expect(dialog).toBeVisible();
   await expect(dialog).toContainText('Your audio stays in this browser');
+  await expect(dialog.locator('#listen-live')).toHaveCount(0);
+  await expect(dialog.locator('#listen-record')).toHaveAttribute('aria-label','Record a phrase');
+  await expect(dialog.locator('#listen-file')).toHaveAttribute('aria-label','Choose an audio file');
+  await expect(dialog.locator('.listen-help-near-actions')).toBeVisible();
   await dialog.locator('#listen-example').click();
   await expect.poll(async()=>{
     const preview=await dialog.locator('#listen-note-preview').isVisible();
@@ -22,6 +26,16 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   await expect(dialog.locator('#listen-status')).toContainText(/ready|longer phrase|convincing match/i,{timeout:30000});
   await expect(dialog.locator('.listen-result').first()).toBeVisible();
   await expect(dialog.locator('.listen-result').first()).toContainText('Paul Desmond');
+  await expect(dialog.locator('#listen-your-score svg')).toBeVisible();
+  await expect(dialog.locator('#listen-play-detected')).toBeEnabled();
+  await dialog.locator('#listen-play-detected').click();
+  await expect(dialog.locator('.listen-result').first().locator('.listen-pair-side')).toHaveCount(2);
+  await expect(dialog.locator('#listen-pair-score-0-b svg')).toBeVisible();
+  await expect(dialog.locator('.listen-result').first().locator('.listen-alignment')).toBeVisible();
+  await dialog.locator('[data-listen-compare="0"]').click();
+  await expect(dialog.locator('#listen-compare-0')).toBeHidden();
+  await dialog.locator('[data-listen-compare="0"]').click();
+  await expect(dialog.locator('#listen-pair-score-0-a svg')).toBeVisible();
   const midiPromise=page.waitForEvent('download');
   await dialog.locator('#listen-export-midi').click();
   const midi=await midiPromise;
