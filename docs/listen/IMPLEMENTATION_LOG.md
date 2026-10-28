@@ -63,23 +63,25 @@ and exercise the actual Basic Pitch model in a browser.
   stops the previous rendition.
 - Local follow-up verification: 15/15 browser tests, 17/17 Listen unit tests,
   model asset verification and a visual check at desktop and 390-pixel width.
+- GitHub PR validation run `40699763773` passed the Python, JavaScript, corpus,
+  model asset and Linux browser gates for commit `ef97e1f`.
 
 ## Measured limitations and unfinished evidence
 
 - Basic Pitch runs on the TF.js CPU backend in a browser Worker. On this Mac,
   one warmed 10-second synthetic clip took about 17 seconds and a 15-second clip
   about 32 seconds. The plan's 5-second transcription target is not met. The
-  faster continuous tracker is used for live mode; its real-instrument quality
-  remains unmeasured. See `MODEL_SPIKE.md`.
+  faster continuous tracker was tested during the pilot; its real-instrument
+  quality remains unmeasured. See `MODEL_SPIKE.md`.
 - No 40-clip, permission-cleared saxophone/trumpet set was available, so the
   plan's held-out real-audio recall and false-positive gates remain unverified.
 - Physical Chrome/Safari microphone checks remain for a human device run.
   Headless Chromium on macOS stalled during
   AudioWorklet initialization, so capture now falls back to ScriptProcessor.
   The fake-microphone browser test records and identifies the built-in phrase
-  locally on macOS. The Linux CI rerun is pending.
-- Firefox and WebKit real-model inference, cross-device p95 latency, and PR CI
-  on the remote host have not yet been observed.
+  locally on macOS and passed in Linux CI.
+- Firefox and WebKit real-model inference and cross-device p95 latency have not
+  yet been observed.
 
 Do not present those missing measurements as passes. The browser checklist makes
 them directly checkable from the local preview. If instrument accuracy is poor,
