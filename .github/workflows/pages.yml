@@ -2,7 +2,7 @@ name: Deploy static site
 
 on:
   push:
-    branches: [main, codex/live-solo-search]
+    branches: [main]
   pull_request:
   workflow_dispatch:
 

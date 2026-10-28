@@ -65,6 +65,9 @@ and exercise the actual Basic Pitch model in a browser.
   model asset verification and a visual check at desktop and 390-pixel width.
 - GitHub PR validation run `40699763773` passed the Python, JavaScript, corpus,
   model asset and Linux browser gates for commit `ef97e1f`.
+- Limited branch CI to the pull request event. Running both push and PR checks
+  for the same feature commit caused the shared Pages concurrency group to
+  cancel one run and display a misleading failed check.
 
 ## Measured limitations and unfinished evidence
 
