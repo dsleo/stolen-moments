@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1;9..144,600,20,1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400,20,1&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="styles.css?v=release-9">
-  <link rel="stylesheet" href="method.css?v=release-4">
+  <link rel="stylesheet" href="method.css?v=release-6">
 </head>
 <body class="methods-page">
   <a class="skip-link" href="#content">Skip to method</a>
@@ -37,17 +37,24 @@
     <div class="methods-layout">
       <nav class="methods-nav" aria-label="On this page">
         <p class="small-caps">Contents</p>
-        <a href="#listen-find">Listen &amp; Find</a>
+        <a href="#film">Watch the film</a>
         <a href="#corpus">01 &nbsp; Corpus</a>
         <a href="#retrieval">02 &nbsp; Retrieval</a>
         <a href="#scoring">03 &nbsp; Scoring</a>
         <a href="#interpretation">04 &nbsp; Interpretation</a>
+        <a href="#listen-find">Listen &amp; Find</a>
         <a href="#references">References</a>
       </nav>
       <article class="methods-article">
-        <section id="listen-find" class="methods-section listen-method-section">
-          <div class="section-heading"><span>From sound to score</span><h2>Listen &amp; Find</h2></div>
-          <p>Record a short solo or upload audio. A <a href="https://github.com/spotify/basic-pitch-ts" target="_blank" rel="noopener noreferrer">local Basic Pitch</a> model transcribes it into notes, then the archive ranks similar passages from WJazzD. Play both scores to compare them. A clear, single-note line works best.</p>
+        <section id="film" class="methods-section methods-film-section">
+          <figure class="methods-film">
+            <video controls preload="metadata" playsinline poster="media/how-it-works-poster.webp?v=3" aria-label="How Stolen Moments finds and compares similar jazz phrases">
+              <source src="media/how-it-works.webm?v=3" type="video/webm">
+              <source src="media/how-it-works.mp4?v=3" type="video/mp4">
+              <track kind="captions" src="media/how-it-works.vtt?v=3" srclang="en" label="English captions" default>
+              <p>Your browser cannot play this video. <a href="media/how-it-works.mp4?v=3">Download the 42-second film</a>.</p>
+            </video>
+          </figure>
         </section>
         <section id="corpus" class="methods-section">
           <div class="section-heading"><span>01 / Input</span><h2>Corpus and representation</h2></div>
@@ -112,6 +119,11 @@
           <p>A match establishes similarity between two symbolic passages in this corpus. It does not by itself establish borrowing, influence, or priority. Shared repertoire, idiom, transcription choices, and chance are alternative explanations. Recording dates come from corpus metadata. Linked recordings, when available, use separate video alignment data and may have imprecise timestamps.<sup><a href="#ref-3">3</a></sup></p>
           <p>In the example, the shared core is a mostly chromatic descent. The two recording dates place Parker’s solo earlier, but the algorithm cannot determine whether Coltrane drew on that performance or on common jazz vocabulary.</p>
           <p>The exact five-interval seed excludes short or heavily transformed motifs; the frequency cap omits some common material. Rightward extension can begin after a musically meaningful start. Pitch and rhythm weights, the 0.80 floor, and the 50% consolidation threshold were chosen heuristically and have not been calibrated against expert relevance judgements. The result set is therefore a discovery aid, not a recall-complete or statistically validated detector.</p>
+        </section>
+
+        <section id="listen-find" class="methods-section listen-method-section">
+          <div class="section-heading"><span>From sound to score</span><h2>Listen &amp; Find</h2></div>
+          <p>Record a short solo or upload audio. A <a href="https://github.com/spotify/basic-pitch-ts" target="_blank" rel="noopener noreferrer">local Basic Pitch</a> model transcribes it into notes, then the archive ranks similar passages from WJazzD. Play both scores to compare them. A clear, single-note line works best.</p>
         </section>
 
         <section id="references" class="methods-section references">

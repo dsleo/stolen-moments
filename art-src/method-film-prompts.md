@@ -1,0 +1,15 @@
+# Illustrated method film artwork
+
+Three original illustration plates were generated for the film in `static/media/`. The figures are anonymous and do not depict Clifford Brown or Joe Henderson. The soundtrack uses synthesized notes from their transcribed passages.
+
+## Trumpeter
+
+> Use case: illustration-story. Asset type: frame artwork for a 30-second animated film about how jazz phrases can resemble one another across performances. Create a wide cinematic 16:9 editorial illustration: an anonymous mid-century jazz trumpet player seen in three-quarter silhouette on the RIGHT side of a small club stage, breath and the horn's sound suggested by loose hand-drawn curved strokes drifting toward the LEFT. Rich layered paper-cut shapes, dry-brush ink, gouache, subtle screenprint texture; warm ivory paper, deep charcoal, muted olive, burnt rust and soft amber. Sophisticated, expressive, intimate, musical rather than nostalgic pastiche. Keep the left 45% relatively open and calm for separately typeset captions. No recognizable real musician, no album artwork, no readable music notation, no lettering, no text, no logo, no UI, no screens, no border. Original illustration, not a photograph.
+
+## Saxophonist
+
+> Use case: illustration-story. Asset type: frame artwork for a 30-second animated film about how jazz phrases can resemble one another across performances. Create a wide cinematic 16:9 editorial illustration: an anonymous saxophone player in a late-20th-century rehearsal room, seen in three-quarter silhouette on the LEFT, expressive hand-drawn curved strokes flowing from the saxophone toward the RIGHT. Match a sophisticated layered paper-cut, dry-brush ink, gouache, subtle screenprint look. Warm ivory paper, deep charcoal, muted olive, burnt rust, soft amber. Musical, intimate, dynamic. Keep the right 45% relatively open and calm for separately typeset captions. No recognizable real musician, no album artwork, no readable music notation, no lettering, no text, no logo, no UI, no screens, no border. Original illustration, not a photograph.
+
+## Melodic ribbons
+
+> Use case: illustration-story. Asset type: central abstract scene for an animated explainer about comparing jazz solo phrases. Wide 16:9 editorial illustration on warm ivory textured paper. Two expressive melodic ribbons enter from opposite sides, one burnt rust and one muted olive. Each ribbon is made of irregular ink strokes, a few hand-painted oval note-like marks, and rhythmic pulses; they weave near one another across the middle with small differences and one visible offshoot. The image should feel like a visual metaphor for listening to two distinct improvisations and noticing a resemblance, not a literal score or data visualization. Sophisticated dry-brush ink, gouache, layered cut paper and restrained screenprint grain matching an illustrated jazz magazine. Deep charcoal accents, warm amber highlights. Leave some uncluttered paper in the upper and lower thirds for separately animated words. No people, no readable notation, no lettering, no text, no logo, no UI, no charts, no screens, no border.

@@ -24,6 +24,8 @@
 .section-heading>span{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--rust);white-space:nowrap}
 .section-heading h2{font:400 clamp(28px,3vw,39px)/1.17 var(--display);letter-spacing:-.04em;margin:0}
 .methods-section p,.method-steps{font-size:14px;line-height:1.8;color:#444b41;max-width:695px;margin:0 0 18px}
+.methods-film{max-width:695px;margin:0}
+.methods-film video{display:block;width:100%;aspect-ratio:16/9;background:var(--ink);border:1px solid var(--line)}
 .methods-section a{color:#92452e;text-decoration-thickness:1px;text-underline-offset:3px}
 .methods-section a:hover{color:#5f2c1e}
 .methods-section sup{font-size:10px;line-height:0}

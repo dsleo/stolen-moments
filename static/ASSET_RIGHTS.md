@@ -10,6 +10,7 @@ This is a working clearance register, not a legal determination. Presence on the
 | `assets/jazz-desk-base.webp` | Generated project artwork. | Candidate for campaign use; retain the original generation record and confirm its terms are archived. |
 | `favicon.svg` | Project-authored icon. | Project asset. |
 | Synthesized transcription playback | Generated in browser from the notation/transcription data; no recording is embedded. | Safer demo audio route. Identify it as synthesized in any clip. |
+| `media/how-it-works.*` and `media/illustrations/` | Original generated illustrations and synthesized audio from WJazzD note data; production prompts are recorded in `art-src/method-film-prompts.md`. | Prepared for the site's educational film. Fictional musicians are identified as illustrations, and captions distinguish synthesized phrases from recordings. |
 
 ## Rights review required before advertising
 
