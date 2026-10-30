@@ -49,6 +49,68 @@ async function load(append=false){
 const hue = name => [...String(name||'')].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7);
 const coverPhoto = s => s.cover?{url:s.cover,kind:'cover'}:
   state.portraits[s.performer]?.image?{url:state.portraits[s.performer].image,kind:'portrait'}:null;
+function youtubeDetails(value){
+  try{
+    const url=new URL(value,location.href),host=url.hostname.replace(/^www\./,'');
+    const id=host==='youtu.be'?url.pathname.slice(1):host.endsWith('youtube.com')?(url.pathname==='/watch'?url.searchParams.get('v'):url.pathname.startsWith('/embed/')?url.pathname.split('/')[2]:url.pathname.startsWith('/shorts/')?url.pathname.split('/')[2]:null):null;
+    if(!id||!/^[-\w]{11}$/.test(id))return null;
+    const raw=url.searchParams.get('t')||url.searchParams.get('start');
+    let start=0;
+    if(raw){const match=String(raw).match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);if(match)start=Number(match[1]||0)*3600+Number(match[2]||0)*60+Number(match[3]||0);else if(/^\d+$/.test(raw))start=Number(raw)}
+    return {id,start,url:url.href};
+  }catch{return null}
+}
+let youtubeApiPromise;
+function loadYouTubeApi(){
+  if(window.YT?.Player)return Promise.resolve(window.YT);
+  if(youtubeApiPromise)return youtubeApiPromise;
+  youtubeApiPromise=new Promise((resolve,reject)=>{
+    const previous=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=()=>{previous?.();resolve(window.YT)};
+    const script=document.createElement('script');
+    script.src='https://www.youtube.com/iframe_api';
+    script.async=true;
+    script.onerror=()=>{youtubeApiPromise=null;reject(new Error('YouTube player unavailable.'))};
+    document.head.append(script);
+  });
+  return youtubeApiPromise;
+}
+function videoFallback(title){
+  const frame=$('#video-frame');frame.replaceChildren();
+  const fallback=document.createElement('div');fallback.className='video-fallback';
+  const heading=document.createElement('strong');heading.textContent='This recording cannot play inside the app.';
+  const message=document.createElement('p');message.textContent='This recording can only be watched on YouTube. Open it there to start playback.';
+  const link=document.createElement('a');link.href=$('#video-external-link').href;link.target='_blank';link.rel='noopener noreferrer';link.textContent=`Watch ${title} on YouTube ↗`;
+  fallback.append(heading,message,link);frame.append(fallback);
+}
+function openVideoExternally(details){
+  const tab=window.open(details.url,'_blank');
+  if(tab){try{tab.opener=null}catch{}closeVideoDialog();return true}
+  return false;
+}
+function openVideoDialog(value,title='YouTube recording',trigger=null){
+  const details=youtubeDetails(value),dialog=$('#video-dialog');
+  if(!details){toast('This recording link is not a valid YouTube video.');return}
+  state.videoTrigger=trigger||document.activeElement;
+  state.videoRequest=(state.videoRequest||0)+1;
+  const request=state.videoRequest;
+  $('#video-dialog-title').textContent=title;
+  $('#video-external-link').href=details.url;
+  const frame=$('#video-frame');frame.innerHTML='<div class="video-loading" role="status">Loading recording…</div>';
+  if(!dialog.open)dialog.showModal();
+  loadYouTubeApi().then(YT=>{
+    if(request!==state.videoRequest||!dialog.open)return;
+    frame.replaceChildren();
+    const mount=document.createElement('div');frame.append(mount);
+    let ready=false;
+    const timeout=setTimeout(()=>{if(!ready&&request===state.videoRequest&&!openVideoExternally(details))videoFallback(title)},8000);
+    state.videoPlayer=new YT.Player(mount,{videoId:details.id,playerVars:{autoplay:1,rel:0,playsinline:1,enablejsapi:1,origin:location.origin,...(details.start?{start:details.start}:{})},events:{
+      onReady:event=>{ready=true;clearTimeout(timeout);event.target.playVideo()},
+      onError:()=>{clearTimeout(timeout);if(request===state.videoRequest&&!openVideoExternally(details))videoFallback(title)},
+    }});
+  }).catch(()=>{if(request===state.videoRequest&&!openVideoExternally(details))videoFallback(title)});
+}
+function closeVideoDialog(){const dialog=$('#video-dialog');if(dialog.open)dialog.close()}
 // Typographic sleeve underneath; the real cover (if the archive finds one) covers it.
 const sleeve = (s,side) => {const photo=coverPhoto(s);return `<span class="sleeve ${side}" style="--h:${hue(s.performer)}"><span class="sleeve-fallback">${esc(initials(s.performer))}<small>${esc(s.title)}</small></span>${photo?`<img loading="lazy" decoding="async" alt="" src="${esc(photo.url)}">`:''}</span>`};
 const crateCard = item => `<div class="crate-card-item" role="listitem"><button type="button" class="crate-card" data-pull="${item.id}" aria-pressed="false" aria-label="Open ${esc(item.a.performer)}, ${esc(item.a.title)}, and ${esc(item.b.performer)}, ${esc(item.b.title)}; ${item.notes} paired notes; ${pct(item.similarity)} similar"><span class="sleeves">${sleeve(item.a,'a')}${sleeve(item.b,'b')}</span><span class="crate-names">${esc(item.a.performer)} ↔ ${esc(item.b.performer)}</span><span class="crate-score">${pct(item.similarity)} similar · ${item.notes} notes</span></button></div>`;
@@ -63,7 +125,7 @@ $('#crate-strip').addEventListener('scroll',()=>{
   state.offset=state.nextOffset;
   load(true);
 });
-function pullPair(id){
+async function pullPair(id){
   const item=state.items.find(x=>x.id===id);if(!item)return;
   document.querySelectorAll('.crate-card').forEach(c=>c.setAttribute('aria-pressed',String(Number(c.dataset.pull)===id)));
   const stage=$('#stage');stage.className='stage has-pair';
@@ -71,6 +133,7 @@ function pullPair(id){
     <h3>${esc(item.a.performer)} <em>↔</em> ${esc(item.b.performer)}</h3>
     <p>${esc(item.a.title)} · ${sec(item.a_track_time)} &nbsp;/&nbsp; ${esc(item.b.title)} · ${sec(item.b_track_time)}</p>
     <button type="button" class="stage-cta" data-match="${id}" aria-haspopup="dialog"><span>Hear this pair</span><span class="stage-cta-arrow" aria-hidden="true">↗</span></button>`;
+  await toggleDetail(document.querySelector(`.crate-card[data-pull="${id}"]`));
 }
 const ECHO_TOP_N=70;
 const echoTopLinks=d=>[...d.links].sort((a,b)=>b.strength-a.strength).slice(0,ECHO_TOP_N);
@@ -81,8 +144,8 @@ function echoVisibleOrder(shown){
   if(state.echoSel!=null)linked.add(state.echoSel);
   return state.echoOrder.filter(i=>linked.has(i));
 }
-function echoNode(p,i,size,extra='',position=''){
-  return `<button type="button" class="echo-node ${extra}" style="--echo-portrait-size:${size}px;${position}" data-echo="${i}" aria-pressed="${state.echoSel===i}" aria-label="${esc(p.name)}. Show connections" title="${esc(p.name)}">${portrait(p.name)}<span>${esc(p.name)}</span></button>`;
+function echoNode(p,i,size,extra='',position='',tabstop=false){
+  return `<button type="button" class="echo-node ${extra}" style="--echo-portrait-size:${size}px;${position}" data-echo="${i}" tabindex="${tabstop?0:-1}" aria-pressed="${state.echoSel===i}" aria-describedby="echo-keyboard-help" title="${esc(p.name)}">${portrait(p.name)}<span>${esc(p.name)}</span></button>`;
 }
 function renderEchoTimeline(d){
   const box=$('#echoes-scroll'),m=d.musicians,sel=state.echoSel;
@@ -97,14 +160,17 @@ function renderEchoTimeline(d){
     if(x[l.from]==null||x[l.to]==null)return '';
     const x1=Math.min(x[l.from],x[l.to]),x2=Math.max(x[l.from],x[l.to]),rx=Math.max(1,(x2-x1)/2),ry=Math.max(20,(arcH-20)*Math.pow(rx/(width/2),.45));
     const down=sel!=null&&l.from===sel,ty=down?y0+66:y0-6;
-    return `<path class="echo-arc ${down?'down':'up'}${sel!=null?' sel':''}" d="M${x1},${ty} A${rx},${ry} 0 0 ${down?0:1} ${x2},${ty}" stroke-width="${(1.5+4.5*l.strength/max).toFixed(1)}" data-match="${l.top_id}" tabindex="0" role="button" aria-label="${esc(m[l.from].name)} to ${esc(m[l.to].name)}, ${l.pairs} solo pairs"><title>${esc(m[l.from].name)} → ${esc(m[l.to].name)} · ${l.pairs} solo pair${l.pairs===1?'':'s'}</title></path>`;
+    return `<path class="echo-arc ${down?'down':'up'}${sel!=null?' sel':''}" d="M${x1},${ty} A${rx},${ry} 0 0 ${down?0:1} ${x2},${ty}" stroke-width="${(1.5+4.5*l.strength/max).toFixed(1)}" data-match="${l.top_id}"><title>${esc(m[l.from].name)} → ${esc(m[l.to].name)} · ${l.pairs} solo pair${l.pairs===1?'':'s'}</title></path>`;
   }).join('');
   let lastDecade=null;
   const years=order.map(mi=>{const dec=echoDecade(m[mi].year),label=dec&&dec!==lastDecade?`<text class="echo-year" x="${Math.max(6,x[mi]-28)}" y="21">${dec}s</text><line class="echo-decade-line" x1="${x[mi]}" x2="${x[mi]}" y1="30" y2="${height}"/>`:'';if(dec)lastDecade=dec;return label}).join('');
-  const nodes=order.map(i=>{const size=degree[i]>=10?58:degree[i]>=4?49:40;return echoNode(m[i],i,size,degree[i]?'':'unlinked',`left:${x[i]}px;top:${y0}px`)}).join('');
-  const left=box.scrollLeft;
-  box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${height}px"><svg width="${width}" height="${height}" aria-label="Arcs from earlier to later musicians">${years}${arcs}</svg>${nodes}</div>`;
+  const tabstop=order.includes(state.echoFocus)?state.echoFocus:order[0];
+  state.echoFocus=tabstop;
+  const nodes=order.map(i=>{const size=degree[i]>=10?58:degree[i]>=4?49:40;return echoNode(m[i],i,size,degree[i]?'':'unlinked',`left:${x[i]}px;top:${y0}px`,i===tabstop)}).join('');
+  const left=box.scrollLeft,focusedEcho=document.activeElement?.closest?.('[data-echo]')?.dataset.echo;
+  box.innerHTML=`<div class="echo-canvas" style="width:${width}px;height:${height}px"><svg width="${width}" height="${height}" aria-hidden="true">${years}${arcs}</svg>${nodes}</div>`;
   box.scrollLeft=left;
+  if(focusedEcho!=null)box.querySelector(`[data-echo="${focusedEcho}"]`)?.focus({preventScroll:true});
   if(box.clientWidth&&box.clientHeight&&(state.echoCenterIndex!=null||!state.echoInitialCentered)){
     const target=state.echoCenterIndex??degree.indexOf(Math.max(...degree));
     state.echoCenterIndex=null;state.echoInitialCentered=true;
@@ -135,8 +201,9 @@ new ResizeObserver(()=>{
   echoWidth=width;echoHeight=height;renderEchoes();
 }).observe($('#echoes-scroll'));
 function selectEcho(i){
-  state.echoSel=i;state.echoPanel=i;state.echoCenterIndex=i;
+  state.echoSel=i;state.echoPanel=i;state.echoCenterIndex=i;state.echoFocus=i;
   renderEchoes();
+  $('#echoes-scroll [data-echo="'+i+'"]')?.focus({preventScroll:true});
 }
 async function loadEchoes(){
   const serial=state.echoSerial=(state.echoSerial||0)+1;
@@ -161,7 +228,7 @@ function setView(view){
   if(view==='echoes'){loadEchoes();$('.results-area').scrollIntoView()}
 }
 document.addEventListener('error',e=>{if(e.target.matches?.('.sleeve img'))e.target.hidden=true},true);
-const portrait=name=>{const photo=state.portraits[name];return `<span class="echo-portrait" style="--h:${hue(name)}"><span class="echo-portrait-fallback">${esc(initials(name))}</span>${photo?`<img loading="lazy" decoding="async" src="${esc(photo.image)}" alt="">`:''}</span>`};
+const portrait=name=>{const photo=state.portraits[name];return `<span class="echo-portrait" style="--h:${hue(name)}" aria-hidden="true"><span class="echo-portrait-fallback">${esc(initials(name))}</span>${photo?`<img loading="lazy" decoding="async" src="${esc(photo.image)}" alt="">`:''}</span>`};
 document.addEventListener('error',e=>{if(e.target.matches?.('.echo-portrait img'))e.target.hidden=true},true);
 
 const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sax',tp:'Trumpet',tb:'Trombone',cl:'Clarinet',p:'Piano',g:'Guitar',vib:'Vibraphone',b:'Bass',fl:'Flute',cor:'Cornet',bcl:'Bass clarinet',voc:'Voice'};
@@ -287,7 +354,7 @@ function mediaSection(d,side){
   const source=s.source_url?`<a href="${esc(s.source_url)}" target="_blank" rel="noopener noreferrer">${s.source==='DTL1000'?'DTL1000 solo details':'Source transcription'} ↗</a>`:'';
   const alignment=recording?.aligned?`<a href="${esc(recording.source_url)}" target="_blank" rel="noopener noreferrer">JazzTube alignment ↗</a>`:'';
   const provenance=(source||alignment)?`<details class="provenance-info"><summary aria-label="Open source information" title="Source information">i</summary><div class="provenance-popover">${source}${alignment}</div></details>`:'';
-  return `<div class="panel-listen"><div class="listen-links">${recording?`<a class="youtube-link" href="${esc(recording.url)}" target="_blank" rel="noopener noreferrer"><span class="youtube-mark">▶</span> ${recording.verified?'Play verified recording':recording.aligned?'Play JazzTube video':recording.estimated?'Play likely recording':'Open candidate video'}${recording.time_seconds!=null?` at ${sec(recording.time_seconds)}`:''} ↗</a>`:'<span class="no-video">No matched video</span>'}${provenance}</div>
+  return `<div class="panel-listen"><div class="listen-links">${recording?`<button type="button" class="youtube-link" data-youtube-url="${esc(recording.url)}" data-video-title="${esc(`${s.performer} · ${s.title}`)}"><span class="youtube-mark">▶</span> ${recording.verified?'Play verified recording':recording.aligned?'Play JazzTube video':recording.estimated?'Play likely recording':'Open candidate video'}${recording.time_seconds!=null?` at ${sec(recording.time_seconds)}`:''} <span aria-hidden="true">↗</span></button>`:'<span class="no-video">No matched video</span>'}${provenance}</div>
   </div>`;
 }
 
@@ -333,7 +400,7 @@ function clearPairURL(){
   history.replaceState(null,'',url);
 }
 async function toggleDetail(buttonOrId){
-  const id=typeof buttonOrId==='number'?buttonOrId:Number(buttonOrId.dataset.match),dialog=$('#pair-dialog');
+  const id=typeof buttonOrId==='number'?buttonOrId:Number(buttonOrId.dataset.match??buttonOrId.dataset.pull),dialog=$('#pair-dialog');
   state.lastTrigger=typeof buttonOrId==='number'?null:buttonOrId;
   const url=await pairURL(id);
   if(url)history.replaceState(null,'',url);
@@ -372,9 +439,11 @@ function stopTranscript(){state.playbackRevision++;for(const source of state.sou
 async function pauseTranscript(){const playback=state.playback;if(playback?.mode!=='playing')return;await state.audio.suspend();if(state.playback===playback){playback.mode='paused';playback.onStateChange('paused')}}
 async function resumeTranscript(){const playback=state.playback;if(playback?.mode!=='paused')return;await state.audio.resume();if(state.playback===playback){playback.mode='playing';playback.onStateChange('playing')}}
 function setCatalogPlayButton(button,mode){if(!button.isConnected)return;button.dataset.playLabel??=button.getAttribute('aria-label');button.dataset.playing=String(mode==='playing');button.setAttribute('aria-label',mode==='playing'?button.dataset.playLabel.replace(/^Play /,'Pause '):mode==='paused'?button.dataset.playLabel.replace(/^Play /,'Resume '):button.dataset.playLabel);button.title=mode==='playing'?'Pause MIDI transcription':mode==='paused'?'Resume MIDI transcription':'Play MIDI transcription';button.querySelector('span').textContent=mode==='playing'?'❚❚':'▶'}
-window.StolenMoments={playTranscript,pausePlayback:pauseTranscript,resumePlayback:resumeTranscript,stopPlayback:stopTranscript,getPlaybackState:owner=>state.playback?.owner===owner?state.playback.mode:'stopped'};
+window.StolenMoments={playTranscript,pausePlayback:pauseTranscript,resumePlayback:resumeTranscript,stopPlayback:stopTranscript,getPlaybackState:owner=>state.playback?.owner===owner?state.playback.mode:'stopped',openVideo:openVideoDialog};
 
 document.addEventListener('click',event=>{
+  const video=event.target.closest('[data-youtube-url]');
+  if(video){event.preventDefault();openVideoDialog(video.dataset.youtubeUrl,video.dataset.videoTitle||'YouTube recording',video);return}
   const facetKind=event.target.closest('[data-facet-kind]');if(facetKind){state.facetKind=facetKind.dataset.facetKind;renderShelf()}
   const facetChip=event.target.closest('[data-facet-value]');if(facetChip)pickFacet(facetChip.dataset.facetValue);
   if(event.target.closest('#open-shelf')){const options=$('#crate-options'),button=$('#open-shelf'),open=options.hidden;options.hidden=!open;button.setAttribute('aria-expanded',String(open));$('#sort-options').hidden=true;$('#open-sort').setAttribute('aria-expanded','false')}
@@ -387,7 +456,7 @@ document.addEventListener('click',event=>{
   const pull=event.target.closest('[data-pull]');if(pull)pullPair(Number(pull.dataset.pull));
   if(event.target.closest('#echo-search-toggle'))setEchoSearchOpen($('#echo-search-field').hidden);
   else if(!event.target.closest('#echo-search-field'))setEchoSearchOpen(false);
-  if(event.target.closest('#echo-overview')){state.echoSel=null;state.echoPanel=null;state.echoCenterIndex=null;state.echoInitialCentered=false;$('#echo-search').value='';renderEchoes()}
+  if(event.target.closest('#echo-overview')){state.echoSel=null;state.echoPanel=null;state.echoCenterIndex=null;state.echoFocus=null;state.echoInitialCentered=false;$('#echo-search').value='';renderEchoes();$('[data-view-btn="echoes"]').focus({preventScroll:true})}
   const echoZoom=event.target.closest('[data-echo-zoom]');if(echoZoom){state.echoZoom=Math.max(.8,Math.min(1.4,(state.echoZoom||1)+(echoZoom.dataset.echoZoom==='in'?.2:-.2)));renderEchoes()}
   const echo=event.target.closest('[data-echo]');if(echo)selectEcho(Number(echo.dataset.echo));
   const viewBtn=event.target.closest('[data-view-btn]');if(viewBtn)setView(viewBtn.dataset.viewBtn);
@@ -397,6 +466,19 @@ document.addEventListener('click',event=>{
   if(event.target.closest('[data-close-pair]'))$('#pair-dialog').close();
 });
 document.addEventListener('keydown',event=>{const match=event.target.closest('[data-match]');if(match&&(event.key==='Enter'||event.key===' ')){event.preventDefault();toggleDetail(match)}});
+$('#echoes-scroll').addEventListener('keydown',event=>{
+  const current=event.target.closest('.echo-node');
+  if(!current||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  const nodes=[...event.currentTarget.querySelectorAll('.echo-node')];
+  const index=nodes.indexOf(current);
+  const next=event.key==='Home'?0:event.key==='End'?nodes.length-1:
+    Math.max(0,Math.min(nodes.length-1,index+(event.key==='ArrowRight'?1:-1)));
+  event.preventDefault();
+  current.tabIndex=-1;
+  nodes[next].tabIndex=0;
+  state.echoFocus=Number(nodes[next].dataset.echo);
+  nodes[next].focus();
+});
 let debounce;
 $('#facet-search').addEventListener('input',renderShelf);
 function setEchoSearchOpen(open){$('#echo-search-field').hidden=!open;$('#echo-search-toggle').setAttribute('aria-expanded',String(open));if(open)$('#echo-search').focus()}
@@ -502,6 +584,16 @@ $('[data-lift-lid]').addEventListener('click',openDesk);
 $('#close-deck').addEventListener('click',closeDesk);
 $('#pair-dialog').addEventListener('click',event=>{if(event.target===$('#pair-dialog'))$('#pair-dialog').close()});
 $('#pair-dialog').addEventListener('close',()=>{stopTranscript();state.openId=null;clearPairURL();if(state.lastTrigger?.isConnected)state.lastTrigger.focus();else $('#crate-strip .crate-card')?.focus()});
+$('#video-close').addEventListener('click',closeVideoDialog);
+$('#video-dialog').addEventListener('click',event=>{if(event.target===$('#video-dialog'))closeVideoDialog()});
+$('#video-dialog').addEventListener('close',()=>{
+  state.videoRequest=(state.videoRequest||0)+1;
+  state.videoPlayer?.destroy?.();
+  state.videoPlayer=null;
+  $('#video-frame').replaceChildren();
+  if(state.videoTrigger?.isConnected)state.videoTrigger.focus();
+  state.videoTrigger=null;
+});
 
 async function init(){
   const perf=()=>new URLSearchParams(location.search).has('perf');

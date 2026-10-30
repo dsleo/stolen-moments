@@ -48,6 +48,8 @@ test('alignment tolerates a missing note and never reports out of-range indices'
   assert.ok(result);
   assert.ok(result.pairedNotes >= 8);
   assert.ok(result.alignment.every(([i, j]) => (i === -1 || (i >= 0 && i < q.notes.length)) && (j === -1 || (j >= 0 && j < base.length))));
+  assert.equal(result.gaps, result.alignment.length - result.pairedNotes);
+  assert.ok(Math.abs(result.score - (1 - result.cost / (result.pairedNotes + result.gaps))) < 1e-9);
 });
 
 test('different solos remain independent and ties are deterministic', () => {

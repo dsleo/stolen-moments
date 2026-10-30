@@ -5,7 +5,9 @@ const path=require('node:path');
 test('Listen & Find opens, runs the real example path, and closes cleanly',async({page})=>{
   test.setTimeout(120000);
   const errors=[];
+  const detailedModelRequests=[];
   page.on('pageerror',error=>errors.push(error.message));
+  page.on('request',request=>{if(/\/listen\/assets\/(?:model\.json|group1-shard1of1\.bin)/.test(request.url()))detailedModelRequests.push(request.url())});
   await page.goto('/');
   await page.locator('#landing-prompt').click();
   await expect(page.locator('#open-listen')).toBeVisible();
@@ -19,9 +21,6 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   await expect(dialog.locator('.listen-icon-control')).toHaveCount(0);
   await expect(dialog.locator('.listen-help-near-actions')).toBeVisible();
   await dialog.locator('#listen-example').click();
-  await expect(dialog.locator('#listen-progress')).toBeVisible();
-  await expect(dialog.locator('.listen-activity')).toBeHidden();
-  await expect(dialog.locator('#listen-progress-step')).toBeVisible();
   await expect(dialog.locator('.listen-result')).toHaveCount(0);
   await expect.poll(async()=>{
     const preview=await dialog.locator('#listen-note-preview').isVisible();
@@ -33,10 +32,17 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   await expect(dialog.locator('.listen-result').first()).toContainText('Paul Desmond');
   await expect(dialog.locator('.listen-result').first()).toContainText('pattern similarity');
   await expect(dialog.locator('.listen-result').first()).toContainText('Alto sax');
+  await expect(dialog.locator('#listen-refine')).toBeVisible();
+  expect(detailedModelRequests).toEqual([]);
   const recordingLink=dialog.locator('.listen-result').first().locator('h4 .listen-recording-link');
-  await expect(recordingLink).toHaveAttribute('aria-label',/Open recording of Paul Desmond/);
-  await expect(recordingLink).toHaveAttribute('target','_blank');
-  await expect(recordingLink.locator('span')).toHaveText('↗');
+  await expect(recordingLink).toHaveAttribute('aria-label',/Play recording of Paul Desmond/);
+  await expect(recordingLink).not.toHaveAttribute('target');
+  await expect(recordingLink.locator('span')).toHaveText('▶');
+  await recordingLink.click();
+  await expect(page.locator('#video-dialog')).toHaveAttribute('open', '');
+  await expect(page.locator('#video-dialog iframe, #video-dialog .video-fallback')).toBeVisible({timeout:15000});
+  await page.locator('#video-close').click();
+  await expect(page.locator('#video-dialog')).not.toHaveAttribute('open', '');
   await expect(dialog.locator('.listen-result-actions')).toHaveCount(0);
   await expect(dialog.locator('#listen-result-explainer')).toHaveCount(0);
   await expect(dialog.locator('#listen-progress')).toBeHidden();
@@ -58,7 +64,7 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   const pairButton=dialog.locator('[data-listen-play="query"]').first();
   await expect(pairButton).toHaveClass(/score-play/);
   const buttonShape=await pairButton.evaluate(button=>{const style=getComputedStyle(button);return {width:style.width,height:style.height,radius:style.borderRadius}});
-  expect(buttonShape).toEqual({width:'32px',height:'32px',radius:'50%'});
+  expect(buttonShape).toEqual({width:'44px',height:'44px',radius:'50%'});
   await expect(dialog.locator('#listen-pair-score-0-b svg')).toBeVisible();
   await expect(dialog.locator('#listen-pair-score-0-a svg')).toBeVisible();
   await expect(dialog.locator('.listen-alignment')).toHaveCount(0);
@@ -71,6 +77,10 @@ test('Listen & Find opens, runs the real example path, and closes cleanly',async
   await dialog.locator('[data-listen-play="match"]').first().click();
   await expect(dialog.locator('#listen-play-detected')).toHaveAttribute('aria-label','Play detected notes as MIDI');
   await expect(dialog.locator('[data-listen-play="match"]').first()).toHaveAttribute('aria-label',/Pause MIDI transcription for Paul Desmond/);
+  await dialog.locator('#listen-refine').click();
+  await expect(dialog.locator('#listen-note-summary')).toContainText('detailed analysis',{timeout:90000});
+  await expect(dialog.locator('.listen-result').first()).toContainText('Paul Desmond',{timeout:90000});
+  await expect(dialog.locator('#listen-refine')).toBeHidden();
   const resultA11y=await new AxeBuilder({page}).include('#listen-dialog').withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();
   expect(resultA11y.violations.map(v=>v.id)).toEqual([]);
   await dialog.locator('#listen-example-kind').selectOption('silence');

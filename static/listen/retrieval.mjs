@@ -99,18 +99,18 @@ function trialScales(query, solo, start, end) {
   return [0.8, 0.9, 1, 1.1, 1.25].map(x => base * x).filter(v => Number.isFinite(v) && v > 0);
 }
 
-function pairCost(query, solo, i, j, previousI, previousJ, shift, scale) {
+const bounded = value => Math.min(1, Math.max(0, value - 0.125) / 0.5);
+function pairCost(query, solo, i, j, previousI, previousJ, shift, scale, beatsPerSecond) {
   const q = query.notes[i];
   const pitch = Math.min(Math.abs(q.pitch + shift - solo.pitches[j]) / 2, 1);
-  const durationRatio = Math.max(0.02, solo.durationsSeconds[j]) / (Math.max(0.02, q.durationSeconds) * scale);
-  const duration = Math.min(Math.abs(Math.log2(durationRatio)), 1);
+  const duration = bounded(Math.abs(q.durationSeconds * scale - solo.durationsSeconds[j]) * beatsPerSecond);
   let timing = 0;
   if (previousI >= 0) {
-    const qGap = Math.max(0.02, q.onsetSeconds - query.notes[previousI].onsetSeconds);
-    const cGap = Math.max(0.02, solo.onsetsSeconds[j] - solo.onsetsSeconds[previousJ]);
-    timing = Math.min(Math.abs(Math.log2(cGap / (qGap * scale))), 1);
+    const qGapBeats = (q.onsetSeconds - query.notes[previousI].onsetSeconds) * scale * beatsPerSecond;
+    const cGapBeats = solo.beatPositions[j] - solo.beatPositions[previousJ];
+    timing = bounded(Math.abs(cGapBeats - qGapBeats));
   }
-  return 0.65 * pitch + 0.25 * timing + 0.10 * duration;
+  return 0.5 * pitch + 0.25 * timing + 0.25 * duration;
 }
 
 function fastCost(query, solo, start, end, shift, scale) {
@@ -154,6 +154,9 @@ export function alignCandidate(query, solo, start, end, shift, scale) {
   const qn = query.notes.length;
   const cn = end - start + 1;
   if (!cn) return null;
+  const seconds = solo.onsetsSeconds[end] - solo.onsetsSeconds[start];
+  const beats = solo.beatPositions[end] - solo.beatPositions[start];
+  const beatsPerSecond = seconds > 0 && beats > 0 ? beats / seconds : 2;
   const rows = Array.from({ length: qn + 1 }, () => Array.from({ length: cn + 1 }, () => []));
   for (let j = 0; j < Math.min(cn, 3); j++) rows[0][j].push({ i: 0, j, lastI: -1, lastJ: -1, skipQ: 0, skipC: 0, cost: 0, paired: 0, alignment: [] });
   const add = (i, j, state) => {
@@ -176,13 +179,13 @@ export function alignCandidate(query, solo, start, end, shift, scale) {
       if (i < qn && j < cn) {
         const absolute = start + j;
         add(i + 1, j + 1, { lastI: i, lastJ: absolute, skipQ: 0, skipC: 0,
-          cost: s.cost + pairCost(query, solo, i, absolute, s.lastI, s.lastJ, shift, scale),
+          cost: s.cost + pairCost(query, solo, i, absolute, s.lastI, s.lastJ, shift, scale, beatsPerSecond),
           paired: s.paired + 1, alignment: [...s.alignment, [i, absolute]] });
       }
       if (i < qn && s.skipQ < 2) add(i + 1, j, { ...s, skipQ: s.skipQ + 1, skipC: 0,
-        cost: s.cost + 0.8, alignment: [...s.alignment, [i, -1]] });
+        cost: s.cost + 1, alignment: [...s.alignment, [i, -1]] });
       if (j < cn && i > 0 && s.skipC < 2) add(i, j + 1, { ...s, skipC: s.skipC + 1, skipQ: 0,
-        cost: s.cost + 0.8, alignment: [...s.alignment, [-1, start + j]] });
+        cost: s.cost + 1, alignment: [...s.alignment, [-1, start + j]] });
     }
   }
   const finals = [];
@@ -191,9 +194,10 @@ export function alignCandidate(query, solo, start, end, shift, scale) {
   const winner = finals[0];
   if (!winner || !winner.paired) return null;
   const paired = winner.alignment.filter(([qi, cj]) => qi >= 0 && cj >= 0);
+  const gaps = winner.alignment.length - winner.paired;
   return { cost: winner.cost, pairedNotes: winner.paired, alignment: winner.alignment,
     startNote: paired[0][1], endNote: paired.at(-1)[1],
-    queryCoverage: winner.paired / qn, score: Math.max(0, 1 - winner.cost / qn),
+    queryCoverage: winner.paired / qn, gaps, score: Math.max(0, 1 - winner.cost / (winner.paired + gaps)),
     transpositionSemitones: shift, tempoScale: scale };
 }
 

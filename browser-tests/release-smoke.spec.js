@@ -64,7 +64,6 @@ test('mobile landing, archive, pair details, deep links, and method assets', asy
   await page.locator('.crate-card').first().click();
   await expect(page.locator('#stage')).toHaveClass(/has-pair/);
   await expect(page.locator('#stage .stage-cta')).toBeVisible();
-  await page.locator('#stage .stage-cta').click();
   const dialog = page.locator('#pair-dialog');
   await expect(dialog).toHaveAttribute('open', '');
   await expect(dialog.locator('.score-panel.a')).toBeVisible({ timeout: 60_000 });
@@ -135,4 +134,27 @@ test('the no-Worker fallback still browses the default archive', async ({ browse
   await expect(page.locator('#result-count')).toHaveText('213,870', { timeout: 60_000 });
   await expect(page.locator('.crate-card').first()).toBeVisible();
   await context.close();
+});
+
+test('Echoes keyboard path reaches musicians directly and preserves focus', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.locator('#landing-title')).toContainText('Moments');
+  await page.locator('#landing-prompt').click();
+  await page.locator('[data-view-btn="echoes"]').click();
+  const nodes=page.locator('#echoes-scroll .echo-node');
+  await expect.poll(() => nodes.count()).toBeGreaterThan(0);
+  await expect(page.locator('#echoes-scroll svg [tabindex]')).toHaveCount(0);
+  await expect(page.locator('#echoes-scroll .echo-node[tabindex="0"]')).toHaveCount(1);
+  await page.locator('[data-view-btn="echoes"]').focus();
+  await page.keyboard.press('Tab');
+  await expect(nodes.first()).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect(nodes.nth(1)).toBeFocused();
+  await expect(page.locator('#echoes-scroll .echo-node[tabindex="0"]')).toHaveCount(1);
+  const musician=await nodes.nth(1).getAttribute('data-echo');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#echoes-panel')).not.toBeEmpty();
+  await expect(page.locator(`#echoes-scroll [data-echo="${musician}"]`)).toBeFocused();
+  await expectAccessible(page, 'Echoes selection');
 });

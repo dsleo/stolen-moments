@@ -7,7 +7,7 @@ export const SETTINGS = Object.freeze({
   maxResults: 5,
   minPaired: 8,
   minCoverage: 0.75,
-  minScore: 0.70,
+  minScore: 0.80,
   maxNotes: 64,
   minNotes: 8,
 });

@@ -74,6 +74,11 @@ async function search(query, solos, token) {
 
 self.addEventListener('message', async event => {
   const { type, requestId, sessionId, payload } = event.data || {};
+  if (type === 'prepare') {
+    corpusPromise ??= loadCorpus().catch(error => { corpusPromise = null; throw error; });
+    await corpusPromise.catch(() => {});
+    return;
+  }
   if (type === 'cancel') {
     if (activeRequest?.sessionId === sessionId) activeRequest.cancelled = true;
     return;

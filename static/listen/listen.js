@@ -6,14 +6,14 @@ const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<
 const formatTime=seconds=>`${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(Math.floor(seconds%60)).padStart(2,'0')}`;
 const pitchName=n=>`${['C','C♯','D','E♭','E','F','F♯','G','A♭','A','B♭','B'][((n%12)+12)%12]}${Math.floor(n/12)-1}`;
 const INSTRUMENTS={ts:'Tenor sax',as:'Alto sax',ss:'Soprano sax',bs:'Baritone sax',tp:'Trumpet',tb:'Trombone',cl:'Clarinet',p:'Piano',g:'Guitar',vib:'Vibraphone',b:'Bass',fl:'Flute',cor:'Cornet',bcl:'Bass clarinet',voc:'Voice'};
-const state={mode:'idle',sessionId:0,requestId:0,capture:null,transcriber:null,liveTracker:null,searcher:null,notes:[],liveNotes:[],results:[],debugData:{},ticker:null,liveTicker:null,inFlight:false,pending:false,finishing:false,pendingRequests:new Set(),liveStarted:0,lastWindow:0,lastSupported:0,stable:null,candidateResult:null,candidateCount:0,trigger:null,progressStage:null,phraseRevision:0};
+const state={mode:'idle',sessionId:0,requestId:0,capture:null,transcriber:null,liveTracker:null,searcher:null,sourceInput:null,notes:[],liveNotes:[],results:[],debugData:{},ticker:null,liveTicker:null,inFlight:false,pending:false,finishing:false,pendingRequests:new Set(),liveStarted:0,lastWindow:0,lastSupported:0,stable:null,candidateResult:null,candidateCount:0,trigger:null,progressStage:null,phraseRevision:0};
 const debugEnabled=new URLSearchParams(location.search).has('listenDebug');
 $('listen-debug').hidden=!debugEnabled;
 function updateDebug(patch){if(!debugEnabled)return;Object.assign(state.debugData,patch);$('listen-debug-text').textContent=JSON.stringify(state.debugData,null,2)}
 
-function setStatus(message,mode=state.mode){state.mode=mode;dialog.dataset.mode=mode;$('listen-status').textContent=message;const active=mode==='recording'||mode==='live';$('listen-stop').hidden=!active;$('listen-cancel').hidden=!['requesting-permission','recording','live','transcribing','searching'].includes(mode);const controls=document.querySelector('.listen-controls');controls.hidden=[...controls.querySelectorAll('button')].every(button=>button.hidden);$('listen-record').disabled=active;$('listen-example').disabled=active;$('listen-file').disabled=active;if(mode!=='transcribing'&&mode!=='searching')hideProgress()}
+function setStatus(message,mode=state.mode){state.mode=mode;dialog.dataset.mode=mode;$('listen-status').textContent=message;const active=mode==='recording'||mode==='live';$('listen-stop').hidden=!active;$('listen-cancel').hidden=!['requesting-permission','recording','live','transcribing','searching'].includes(mode);const controls=document.querySelector('.listen-controls');controls.hidden=[...controls.querySelectorAll('button')].every(button=>button.hidden);$('listen-record').disabled=active;$('listen-example').disabled=active;$('listen-file').disabled=active;$('listen-refine').disabled=active||mode==='transcribing'||mode==='searching';if(mode!=='transcribing'&&mode!=='searching')hideProgress()}
 function hideProgress(){$('listen-progress').hidden=true;state.progressStage=null}
-function showProgress(stage,fraction=null){const names={preparing:'Preparing audio…',loading:'Loading the note model…',transcribing:'Transcribing your phrase…','loading-corpus':'Opening the archive…',searching:'Comparing passages…'};const label=names[stage]||names.preparing;$('listen-progress').hidden=false;if(state.progressStage!==stage){state.progressStage=stage;$('listen-progress-step').textContent=label}const track=$('listen-progress-track');if(stage==='transcribing'&&Number.isFinite(fraction)){const percent=Math.max(0,Math.min(100,Math.round(fraction*100)));track.setAttribute('aria-valuenow',String(percent));$('listen-progress-fill').style.width=`${percent}%`;$('listen-progress-percent').textContent=`${percent}%`}else{track.removeAttribute('aria-valuenow');$('listen-progress-fill').style.width='';$('listen-progress-percent').textContent=''}}
+function showProgress(stage,fraction=null){const names={preparing:'Preparing audio…',loading:'Loading the detailed note model…',transcribing:'Detecting your notes…','loading-corpus':'Opening the archive…',searching:'Comparing passages…'};const label=names[stage]||names.preparing;$('listen-progress').hidden=false;if(state.progressStage!==stage){state.progressStage=stage;$('listen-progress-step').textContent=label}const track=$('listen-progress-track');if(stage==='transcribing'&&Number.isFinite(fraction)){const percent=Math.max(0,Math.min(100,Math.round(fraction*100)));track.setAttribute('aria-valuenow',String(percent));$('listen-progress-fill').style.width=`${percent}%`;$('listen-progress-percent').textContent=`${percent}%`}else{track.removeAttribute('aria-valuenow');$('listen-progress-fill').style.width='';$('listen-progress-percent').textContent=''}}
 function fail(error){const message=error instanceof Error?error.message:String(error);setStatus(message||'Something went wrong. Please try again.','error')}
 function meter(level){const value=Math.max(0,Math.min(100,Math.round((typeof level==='number'?level:level?.rms||0)*500)));$('listen-level').style.width=value+'%';document.querySelector('.listen-meter').setAttribute('aria-valuenow',String(value))}
 function elapsed(){return (performance.now()-state.liveStarted)/1000}
@@ -21,8 +21,8 @@ function timer(){$('listen-time').textContent=formatTime(elapsed())}
 function clearTimers(){clearInterval(state.ticker);clearInterval(state.liveTicker);state.ticker=null;state.liveTicker=null}
 function stopPlayback(){window.StolenMoments?.stopPlayback?.()}
 async function closeCapture(){const capture=state.capture;state.capture=null;if(capture)await capture.close();meter(0)}
-async function cancelWork(){state.sessionId++;clearTimers();state.inFlight=false;state.pending=false;for(const reject of state.pendingRequests)reject(new Error('Analysis cancelled.'));state.pendingRequests.clear();await closeCapture();state.transcriber?.terminate();state.liveTracker?.terminate();state.searcher?.terminate();state.transcriber=null;state.liveTracker=null;state.searcher=null}
-function clearPhrase(){state.phraseRevision++;stopPlayback();state.notes=[];state.liveNotes=[];state.results=[];state.stable=null;state.candidateResult=null;state.candidateCount=0;state.lastSupported=0;$('listen-note-preview').hidden=true;$('listen-your-score').replaceChildren();$('listen-preview-details').open=true;$('listen-note-summary').textContent='';$('listen-note-names').textContent='';$('listen-result-list').innerHTML='<p class="listen-empty">No passage has been searched yet.</p>';$('listen-result-count').textContent='';document.querySelector('.listen-results').hidden=true;hideProgress()}
+async function cancelWork({keepSearch=false}={}){const previousSession=state.sessionId++;clearTimers();state.inFlight=false;state.pending=false;for(const reject of state.pendingRequests)reject(new Error('Analysis cancelled.'));state.pendingRequests.clear();await closeCapture();state.transcriber?.terminate();state.transcriber=null;if(keepSearch){state.searcher?.postMessage({type:'cancel',sessionId:previousSession})}else{state.liveTracker?.terminate();state.searcher?.terminate();state.liveTracker=null;state.searcher=null}}
+function clearPhrase(){state.phraseRevision++;stopPlayback();state.sourceInput=null;state.notes=[];state.liveNotes=[];state.results=[];state.stable=null;state.candidateResult=null;state.candidateCount=0;state.lastSupported=0;$('listen-note-preview').hidden=true;$('listen-refine').hidden=true;$('listen-your-score').replaceChildren();$('listen-preview-details').open=true;$('listen-note-summary').textContent='';$('listen-note-names').textContent='';$('listen-result-list').innerHTML='<p class="listen-empty">No passage has been searched yet.</p>';$('listen-result-count').textContent='';document.querySelector('.listen-results').hidden=true;hideProgress()}
 async function reset(){await cancelWork();clearPhrase();state.debugData={};updateDebug({});$('listen-time').textContent='00:00';setStatus('Ready when you are.','idle')}
 
 function workerRequest(worker,type,payload,sessionId,transfer=[]){
@@ -39,34 +39,45 @@ function workerRequest(worker,type,payload,sessionId,transfer=[]){
   });
 }
 function modelWorker(){return state.transcriber??=new Worker(new URL('./assets/transcription-worker.bundle.js?v=cpu-3',import.meta.url))}
-function liveWorker(){return state.liveTracker??=new Worker(new URL('./live-pitch-worker.js',import.meta.url),{type:'module'})}
-function searchWorker(){return state.searcher??=new Worker(new URL('./retrieval-worker.js',import.meta.url),{type:'module'})}
+function liveWorker(){return state.liveTracker??=new Worker(new URL('./live-pitch-worker.js?v=2',import.meta.url),{type:'module'})}
+function searchWorker(){return state.searcher??=new Worker(new URL('./retrieval-worker.js?v=2',import.meta.url),{type:'module'})}
 function normalizedNotes(notes,durationSeconds){return notes.map((n,i)=>({pitch:n.pitch,onsetSeconds:n.onsetSeconds??n.onset,durationSeconds:n.durationSeconds??n.duration,confidence:n.confidence??null,originalIndex:n.originalIndex??i})).filter(n=>Number.isInteger(n.pitch)&&Number.isFinite(n.onsetSeconds)&&Number.isFinite(n.durationSeconds)&&n.onsetSeconds>=0&&n.onsetSeconds<durationSeconds&&n.durationSeconds>0).map(n=>({...n,durationSeconds:Math.min(n.durationSeconds,durationSeconds-n.onsetSeconds)})).sort((a,b)=>a.onsetSeconds-b.onsetSeconds).slice(-64)}
-async function analyse(input,sessionId,{live=false,source='microphone'}={}){
+async function analyse(input,sessionId,{live=false,source='microphone',detailed=false}={}){
   if(sessionId!==state.sessionId)return;
-  if(!live){setStatus('Preparing audio…','transcribing');showProgress('preparing')}
+  if(!live){setStatus(detailed?'Refining note detection…':'Detecting your notes…','transcribing');showProgress('preparing')}
   const {pcm,sampleRate,durationSeconds}=input;
+  if(!live&&!detailed)state.sourceInput={pcm,sampleRate,durationSeconds,source};
   if(durationSeconds<2)throw new Error('Play for at least two seconds.');
   let peak=0,sum=0;for(let i=0;i<pcm.length;i++){const v=Math.abs(pcm[i]);peak=Math.max(peak,v);sum+=v*v}
   if(peak<.003&&Math.sqrt(sum/pcm.length)<.001)throw new Error('No clear sound detected. Try playing closer to the microphone.');
   const copy=new Float32Array(pcm);
-  const transcription=await workerRequest(modelWorker(),'transcribe',{pcm:copy,sampleRate},sessionId,[copy.buffer]);
+  const transcription=await workerRequest(detailed?modelWorker():liveWorker(),detailed?'transcribe':'transcribe-recorded',{pcm:copy,sampleRate},sessionId,[copy.buffer]);
   if(sessionId!==state.sessionId)return;
-  updateDebug({backend:transcription.backend,model:'@spotify/basic-pitch 1.0.1',rawNoteCount:transcription.rawNoteCount,retainedNoteCount:transcription.retainedNoteCount,transcriptionTimings:transcription.timings,sessionId});
+  updateDebug({backend:transcription.backend,model:detailed?'@spotify/basic-pitch 1.0.1':'fast monophonic tracker',rawNoteCount:transcription.rawNoteCount,retainedNoteCount:transcription.retainedNoteCount,transcriptionTimings:transcription.timings,sessionId});
   const notes=normalizedNotes(transcription.notes||[],durationSeconds);state.notes=notes;
   $('listen-note-preview').hidden=false;
-  $('listen-note-summary').textContent=(notes.length?`${notes.length} notes detected.`:'No distinct notes found in this recording.')+(transcription.retainedNoteCount>64?' Searching the latest 64 notes.':'')+(transcription.clipping?' Recording clipped; try a lower input level.':'');
+  $('listen-refine').hidden=detailed;
+  $('listen-note-summary').textContent=(notes.length?`${notes.length} notes detected${detailed?' with detailed analysis':''}.`:'No distinct notes found in this recording.')+(transcription.retainedNoteCount>64?' Searching the latest 64 notes.':'')+(transcription.clipping?' Recording clipped; try a lower input level.':'');
   $('listen-note-names').textContent=notes.length?notes.map(n=>pitchName(n.pitch)).join(' · '):'';
   $('listen-play-detected').disabled=!notes.length;
   renderScore($('listen-your-score'),notes,'Your phrase');
-  if(notes.length<8){if(!live){setStatus('Play a longer, clearer phrase with at least eight notes.','empty');renderResults([])}return}
+  if(notes.length<8){if(!live){setStatus(detailed?'Play a longer, clearer phrase with at least eight notes.':'Too few clear notes for a quick match. Try detailed detection.','empty');renderResults([])}return}
   if(!live){setStatus('Looking through the archive…','searching');showProgress('searching')}
-  const result=await workerRequest(searchWorker(),'search',{schemaVersion:1,requestId:state.requestId+1,source,audioDurationSeconds:durationSeconds,notes},sessionId);
+  let result=await workerRequest(searchWorker(),'search',{schemaVersion:1,requestId:state.requestId+1,source,audioDurationSeconds:durationSeconds,notes},sessionId);
   if(sessionId!==state.sessionId)return;
+  // A long capture may contain more than one phrase. If the whole line does
+  // not match, try its latest complete 16-note window and show that window.
+  if(!live&&!detailed&&!result.results?.length&&notes.length>16){
+    const latest=notes.slice(-16),offset=latest[0].onsetSeconds;
+    const phrase=latest.map(note=>({...note,onsetSeconds:note.onsetSeconds-offset}));
+    result=await workerRequest(searchWorker(),'search',{schemaVersion:1,requestId:state.requestId+1,source,audioDurationSeconds:durationSeconds-offset,notes:phrase},sessionId);
+    if(sessionId!==state.sessionId)return;
+    if(result.results?.length){state.notes=phrase;$('listen-note-summary').textContent=`${notes.length} notes detected. Comparing the latest 16 notes.`;$('listen-note-names').textContent=phrase.map(note=>pitchName(note.pitch)).join(' · ');renderScore($('listen-your-score'),phrase,'Your phrase')}
+  }
   updateDebug({algorithmVersion:result.algorithmVersion,candidateCount:result.candidateCount,searchTimings:result.timings,queryNoteCount:result.queryNoteCount,requestId:state.requestId});
   renderResults(result.results||[],{live});
   if(!live&&result.results?.length)$('listen-preview-details').open=false;
-  if(!live)setStatus(result.results?.length?'Closest passages are ready.':'No convincing match found. Try a longer phrase. ',result.results?.length?'results':'empty');
+  if(!live)setStatus(result.results?.length?'Closest passages are ready.':detailed?'No convincing match found. Try a longer phrase.':'No quick match found. Try detailed detection.',result.results?.length?'results':'empty');
 }
 function recordingURL(result){const rec=result.recording;if(!rec?.videoId)return null;const url=new URL('https://www.youtube.com/watch');url.searchParams.set('v',rec.videoId);if(Number.isFinite(result.recordingTimeSeconds))url.searchParams.set('t',`${Math.floor(result.recordingTimeSeconds)}s`);return url.href}
 function renderResults(results,{live=false}={}){
@@ -84,7 +95,7 @@ function renderResults(results,{live=false}={}){
   document.querySelector('.listen-results').hidden=false;
   $('listen-result-count').textContent=results.length?`${results.length} shown`:'';
   if(!results.length){$('listen-result-list').innerHTML=`<p class="listen-empty">${live?'Listening for a clear phrase…':state.notes.length<8?'Play at least eight clear notes to search the archive.':'No close passage found. Try a longer or clearer phrase.'}</p>`;return}
-  $('listen-result-list').innerHTML=results.map((r,i)=>{const url=recordingURL(r),kind=({verified:'Verified recording',aligned:'Aligned recording',estimated:'Likely recording',candidate:'Unverified recording'})[r.recording?.kind]||'Source recording';const at=Number.isFinite(r.recordingTimeSeconds)?` at ${formatTime(r.recordingTimeSeconds)}`:'';const stable=live&&i===0&&state.stable===r.soloId?'<span class="listen-stable"> · steady match</span>':'';const instrument=INSTRUMENTS[r.instrument]||r.instrument||'solo',title=`${r.performer} · ${r.title}`;const recordingLink=url?`<a class="listen-recording-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" aria-label="Open recording of ${escapeHTML(title)} in a new tab" title="Open recording"><span aria-hidden="true">↗</span></a>`:'';return `<article class="listen-result"><div class="listen-result-head"><h4><span>${escapeHTML(title)}</span>${recordingLink}</h4><strong>${Math.round(r.score*100)}% pattern similarity${stable}</strong></div><p class="listen-result-meta">${r.pairedNotes} matched notes · ${r.transpositionSemitones>0?'+':''}${r.transpositionSemitones} semitones · ${escapeHTML(instrument)} · ${url?escapeHTML(kind+at):'No matched recording'}</p><div class="listen-compare" id="listen-compare-${i}">${comparison(r,i)}</div></article>`}).join('');results.forEach((_,i)=>renderPairScores(i))}
+  $('listen-result-list').innerHTML=results.map((r,i)=>{const url=recordingURL(r),kind=({verified:'Verified recording',aligned:'Aligned recording',estimated:'Likely recording',candidate:'Unverified recording'})[r.recording?.kind]||'Source recording';const at=Number.isFinite(r.recordingTimeSeconds)?` at ${formatTime(r.recordingTimeSeconds)}`:'';const stable=live&&i===0&&state.stable===r.soloId?'<span class="listen-stable"> · steady match</span>':'';const instrument=INSTRUMENTS[r.instrument]||r.instrument||'solo',title=`${r.performer} · ${r.title}`;const recordingLink=url?`<button type="button" class="listen-recording-link" data-youtube-url="${escapeHTML(url)}" data-video-title="${escapeHTML(title)}" aria-label="Play recording of ${escapeHTML(title)}" title="Play recording"><span aria-hidden="true">▶</span></button>`:'';return `<article class="listen-result"><div class="listen-result-head"><h4><span>${escapeHTML(title)}</span>${recordingLink}</h4><strong>${Math.round(r.score*100)}% pattern similarity${stable}</strong></div><p class="listen-result-meta">${r.pairedNotes} matched notes · ${r.transpositionSemitones>0?'+':''}${r.transpositionSemitones} semitones · ${escapeHTML(instrument)} · ${url?escapeHTML(kind+at):'No matched recording'}</p><div class="listen-compare" id="listen-compare-${i}">${comparison(r,i)}</div></article>`}).join('');results.forEach((_,i)=>renderPairScores(i))}
 function setPlayButton(button,mode){if(!button.isConnected)return;const original=button.dataset.playLabel??button.getAttribute('aria-label');button.dataset.playLabel=original;button.dataset.playMode=mode;button.dataset.playing=String(mode==='playing');button.querySelector('[data-play-icon]').textContent=mode==='playing'?'❚❚':'▶';button.setAttribute('aria-label',mode==='playing'?original.replace(/^Play /,'Pause '):mode==='paused'?original.replace(/^Play /,'Resume '):original);button.title=button.getAttribute('aria-label')}
 async function playNotes(notes,button){if(!notes?.length||!button)return;const engine=window.StolenMoments;if(!engine?.playTranscript){$('listen-status').textContent='Note playback is unavailable in this browser.';return}const mode=engine.getPlaybackState(button);try{if(mode==='playing')await engine.pausePlayback();else if(mode==='paused')await engine.resumePlayback();else await engine.playTranscript(notes.map(n=>({pitch:n.pitch,onset:n.onsetSeconds??n.onset,duration:n.durationSeconds??n.duration})),{owner:button,onStateChange:next=>setPlayButton(button,next)})}catch{$('listen-status').textContent='Could not play the notes. Try again.';engine.stopPlayback()}}
 let abcLoad;
@@ -98,7 +109,7 @@ function comparison(r,index){
   return `<div class="listen-pair-split">${scoreSide('A','Your phrase',state.notes,'a',index)}${scoreSide('B',`${r.performer} · ${r.title}`,r.notes||[],'b',index)}</div>`;
 }
 
-async function begin(live){await cancelWork();clearPhrase();state.liveNotes=[];state.lastWindow=0;const sessionId=state.sessionId;state.liveStarted=performance.now();$('listen-time').textContent='00:00';setStatus('Waiting for microphone permission…','requesting-permission');try{state.capture=new CaptureSession({onLevel:meter});await state.capture.start();if(sessionId!==state.sessionId){await closeCapture();return}state.liveStarted=performance.now();setStatus(live?'Listening — gathering a phrase…':'Recording. Play a single-note phrase. ',live?'live':'recording');state.ticker=setInterval(timer,200);if(live){state.liveTicker=setInterval(()=>liveTick(sessionId),3000);setTimeout(()=>liveTick(sessionId),5000)}else state.liveTicker=setInterval(()=>{if(elapsed()>=20)finish()},500)}catch(error){await closeCapture();if(sessionId===state.sessionId)fail(error)}}
+async function begin(live){await cancelWork({keepSearch:true});clearPhrase();state.liveNotes=[];state.lastWindow=0;const sessionId=state.sessionId;state.liveStarted=performance.now();$('listen-time').textContent='00:00';setStatus('Waiting for microphone permission…','requesting-permission');try{state.capture=new CaptureSession({onLevel:meter});await state.capture.start();if(sessionId!==state.sessionId){await closeCapture();return}state.liveStarted=performance.now();setStatus(live?'Listening — gathering a phrase…':'Recording. Play a single-note phrase. ',live?'live':'recording');state.ticker=setInterval(timer,200);if(live){state.liveTicker=setInterval(()=>liveTick(sessionId),3000);setTimeout(()=>liveTick(sessionId),5000)}else state.liveTicker=setInterval(()=>{if(elapsed()>=20)finish()},500)}catch(error){await closeCapture();if(sessionId===state.sessionId)fail(error)}}
 async function liveTick(sessionId){
   if(sessionId!==state.sessionId||state.mode!=='live'||!state.capture)return;
   if(elapsed()>=300){await finish();return}
@@ -133,9 +144,9 @@ async function liveTick(sessionId){
   finally{state.inFlight=false;if(state.pending&&sessionId===state.sessionId){state.pending=false;setTimeout(()=>liveTick(sessionId),0)}else if(sessionId===state.sessionId&&state.mode==='live')$('listen-status').textContent='Listening for another phrase…'}
 }
 async function finish(){const live=state.mode==='live';if(!state.capture||state.finishing)return;state.finishing=true;clearTimers();const sessionId=state.sessionId;try{const input=await state.capture.stop();await closeCapture();if(live){await cancelWork();setStatus('Listening stopped. Your latest suggestions are shown.','results');return}await analyse(input,sessionId)}catch(error){if(sessionId===state.sessionId)fail(error)}finally{state.finishing=false}}
-async function fileInput(file,source='upload'){if(!file)return;await cancelWork();clearPhrase();const sessionId=state.sessionId;state.liveStarted=performance.now();if(file.size>20*1024*1024){fail(new Error('Choose an audio file smaller than 20 MB.'));return}setStatus('Opening your audio…','transcribing');showProgress('preparing');let context;try{context=new AudioContext();const buffer=await context.decodeAudioData(await file.arrayBuffer());if(buffer.duration>20)throw new Error('Choose a recording shorter than 20 seconds.');const mono=new Float32Array(buffer.length);for(let channel=0;channel<buffer.numberOfChannels;channel++){const data=buffer.getChannelData(channel);for(let i=0;i<data.length;i++)mono[i]+=data[i]/buffer.numberOfChannels}await context.close();context=null;await analyse({pcm:mono,sampleRate:buffer.sampleRate,durationSeconds:buffer.duration},sessionId,{source})}catch(error){if(sessionId===state.sessionId)fail(error)}finally{if(context)await context.close()}}
+async function fileInput(file,source='upload'){if(!file)return;await cancelWork({keepSearch:true});clearPhrase();const sessionId=state.sessionId;state.liveStarted=performance.now();if(file.size>20*1024*1024){fail(new Error('Choose an audio file smaller than 20 MB.'));return}setStatus('Opening your audio…','transcribing');showProgress('preparing');let context;try{context=new AudioContext();const buffer=await context.decodeAudioData(await file.arrayBuffer());if(buffer.duration>20)throw new Error('Choose a recording shorter than 20 seconds.');const mono=new Float32Array(buffer.length);for(let channel=0;channel<buffer.numberOfChannels;channel++){const data=buffer.getChannelData(channel);for(let i=0;i<data.length;i++)mono[i]+=data[i]/buffer.numberOfChannels}await context.close();context=null;await analyse({pcm:mono,sampleRate:buffer.sampleRate,durationSeconds:buffer.duration},sessionId,{source})}catch(error){if(sessionId===state.sessionId)fail(error)}finally{if(context)await context.close()}}
 async function example(){
-  await cancelWork();
+  await cancelWork({keepSearch:true});
   clearPhrase();
   const sessionId=state.sessionId,kind=$('listen-example-kind').value;
   setStatus('Preparing an archive phrase…','transcribing');
@@ -149,7 +160,7 @@ async function example(){
   }catch(error){if(sessionId===state.sessionId)fail(error)}
 }
 
-$('open-listen').addEventListener('click',async()=>{state.trigger=document.activeElement;dialog.showModal();await reset()});
+$('open-listen').addEventListener('click',async()=>{state.trigger=document.activeElement;dialog.showModal();await reset();searchWorker().postMessage({type:'prepare',requestId:0,sessionId:state.sessionId})});
 $('listen-close').addEventListener('click',()=>dialog.close());
 dialog.addEventListener('close',async()=>{await reset();state.trigger?.focus?.()});
 dialog.addEventListener('cancel',()=>{dialog.close()});
@@ -158,6 +169,7 @@ $('listen-stop').addEventListener('click',finish);
 $('listen-cancel').addEventListener('click',reset);
 $('listen-file').addEventListener('change',event=>{const file=event.target.files?.[0];event.target.value='';fileInput(file)});
 $('listen-example').addEventListener('click',example);
+$('listen-refine').addEventListener('click',async()=>{if(!state.sourceInput)return;try{await analyse(state.sourceInput,state.sessionId,{source:state.sourceInput.source,detailed:true})}catch(error){if(state.sourceInput)fail(error)}});
 $('listen-play-detected').addEventListener('click',event=>playNotes(state.notes,event.currentTarget));
 dialog.addEventListener('click',event=>{const play=event.target.closest('[data-listen-play]');if(play){const r=state.results[Number(play.dataset.index)];playNotes(play.dataset.listenPlay==='query'?state.notes:r?.notes||[],play)}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state.capture)finish()});
